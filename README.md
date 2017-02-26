@@ -1,5 +1,5 @@
 # node
-npm init -y
-npm install elasticsearch
-npm install log4js
-npm install express
+npm init -y <br />
+npm install elasticsearch <br />
+npm install log4js <br />
+npm install express <br />
