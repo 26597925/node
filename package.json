@@ -1,0 +1,26 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "npm init -y <br /> npm install elasticsearch <br /> npm install log4js <br /> npm install express <br />",
+  "main": "config.js",
+  "dependencies": {
+    "elasticsearch": "^12.1.3",
+    "log4js": "^1.1.0",
+    "log4node": "^0.1.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mazhou/node.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mazhou/node/issues"
+  },
+  "homepage": "https://github.com/mazhou/node#readme"
+}
