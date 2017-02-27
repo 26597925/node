@@ -1,38 +1,19 @@
 var http = require('http');
 var url = require('url');
+var log4js = require('log4js');
+var unit_date = require("./../js_unit/unit_date.js");
+var config = require("./../config.js");
 //exports MD----------------------------------------------
-function http_get_request_MD(){
-	
+var http_get_request=function (){
+	var logger = log4js.getLogger("httprequest");
+	logger.info("aaaaa");
 	//declear----------------------------------------------
 	var self = this;
-	self.offsetday = 6;//偏移的天数
+	self.offsetday = 0;//偏移的天数
 	self.iterate_id = 0;
 	self.iterate_list = [];
-	//date format----------------------------------------------
-	Date.prototype.Format = function(fmt) { // author: meizz
-		var o = {
-		"M+" : this.getMonth() + 1, // 月份
-		"d+" : this.getDate(), // 日
-		"H+" : this.getHours(), // 小时
-		"m+" : this.getMinutes(), // 分
-		"s+" : this.getSeconds(), // 秒
-		"q+" : Math.floor((this.getMonth() + 3) / 3), // 季度
-		"S" : this.getMilliseconds()
-		// 毫秒
-		};
-		if (/(y+)/.test(fmt))
-		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "")
-		.substr(4 - RegExp.$1.length));
-		for ( var k in o) {
-		if (new RegExp("(" + k + ")").test(fmt))
-		fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
-		: (("00" + o[k]).substr(("" + o[k]).length)));
-		}
-		return fmt;
-	}
-
+	self.g_callback = null;
 	//function----------------------------------------------
-
 	self.request_one_url = function(url,callback){
 		
 		http.get(url,function(res){
@@ -44,25 +25,29 @@ function http_get_request_MD(){
 				result += chunk;
 			});
 			res.on("end",function(){
-				callback(result,res.headers);
+				callback(result,url);
 			});
 		}).on("error",function(err){
-			callback("error>>>"+err.message);
+			callback("error>>>"+err.message,url);
 		})
 	}
 	
-	self.iterate_callback = function(result){
+	self.iterate_callback = function(result,url){
 		if(result.indexOf("error>>>")==0){
-
-		}else{
-			console.log(result.split("\n")[0].substr(0,200));
+			config.httprequest.error(url+"\n"+result);
+		}if(result.indexOf("404 Not Found")>=0){
+			config.httprequest.error(url+"\n"+"404 Not Found");
+		} else{
+			if(self.g_callback){
+				self.g_callback(result);
+			}
 		}
 
 		self.iterate_id++;
 		if(self.iterate_id==2){
 			return 0;
 		}else{
-			self.iterate_request_list()
+			self.iterate_request_list();
 		}
 	}
 
@@ -70,7 +55,7 @@ function http_get_request_MD(){
 		var parse_suffix = param.split("\t")[0];
 		var date = new Date();
 		date.setDate(date.getDate()-self.offsetday);
-		var yMd =date.Format("yyyy-MM-dd");
+		var yMd =unit_date.Format(date,"yyyy-MM-dd");
 		//http://106.39.244.172:443/2017-02-20-000001
 		console.log("http://106.39.244.172:443/"+yMd+"-"+parse_suffix);
 		return "http://106.39.244.172:443/"+yMd+"-"+parse_suffix;
@@ -80,7 +65,8 @@ function http_get_request_MD(){
 		self.request_one_url(self.rebuildurl( self.iterate_list[self.iterate_id]),self.iterate_callback);		
 	}
 
-	self.main=function(){
+	self.main=function(callback){
+		self.g_callback = callback;
 		self.request_one_url("http://111.206.211.60/code.txt",function(result){
 			if(result.indexOf("error>>>")==0){
 			}else{
@@ -92,33 +78,30 @@ function http_get_request_MD(){
 
 	self.test=function(){
 		// var date = new Date("2016-1-1");
-		var date = new Date();
-		date.setDate(date.getDate()-1);
-		var yMd =date.Format("yyyy-MM-dd");
-		console.log(yMd);
+		self.rebuildurl("aa");
+		
 	}
 
-	self.test2=function(){
+	self.test2=function(callback){
 		// self.request_one_url("http://111.206.211.60/code.txt",function(result){
 		// 	console.log(result.substring(20000,20200));
 		// })
-		// self.request_one_url("http://106.39.244.172:443/2017-02-20-300566",function(result){
-		// 	console.log(result.substring(0,100));
-		// })
-		self.request_one_url("http://106.39.244.172:443/2017-02-20-600000",function(result,head){
-			if(result.indexOf("404 Not Found")>=0){
-				console.log("not found");
-			}
+		self.request_one_url("http://106.39.244.172:443/2017-02-20-300566",function(result){
+			callback(result);
+			// console.log(result.substring(0,100));
 		})
+		// self.request_one_url("http://106.39.244.172:443/2017-02-20-600000",function(result,head){
+		// 	if(result.indexOf("404 Not Found")>=0){
+		// 		console.log("not found");
+		// 	}
+		// })
 	}
 }
-
-exports.http_get_request_MD = http_get_request_MD;
+module.exports = new http_get_request();
 
 //test---------------------------------
-
-var http_requestJS = require('./httprequest.js');
-var http_request =new http_requestJS.http_get_request_MD();
+// var http_requestJS = require('./httprequest.js');
+// var http_request =new http_requestJS.http_get_request_MD();
 // http_request.test();
-http_request.test2();
+// http_request.test2();
 // http_request.main();

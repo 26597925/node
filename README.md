@@ -7,3 +7,5 @@ npm install express <br />
 npm install nodemailer  <br />
 https://nodemailer.com/about/  <br />
 npm install node-schedule   <br />
+npm install phantomjs   <br />
+npm install ejs  <br />
