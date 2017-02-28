@@ -1,10 +1,12 @@
 var elasticsearch = require('elasticsearch');
 var unit_date = require("./../js_unit/unit_date.js");
 var config = require("./../config.js");
+var unit_string = require("./../js_unit/unit_string.js");
 
 var ReportESMD = function() {
 
 	var _root = this;
+	_root.debug = false;
 	_root._count = 0;
 	_root.data = {"body":[]};
 	_root.client = new elasticsearch.Client({
@@ -17,15 +19,16 @@ var ReportESMD = function() {
 		var field_arr = [];
 		var result_obj = {};
 		var result_arr=[]
+
 		for(var i = 0; i < line_arr.length; i++){
 			if(line_arr[i].length>0){
 				field_arr = line_arr[i].split("\t");
 				if(field_arr.length == 5){
-					result_obj.sorttime = line_arr[i][0];
-					result_obj.price = line_arr[i][1];
-					result_obj.amount = line_arr[i][2];
-					result_obj.delegatetype = line_arr[i][3];
-					result_obj.integrality = line_arr[i][4];
+					result_obj.sorttime = field_arr[0];
+					result_obj.price = field_arr[1];
+					result_obj.amount = field_arr[2];
+					result_obj.delegatetype = field_arr[3];
+					result_obj.integrality = unit_string.trim(field_arr[4]);
 					result_arr.push(result_obj);
 				}else{
 					config.es.error("date formate err \n",JSON.stringify(result_obj),"\n 时间  价格 数量 委托类型 完整性");
@@ -34,25 +37,53 @@ var ReportESMD = function() {
 		}
 		return result_arr;
 	}
+	_root.getSuffixName = function(){
+		var d = new Date();
+		var yMd =unit_date.Format(d,"yyyy-MM-dd");
+		var yMdArr = yMd.split("-");
 
-	_root.insertdata = function(param){
-		_root.data.body.push({
-			_index :"delegatetype",
-			_type :"delegatetype"
-		})
-
+		var yy = yMdArr[0];
+		var MM = yMdArr[1];
+		var dd = yMdArr[2];
+		
+		if(Math.ceil(dd/10)== 1){
+			return yy+"_"+MM+"_pre";
+		}else if(Math.ceil(dd/10 )== 2){
+			return yy+"_"+MM+"_mid";
+		}else{
+			return yy+"_"+MM+"_suf";
+		}
+	}
+	_root.insertdata = function(param,param2){
+		if(_root.debug){
+			_root.data.body.push({
+				"index":{
+					_index :"delegatetype_test"+_root.getSuffixName(),
+					_type :unit_date.Format(new Date(),"yyyy-MM-dd"),
+					_id :param2
+				}
+			})
+		}else{
+			_root.data.body.push({
+				_index :"delegatetype_"+_root.getSuffixName(),
+				_type :unit_date.Format(new Date(),"yyyy-MM-dd"),
+				_id :param2
+			})
+		}
 		_root.data.body.push({
 			time:unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss.S")
 			,list:_root.parseTableBody(param)});
-		// config.es.info(_root.data);
+		
 		_root.client.bulk(_root.data, function (err, resp) {
-			config.es.error(err, resp);
+			config.es.error(JSON.stringify(err), JSON.stringify(resp));
 		});
 
 		_root.data.body = [];
 	}
 
 	_root.test=function(){
+
+		
 		// // ==>>DEPRECATE======
 		_root.client.index({
 			index : "mz_test_index",
