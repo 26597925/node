@@ -8,7 +8,7 @@ var config = require("./../config.js");
 var http_get_request=function (){
 	//declear----------------------------------------------
 	var self = this;
-	self.offsetday = 1;//偏移的天数,0为今天，1为昨天
+	self.offsetday = 0;//偏移的天数,0为今天，1为昨天
 	self.iterate_id = 0;
 	self.iterate_list = [];
 	self.g_callback = null;

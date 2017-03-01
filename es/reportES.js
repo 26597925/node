@@ -6,7 +6,7 @@ var unit_string = require("./../js_unit/unit_string.js");
 var ReportESMD = function() {
 
 	var _root = this;
-	_root.offsetday = 1;
+	_root.offsetday = 0;
 	_root.debug = false;
 	_root.debug2 = false;
 	_root._count = 0;
@@ -16,7 +16,7 @@ var ReportESMD = function() {
 	_root.init=function(){
 		
 	}
-	
+
 	_root.insertTime = function(){
 		var date = new Date();
 		date.setDate(date.getDate()-_root.offsetday);
@@ -107,11 +107,13 @@ var ReportESMD = function() {
 			}
 		);
 		// console.log(JSON.stringify(_root.data).substring(0,200));
+
 		_root.client.bulk(_root.data, function (err, resp) {
 			
 			if(err){
 				config.es.error(">>>",JSON.stringify(err).substring(0,200));
 			}
+			
 			debugger;
 			_root.data.body = [];
 			_root.insertCallBack();
