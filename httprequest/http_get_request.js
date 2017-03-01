@@ -6,7 +6,6 @@ var unit_string = require("./../js_unit/unit_string.js");
 var config = require("./../config.js");
 //exports MD----------------------------------------------
 var http_get_request=function (){
-	
 	//declear----------------------------------------------
 	var self = this;
 	self.offsetday = 1;//偏移的天数,0为今天，1为昨天
@@ -50,20 +49,17 @@ var http_get_request=function (){
 			config.httprequest.error(url+"\n"+"404 Not Found");
 			self.callNextUrl();
 		} else{
-			
 			if(self.g_callback){
 				self.g_callback(result,param,self.callNextUrl);
 			}
 		}
-
-		// 
-		
 	}
 
 	self.callNextUrl = function(){
 		self.iterate_id++;
 		if(self.iterate_id　>= self.iterate_list.length){
 			config.httprequest.info("\n>>>>>>>>>>>>>>>>>>over\n");
+			process.exit();
 		}else{
 			self.iterate_request_list();
 		}
@@ -82,11 +78,7 @@ var http_get_request=function (){
 				break;
 			}
 		}
-		// console.log(self.iterate_list[self.iterate_id])
-		// console.log(self.iterate_list[self.iterate_id-1])
-		// console.log(self.iterate_list[self.iterate_id-2])
-		// console.log(parse_suffix);
-		// debugger;
+		
 		var date = new Date();
 		date.setDate(date.getDate()-self.offsetday);
 		var yMd =unit_date.Format(date,"yyyy-MM-dd");
@@ -111,6 +103,7 @@ var http_get_request=function (){
 	}
 
 	self.main=function(callback){
+		config.httprequest.info("\n>>>>>>>>>>>>>>>>>>main\n");
 		self.init();
 		self.g_callback = callback;
 		
