@@ -9,7 +9,7 @@ var http_get_request=function (){
 	
 	//declear----------------------------------------------
 	var self = this;
-	self.offsetday = 1;//偏移的天数,1为今天，2为昨天
+	self.offsetday = 1;//偏移的天数,0为今天，1为昨天
 	self.iterate_id = 0;
 	self.iterate_list = [];
 	self.g_callback = null;
@@ -19,6 +19,7 @@ var http_get_request=function (){
 		if( (unit_string.trim(url)).length < 4 ){
 			callback("error>>>"+err.message,url);
 		}else{
+			console.log("http_get_request",url);
 			http.get(url,function(res){
 				// console.log("Got response: " + res.statusCode);
 		  		// console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -44,31 +45,49 @@ var http_get_request=function (){
 	self.iterate_callback = function(result,url,param){
 		if(result.indexOf("error>>>")==0){
 			config.httprequest.error(url+"\n"+result);
+			self.callNextUrl();
 		}if(result.indexOf("404 Not Found")>=0){
 			config.httprequest.error(url+"\n"+"404 Not Found");
+			self.callNextUrl();
 		} else{
 			
 			if(self.g_callback){
-				self.g_callback(result,param);
+				self.g_callback(result,param,self.callNextUrl);
 			}
 		}
+
+		// 
 		
+	}
+
+	self.callNextUrl = function(){
 		self.iterate_id++;
 		if(self.iterate_id==self.iterate_list.length){
+			config.httprequest.info("\n>>>>>>>>>>>>>>>>>>over\n");
 			return 0;
 		}else{
 			self.iterate_request_list();
 		}
 	}
 
-	self.rebuildurl=function(param){
-		var parse_suffix = param.split("\t")[0];
-		
-		if(parse_suffix.indexOf("6")==0){
-			self.iterate_id++;
-			self.rebuildurl( self.iterate_list[self.iterate_id]);
+	self.rebuildurl=function(){
+		var parse_suffix;
+		// debugger;
+		while(self.iterate_id < self.iterate_list.length)
+		{
+			parse_suffix = self.iterate_list[self.iterate_id].split("\t")[0];
+			if(parse_suffix.indexOf("6")==0){
+				self.iterate_id++;
+				continue;
+			}else{
+				break;
+			}
 		}
-		var parse_suffix1 = param.split("\t")[1];
+		// console.log(self.iterate_list[self.iterate_id])
+		// console.log(self.iterate_list[self.iterate_id-1])
+		// console.log(self.iterate_list[self.iterate_id-2])
+		// console.log(parse_suffix);
+		// debugger;
 		var date = new Date();
 		date.setDate(date.getDate()-self.offsetday);
 		var yMd =unit_date.Format(date,"yyyy-MM-dd");
@@ -79,12 +98,23 @@ var http_get_request=function (){
 	}
 	
 	self.iterate_request_list=function(){
-		var urlparse = self.rebuildurl( self.iterate_list[self.iterate_id]);
-		self.request_one_url(urlparse.url,self.iterate_callback,urlparse.name);
+		var urlparse = self.rebuildurl( );
+		if(urlparse && urlparse.url){
+			config.httprequest.info(urlparse.url);
+			self.request_one_url(urlparse.url,self.iterate_callback,urlparse.name);
+		}
+	}
+
+	self.init=function(){
+		self.iterate_id = 0;
+		self.iterate_list = [];
+		self.g_callback = null;
 	}
 
 	self.main=function(callback){
 		self.g_callback = callback;
+		self.init();
+
 		self.request_one_url("http://111.206.211.60/code.txt",function(result){
 			if(result.indexOf("error>>>")==0){
 				config.httprequest.error("http://111.206.211.60/code.txt+\n"+result);
@@ -97,8 +127,10 @@ var http_get_request=function (){
 
 	self.test=function(){
 		// var date = new Date("2016-1-1");
-		self.rebuildurl("aa");
-		
+		var date = new Date();
+		date.setDate(date.getDate()-self.offsetday);
+		var yMd =unit_date.Format(date,"yyyy-MM-dd");
+		console.log(yMd);
 	}
 
 	self.test2=function(callback){
@@ -119,8 +151,7 @@ var http_get_request=function (){
 module.exports = new http_get_request();
 
 //test---------------------------------
-// var http_requestJS = require('./httprequest.js');
-// var http_request =new http_requestJS.http_get_request_MD();
+// var http_request = require('./http_get_request.js');
 // http_request.test();
 // http_request.test2();
 // http_request.main();

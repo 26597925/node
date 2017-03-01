@@ -12,7 +12,11 @@ var ReportESMD = function() {
 	_root._count = 0;
 	_root.insertCallBack = null;
 	_root.data = {"body":[]};
-
+	
+	_root.init=function(){
+		
+	}
+	
 	_root.insertTime = function(){
 		var date = new Date();
 		date.setDate(date.getDate()-_root.offsetday);
