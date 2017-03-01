@@ -19,7 +19,7 @@ var http_get_request=function (){
 		if( (unit_string.trim(url)).length < 4 ){
 			callback("error>>>"+err.message,url);
 		}else{
-			console.log("http_get_request",url);
+			config.httprequest.info("url:",url);
 			http.get(url,function(res){
 				// console.log("Got response: " + res.statusCode);
 		  		// console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -62,9 +62,8 @@ var http_get_request=function (){
 
 	self.callNextUrl = function(){
 		self.iterate_id++;
-		if(self.iterate_id==self.iterate_list.length){
+		if(self.iterate_id　>= self.iterate_list.length){
 			config.httprequest.info("\n>>>>>>>>>>>>>>>>>>over\n");
-			return 0;
 		}else{
 			self.iterate_request_list();
 		}
@@ -100,7 +99,7 @@ var http_get_request=function (){
 	self.iterate_request_list=function(){
 		var urlparse = self.rebuildurl( );
 		if(urlparse && urlparse.url){
-			config.httprequest.info(urlparse.url);
+			
 			self.request_one_url(urlparse.url,self.iterate_callback,urlparse.name);
 		}
 	}
