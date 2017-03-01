@@ -9,8 +9,7 @@ var reportES = require("./es/reportES.js");
 // http_requestJS.offsetday = reportES.offsetday = 2;
 
 var http_get_result=function(result,param,callback){
-	console.log("main"+param)
-    reportES.insertdata(result,param,callback);
+	reportES.insertdata(result,param,callback);
 }
 
 var rule = new schedule.RecurrenceRule();
