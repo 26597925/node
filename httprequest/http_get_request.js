@@ -112,9 +112,9 @@ var http_get_request=function (){
 	}
 
 	self.main=function(callback){
-		self.g_callback = callback;
 		self.init();
-
+		self.g_callback = callback;
+		
 		self.request_one_url("http://111.206.211.60/code.txt",function(result){
 			if(result.indexOf("error>>>")==0){
 				config.httprequest.error("http://111.206.211.60/code.txt+\n"+result);
