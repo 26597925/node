@@ -25,12 +25,23 @@ var unit_date = function()
 		return fmt;
 	}
 
+	this.sortTime = function(date_str){
+		var _date = new Date("1970-1-1 0:0:0");
+		var _date2;
+		if(date_str){
+			_date2 = new Date(date_str);
+		}
+		return _date2.getTime() - _date.getTime();
+	}
+
 	this.test=function()
 	{
 		var _d = new Date("2016-2-12 2:4:45");
 		console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
 		var _d = new Date();
 		console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
+		console.log(this.sortTime("2016-2-12 2:4:45"));
+		console.log(">>>",JSON.stringify({aa:0,bb:1}).substring(0,200));
 	}
 	
 }
