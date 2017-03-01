@@ -19,6 +19,7 @@ var http_get_request=function (){
 			callback("error>>>"+err.message,url);
 		}else{
 			config.httprequest.info("url:",url);
+			console.log("url:",url);
 			http.get(url,function(res){
 				// console.log("Got response: " + res.statusCode);
 		  		// console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -59,7 +60,7 @@ var http_get_request=function (){
 		self.iterate_id++;
 		if(self.iterate_id　>= self.iterate_list.length){
 			config.httprequest.info("\n>>>>>>>>>>>>>>>>>>over\n");
-			process.exit();
+			
 		}else{
 			self.iterate_request_list();
 		}
