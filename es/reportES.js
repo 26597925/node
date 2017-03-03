@@ -52,12 +52,10 @@ var ReportESMD = function() {
 		}
 		return result_arr;
 	}
-	_root.getSuffixName = function(date_str){
-		var d = new Date();
-		if(date_str){
-			d = new Date(date_str);
-		}
-		var yMd =unit_date.Format(d,"yyyy-MM-dd");
+	_root.getSuffixName = function(){
+		var date = new Date();
+		date.setDate(date.getDate()-_root.offsetday);
+		var yMd =unit_date.Format(date,"yyyy-MM-dd");
 		var yMdArr = yMd.split("-");
 
 		var yy = yMdArr[0];
@@ -83,24 +81,16 @@ var ReportESMD = function() {
 					_id :param2
 				}
 			})
-		}else if(_root.debug2){
-			var d_str = "2017-02-28";
+		}else{
 			_root.data.body.push({
 				"index":{
-					_index: "delegatetype"+_root.getSuffixName(d_str),
+					_index: "delegatetype"+_root.getSuffixName(),
 					_type: _root.insertTime(),
 					_id: param2
 				}
 			})
-			
-		}else{
-			_root.data.body.push({
-				_index :"delegatetype"+_root.getSuffixName(),
-				_type :unit_date.Format(new Date(),"yyyy-MM-dd"),
-				_id :param2
-			})
 		}
-		// console.log(JSON.stringify(_root.data));
+		
 		_root.data.body.push({
 				inserttime:unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss.S"),
 				list:_root.parseTableBody(param)
@@ -113,7 +103,6 @@ var ReportESMD = function() {
 			if(err){
 				config.es.error(">>>",JSON.stringify(err).substring(0,200));
 			}
-			
 			debugger;
 			_root.data.body = [];
 			_root.insertCallBack();
