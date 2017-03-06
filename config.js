@@ -44,6 +44,13 @@ var Config = function Config()
                 maxLogSize:80*1024*1024, 
                 backups:10
             }
+            ,{
+                category: 'webserver',
+                type: 'file',
+                filename: path.join(__dirname,'logs','webserver.log'),
+                maxLogSize:80*1024*1024, 
+                backups:10
+            }
         ],
         "replaceConsole":true,
         levels:{
@@ -60,6 +67,7 @@ var Config = function Config()
     this.httprequest = log4js.getLogger("httprequest");
     this.es = log4js.getLogger("es");
     this.console = log4js.getLogger("console");
+
     
     this.test = function(){
         // console.log(">>>"+__dirname);

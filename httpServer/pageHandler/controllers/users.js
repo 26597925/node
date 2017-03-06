@@ -1,11 +1,9 @@
 var util = require('util');
-var log4js = require('log4js');
-var config = require('../../config.js');
-log4js.configure(config.log4jConfig);
-var logger = log4js.getLogger("web");
-var db = require("../../DBManager.js");
+var path = require('path');
 var uuid = require('node-uuid');
-var sessions = require("./sessions.js");
+var db = require(path.join(__dirname,"..","web_DB_config.js"));
+var sessions = require(path.join(__dirname,"sessions.js"));
+console.log(uuid);
 
 exports.listAll = function(args){
     var thisObj = this;

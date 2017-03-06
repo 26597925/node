@@ -1,0 +1,43 @@
+<div class="box left">
+  <div>
+    <table class="cellspacing" style="margin:0 auto;">
+
+        <!--
+INSERT INTO `tb_user_basic` (`USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `ONLINE`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES
+(10000, 1, 'tester', '测试用户', '15810865503', 'ttttt', 'beijing chaoyang', '100016', 0, 1, 1, '2017-02-10 01:50:50', '0000-00-00 00:00:00', NULL),
+(20000, 2, 'test2', '正式用户', '12', '222222', 'beijing', '100016', 0, 1, 1, '2017-02-13 09:08:02', '0000-00-00 00:00:00', NULL);
+
+        -->
+        <tr>
+            <td>
+                用户名：
+            </td>
+            <td>
+                <input type="text" id="username" value="" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                密码：
+            </td>
+            <td>
+                <input type="password" id="password" value="" />
+				<a id="findpsw" style="font-size:11px;" href="#">找回密码</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center" valign="bottom">
+                <input type="button" id="login" value="登录" />
+				<input type="button" id="reset" value="重置" />
+
+            </td>
+        </tr>
+		<tr>
+            <td colspan="2" align="left">
+				<label id="message"><%- message %></label>
+			</td>
+		</tr>
+    </table>
+    
+  </div>
+</div>

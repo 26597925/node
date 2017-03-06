@@ -1,26 +1,23 @@
-var log4js = require('log4js');
-var web_DB_config = require("./web_DB_config.js");
 var http = require('http');
 var url = require("url");
 var path = require("path");
-var ejs = require('ejs');
 var fs = require("fs");
+var ejs = require('ejs');
 var querystring = require("querystring");
-var workDir = '../pageHandler';
-var mfm = require('./'+workDir+'/controllers/mainFrame');
-var config = require('./'+workDir+'/models/PageConfig');
-var route = require('./'+workDir+'/models/Route');
+
+var web_DB_config = require(path.join(__dirname,"web_DB_config.js"));
+var mfm = require(path.join(__dirname,'pageHandler','controllers','mainFrame.js'));
+
+// var config = require(path.join(__dirname,'pageHandler','models','PageConfig'));
+var route = require(path.join(__dirname,'pageHandler','models','Route'));
 
 var root = this;
 var workerList = new Array();
 
-log4js.configure(config.log4jConfig);
-var logger = log4js.getLogger("web");
 //*****pageHandler*****/
 exports.runPageServer = function( port )
 {
-	port = port || config.svrPort;
-	logger.info('Collector Server 127.0.0.1:'+ port );
+	port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 
 	var server = http.createServer(function(req, res){
@@ -35,13 +32,13 @@ exports.runPageServer = function( port )
 				var reqData;
 				if( "POST" == req.method.toUpperCase() )
 				{
-				if(req.headers.accept.indexOf('application/json')!=-1)
-				{
-				reqData = JSON.parse(_bufData);
-				}else
-				{
-				reqData = querystring.parse(_bufData);
-				}
+  				if(req.headers.accept.indexOf('application/json')!=-1)
+  				{
+  				  reqData = JSON.parse(_bufData);
+  				}else
+  				{
+  				  reqData = querystring.parse(_bufData);
+  				}
 				}
 				req.post = reqData;
 				handlerRequest(req, res);
@@ -50,7 +47,7 @@ exports.runPageServer = function( port )
 	}).listen(port);
 
 	//	setInterval(function(){sreadRedisHandler();},30);
-	logger.info('Collector Server 10.200.91.120:'+ port +'/'+ Date());
+	
 }
 
 /**
@@ -61,10 +58,10 @@ var handlerRequest = function(req, res){
     if(actionInfo.action){
         if( actionInfo.action != "querySummaryInfoData")
         {
-            logger.warn("actionInfo:"+actionInfo.action + " controller: " + actionInfo.controller);
+            console.log("actionInfo:"+actionInfo.action + " controller: " + actionInfo.controller);
         }
 
-        var controller = require('./'+workDir+'/controllers/'+actionInfo.controller);
+        var controller = require(path.join(__dirname,'pageHandler','controllers',actionInfo.controller));
         if(controller[actionInfo.action]){
             var ct = new controllerContext(req, res);
             controller[actionInfo.action].apply(ct, actionInfo.args);
@@ -72,7 +69,7 @@ var handlerRequest = function(req, res){
             handler500(req, res, 'Error: controller "' + actionInfo.controller + '" without action "' + actionInfo.action + '"')
         }
     }else{
-            staticFileServer (req, res);
+      staticFileServer (req, res);
     }
 };
 
@@ -105,15 +102,15 @@ controllerContext.prototype.responseDirect = function(status,content_type,data){
  */
 var viewEngine = {
 	render:function(req,res,viewNames,ctx){
-		var hfile = path.join(__dirname,workDir+'/views',viewNames[0]);
+		var hfile = path.join(__dirname,'pageHandler','views',viewNames[0]);
 		var templates = fs.readFileSync(hfile,'utf-8');
-		var jsfile = viewNames.length > 1 ? path.join(__dirname,'./'+workDir+'/views',viewNames[1]) : null;
+		var jsfile = viewNames.length > 1 ? path.join(__dirname,'pageHandler','views',viewNames[1]) : null;
 		var js = jsfile != null ? fs.readFileSync(jsfile,'utf-8') : '';
 	
 	// Use ejs render views
 	  try{
 			var content = ejs.render(templates,ctx);
-			var layout = fs.readFileSync(path.join(__dirname,'./'+workDir+'/views','layout.html'),'utf-8');
+			var layout = fs.readFileSync(path.join(__dirname,'pageHandler','views','layout.html'),'utf-8');
 	    var output = ejs.render(layout,{script:js,body:content});
 	    res.writeHead(200,{'Content-type' : 'text/html'});
 			res.end(output);
@@ -129,13 +126,13 @@ var viewEngine = {
 };
 
 var handler404 = function(req, res){
-	logger.info("404"+req.url);
+	console.log("404"+req.url);
 	res.writeHead(404, {'Content-Type': 'text/plain'});
 	res.end('Page Not Found');
 };
 
 var handler500 = function(req, res, err){
-    res.writeHead(500, {'Content-Type': 'text/plain'});
+  res.writeHead(500, {'Content-Type': 'text/plain'});
 	res.end(err);
 };
 
@@ -145,30 +142,28 @@ var handler500 = function(req, res, err){
  * Static files handler.
  */
 var staticFileServer = function(req, res, filePath){
-	//return;
-  if(!filePath){
-  //filePath = path.join(__dirname, config.staticFileDir, url.parse(req.url).pathname);
-	filePath = path.join(__dirname, url.parse(req.url).pathname);
+	if(!filePath){
+	 filePath = path.join(__dirname,"staticFile", url.parse(req.url).pathname);
   }
 
   fs.exists(filePath, function(exists) {
-      if(!exists) {  
-          handler404(req, res);  
-          return;  
-      }  
+    if(!exists) {  
+        handler404(req, res);  
+        return;  
+    }  
 
-      fs.readFile(filePath, "binary", function(err, file) {  
-          if(err) {  
-              handler500(req, res, err);
-              return;  
-          }
-          
-          var ext = path.extname(filePath);
-          ext = ext ? ext.slice(1) : 'html';
-          res.writeHead(200, {'Content-Type': contentTypes[ext] || 'text/html'});
-          res.write(file, "binary");
-          res.end();
-      });  
+    fs.readFile(filePath, "binary", function(err, file) {  
+      if(err) {  
+          handler500(req, res, err);
+          return;  
+      }
+      
+      var ext = path.extname(filePath);
+      ext = ext ? ext.slice(1) : 'html';
+      res.writeHead(200, {'Content-Type': contentTypes[ext] || 'text/html'});
+      res.write(file, "binary");
+      res.end();
+    });  
   });
 };
 
@@ -312,27 +307,4 @@ var contentTypes = {
   "zip": "application/zip"
 };
 
-var timely_share_rate = [];
-var timely_overload_data = {};
-//var timely_rtmfp_data = {};
-exports.get_timely_data= function()
-{
-	logger.info("web worker:  get timely data !");
-	return timely_share_rate;
-};
-	
-exports.get_timely_overload_data = function()
-{
-	logger.info("web worker:  get timely overload data !");
-	return timely_overload_data;
-};
-process.on('message', function(msg) {
-//    logger.debug("received parent process message: " + JSON.stringify(msg));
-//logger.info("web worker: "+JSON.stringify(msg));
-    timely_share_rate = msg["timely_share_rate"];
-    timely_overload_data = msg["timely_overload_data"];
-});
-process.on('uncaughtException',function(err) {
-	logger.error("web work uncaught exception:  " + err + "\n" + err.stack);
-});
 var s_runPage = this.runPageServer(  );

@@ -1,10 +1,7 @@
 var util = require('util');
-var sessions = require("./sessions.js");
-var log4js = require('log4js');
-var config = require('../../config.js');
-log4js.configure(config.log4jConfig);
-var logger = log4js.getLogger("web");
-var db = require("../../DBManager.js");
+var path = require('path');
+var sessions = require(path.join(__dirname,"sessions.js"));
+var db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
 
 exports.index = function(){
     this.render(['login.html','login.js'], {message:''});
@@ -31,12 +28,10 @@ exports.login = function(args){
   if(usr && psw){
   	var userStatement = "select authority,cid from users where name= '" + usr + "' and ptxt = '" + psw + "'";
 
-  	logger.info("\n userStatement:"+userStatement);	  	
+  	  	
   	db.query(userStatement,function(err,rows){
   		if(!err && rows && rows.length > 0 ){
-  				logger.info(userStatement+" login ok");
   				sessions.startSession(thisObj.req,thisObj.res,usr,function(sess){
-  				logger.info("into sessions");
   				sess.set('authority',Number(rows[0]['authority']));
   				sess.set('user',usr);
   				sess.set('cid',rows[0]['cid']);
@@ -46,13 +41,13 @@ exports.login = function(args){
 				return;
   		}else
 		{
-			logger.error("login error, error: " + err);
+			
 			res = {'success':false,'message':'用户名或密码错误，请重新登录'};
 			thisObj.responseDirect(200,"text/json",JSON.stringify(res));
 		}
   	});
 	}else{
-		logger.error("login 404");
+		
 		this.handler404(this.req,this.res);
 	}
 };
