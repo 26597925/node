@@ -10,7 +10,7 @@ exports.main = function(){
 
 	if(!this.init){
 		this.init = function(){
-			http_get.delegateType.offsetday = insertES.insertES_delegateType.offsetday = 1;
+			http_get.delegateType.offsetday = insertES.insertES_delegateType.offsetday = 4;
 			http_get.stock.offsetday = insertES.insertES_stock.offsetday = 1;
 			console.log(path.basename(__filename),"main","init")
 		}
@@ -56,4 +56,3 @@ var j = schedule.scheduleJob(rule, function(){
 // });
 
 this.main();
-// this.main();
