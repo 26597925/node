@@ -8,7 +8,7 @@ var querystring = require("querystring");
 var web_DB_config = require(path.join(__dirname,"web_DB_config.js"));
 var mfm = require(path.join(__dirname,'pageHandler','controllers','mainFrame.js'));
 
-// var config = require(path.join(__dirname,'pageHandler','models','PageConfig'));
+var pgconfig = require(path.join(__dirname,'pageHandler','models','PageConfig'));
 var route = require(path.join(__dirname,'pageHandler','models','Route'));
 
 var root = this;
@@ -29,6 +29,8 @@ exports.runPageServer = function( port )
 				})
 			.on('end', function()
 				{
+          
+          
 				var reqData;
 				if( "POST" == req.method.toUpperCase() )
 				{
@@ -54,15 +56,14 @@ exports.runPageServer = function( port )
  * All requests entries.
  */
 var handlerRequest = function(req, res){
+  debugger;
   var actionInfo = route.getActionInfo(req.url, req.method);
     if(actionInfo.action){
-        if( actionInfo.action != "querySummaryInfoData")
-        {
-            console.log("actionInfo:"+actionInfo.action + " controller: " + actionInfo.controller);
-        }
-
+        debugger;
         var controller = require(path.join(__dirname,'pageHandler','controllers',actionInfo.controller));
+        debugger;
         if(controller[actionInfo.action]){
+
             var ct = new controllerContext(req, res);
             controller[actionInfo.action].apply(ct, actionInfo.args);
         }else{
@@ -77,10 +78,13 @@ var handlerRequest = function(req, res){
  * Context object for controller.
  */
 var controllerContext = function(req, res){
+
     this.req = req;
     this.res = res;
+
     this.handler404 = handler404;
     this.handler500 = handler500;
+
 };
 
 

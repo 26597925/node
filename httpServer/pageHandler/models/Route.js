@@ -1,6 +1,5 @@
 //
 var parseURL = require('url').parse;
-
 var routes = {get:[], post:[], head:[], put:[], delete:[]};
 
 /**

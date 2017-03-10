@@ -4,6 +4,7 @@ var sessions = require(path.join(__dirname,"sessions.js"));
 var db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
 
 exports.index = function(){
+    sessions.createAuthorize("aaa","bbb");
     this.render(['login.html','login.js'], {message:''});
 };
 
@@ -27,8 +28,7 @@ exports.login = function(args){
   var psw = args["psw"] || null;
   if(usr && psw){
   	var userStatement = "select authority,cid from users where name= '" + usr + "' and ptxt = '" + psw + "'";
-
-  	  	
+	
   	db.query(userStatement,function(err,rows){
   		if(!err && rows && rows.length > 0 ){
   				sessions.startSession(thisObj.req,thisObj.res,usr,function(sess){

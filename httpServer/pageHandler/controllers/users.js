@@ -2,8 +2,8 @@ var util = require('util');
 var path = require('path');
 var uuid = require('node-uuid');
 var db = require(path.join(__dirname,"..","web_DB_config.js"));
-var sessions = require(path.join(__dirname,"sessions.js"));
-console.log(uuid);
+var sessions = require(path.join(__dirname,"./sessions.js"));
+console.log("uuid",uuid);
 
 exports.listAll = function(args){
     var thisObj = this;
