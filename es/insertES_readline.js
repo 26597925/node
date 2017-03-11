@@ -149,7 +149,7 @@ var insertES_stock = function() {
 		// param2 = param2.replace("-","_");
 		
 		var body = _self.parseTableBody(param);
-		if(!body){
+		if(body){
 			_self.data.body.push({
 				"index":{
 					_index: "stock"+_self.getSuffixName(param2)
@@ -184,8 +184,6 @@ var insertES_stock = function() {
 		}else{
 			main_readline.main.esindex++;
 			main_readline.main.insertdataOk();
-			
-					
 		}
 		
 	}
