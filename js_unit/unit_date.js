@@ -34,15 +34,27 @@ var unit_date = function()
 		return _date2.getTime() - _date.getTime();
 	}
 
+	this.toNumber = function(date_str){
+		// date_str = "1:1:1";
+		date_str = date_str.trim();
+		date_str = date_str.split(":");
+		date_str = parseInt(date_str[0])*60*60+parseInt(date_str[1])*60+parseInt(date_str[2])
+		return date_str;
+	}
+	
 	this.test=function()
 	{
-		var _d = new Date("2016-2-12 2:4:45");
-		console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
-		var _d = new Date();
-		console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
-		console.log(this.sortTime("2016-2-12 2:4:45"));
-		console.log(">>>",JSON.stringify({aa:0,bb:1}).substring(0,200));
+		var status = ["TP","PQ","KJ","PZ","ZJ","LT","SJ","PH","WX"];
+		console.log(status.indexOf("PH"));
+		// var _d = new Date("2016-2-12 2:4:45");
+		// console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
+		// var _d = new Date();
+		// console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
+		// console.log(this.sortTime("2016-2-12 2:4:45"));
+		// console.log(">>>",JSON.stringify({aa:0,bb:1}).substring(0,200));
 	}
+
+	// this.test();
 	
 }
 module.exports = new unit_date();
