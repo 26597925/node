@@ -216,6 +216,7 @@ var main = function(){
 	_self.insertes = function(){
 		_self.client.bulk(_self.data, function (err, resp) {
 			_self.data.body = [];
+			return ;
 			if(err){
 				config.es.error(">>>",JSON.stringify(err).substring(0,300));
 			}
