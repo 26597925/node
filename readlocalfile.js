@@ -227,8 +227,8 @@ var main = function(){
 
 var mainobj = exports.main = new main();
 mainobj.addNewdate();
-mainobj.main.pre = "2016-12-01-00"
-mainobj._self.insertdataOk();
+mainobj.pre = "2016-12-01-00"
+mainobj.insertdataOk();
 
 
 
