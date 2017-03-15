@@ -2,6 +2,7 @@ var path = require("path");
 var schedule = require("node-schedule");
 var fs = require("fs");
 var readline = require('readline');
+var elasticsearch = require('elasticsearch');
 var config = require(path.join(__dirname,"config.js"));
 var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
@@ -17,6 +18,10 @@ var main = function(){
 	_self.fileName = [];
 	_self.index = 0;
 	_self.pre = "";
+
+	_self.client = new elasticsearch.Client({
+		hosts : [ '10.127.92.39:9200', '10.127.92.40:9200', '10.127.92.41:9200' ]
+	});
 
 	_self.addNewdate = function(){
 		var pre = unit_date.Format(_self.date,"yyyy-MM-dd");
