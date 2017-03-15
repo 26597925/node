@@ -7,7 +7,6 @@ var config = require(path.join(__dirname,"config.js"));
 var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
 
-console.log(process.argv[2]);
 var filePath = process.argv[2];
 var main = function(){
 	var _self = this;
