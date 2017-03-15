@@ -164,7 +164,7 @@ var main = function(){
 
 	_self.readFile = function(){
 		
-		var fReadName = _self.fileName[_self.index]; 
+		var fReadName = "./data/"+_self.fileName[_self.index]; 
 		console.log(fReadName);
 		var fRead = fs.createReadStream(fReadName);
 		
@@ -176,7 +176,7 @@ var main = function(){
 
 		objReadline.on('line', (line)=>{ 
 			_self.generateBulk(line);
-		}
+		});
 
 		objReadline.on('close', ()=>{
 		    console.log('readline close...');
