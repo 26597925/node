@@ -1,5 +1,6 @@
 var path = require("path");
 var schedule = require("node-schedule");
+var fs = require("fs");
 var config = require(path.join(__dirname,"config.js"));
 var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
