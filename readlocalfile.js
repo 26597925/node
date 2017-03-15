@@ -1,6 +1,7 @@
 var path = require("path");
 var schedule = require("node-schedule");
 var fs = require("fs");
+var readline = require('readline');
 var config = require(path.join(__dirname,"config.js"));
 var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
@@ -228,6 +229,7 @@ var main = function(){
 
 var mainobj = exports.main = new main();
 mainobj.addNewdate();
+mainobj.createFileName();
 mainobj.pre = "2016-12-01-00"
 mainobj.insertdataOk();
 
