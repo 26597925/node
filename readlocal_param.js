@@ -8,6 +8,7 @@ var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
 
 var filePath = process.argv[2];
+var presuff = process.argv[3];
 var main = function(){
 	var _self = this;
 	_self.offsetday = 0; // start 2016-09-01 2017-03-12
@@ -174,7 +175,7 @@ var main = function(){
 	_self.readFile = function(path){
 		
 		var fReadName = path;
-		console.log(fReadName);
+		console.log(fReadName,_self.pre);
 		var fRead = fs.createReadStream(fReadName);
 		
 		var objReadline = readline.createInterface({
@@ -223,4 +224,5 @@ var main = function(){
 }
 
 var mainobj = exports.main = new main();
+mainobj.pre=presuff;
 mainobj.readFile(filePath);
