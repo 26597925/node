@@ -4,7 +4,6 @@ var fs = require("fs");
 var readline = require('readline');
 var elasticsearch = require('elasticsearch');
 var config = require(path.join(__dirname,"config.js"));
-var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
 
 if(process.argv.length != 5){
@@ -32,31 +31,31 @@ var main = function(){
 		hosts : [ '10.127.92.39:9200', '10.127.92.40:9200', '10.127.92.41:9200' ]
 	});
 
-	_self.addNewdate = function(){
-		var pre = unit_date.Format(_self.date,"yyyy-MM-dd");
-		if(_self.subOffday<48){
-			pre = pre
-				+"-"
-				+(_self.subOffday<=9?("0"+_self.subOffday):_self.subOffday);
-		}
+	// _self.addNewdate = function(){
+	// 	var pre = unit_date.Format(_self.date,"yyyy-MM-dd");
+	// 	if(_self.subOffday<48){
+	// 		pre = pre
+	// 			+"-"
+	// 			+(_self.subOffday<=9?("0"+_self.subOffday):_self.subOffday);
+	// 	}
 		
-		_self.subOffday++;
-		if(_self.subOffday == 49){
-			_self.subOffday = 0;
-			_self.offsetday++;
-			_self.date.setDate(_self.date.getDate()+1);
-		}
+	// 	_self.subOffday++;
+	// 	if(_self.subOffday == 49){
+	// 		_self.subOffday = 0;
+	// 		_self.offsetday++;
+	// 		_self.date.setDate(_self.date.getDate()+1);
+	// 	}
 
-		return "http://10.130.211.60:8001/stock_data/"+pre+".data";
-	}
+	// 	return "http://10.130.211.60:8001/stock_data/"+pre+".data";
+	// }
 	
-	_self.createFileName = function(){
-		for(var i=0;i<_self.alph.length;i++){
-			for(var j=0; j<_self.alph.length;j++){
-				_self.fileName.push("x"+_self.alph[i]+_self.alph[j]);
-			}
-		}
-	}
+	// _self.createFileName = function(){
+	// 	for(var i=0;i<_self.alph.length;i++){
+	// 		for(var j=0; j<_self.alph.length;j++){
+	// 			_self.fileName.push("x"+_self.alph[i]+_self.alph[j]);
+	// 		}
+	// 	}
+	// }
 
 	_self.parseTableBody = function(param){
 
@@ -175,7 +174,7 @@ var main = function(){
 
 
 	_self.readFile = function(path){
-		
+		debugger;
 		var fReadName = path;
 		console.log(fReadName,_self.pre);
 		var fRead = fs.createReadStream(fReadName);
@@ -192,7 +191,6 @@ var main = function(){
 
 		objReadline.on('close', ()=>{
 		    console.log('readline close...');
-		    _self.insertes();
 		});
 	}
 
@@ -217,11 +215,14 @@ var main = function(){
 
 	_self.insertes = function(){
 		console.log("insertes");
+		console.log(_self.pre);
 		if(_self.data.body.length>0){
+
 			_self.client.bulk(_self.data, function (err, resp) {
 				console.log("bulk over");
 				
 				if(err){
+					console.log(">>>",JSON.stringify(err).substring(0,300));
 					config.es.error(">>>",JSON.stringify(err).substring(0,300));
 				}
 				process.exit(-1);
