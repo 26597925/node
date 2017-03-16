@@ -7,14 +7,20 @@ var config = require(path.join(__dirname,"config.js"));
 var insertES = require(path.join(__dirname,"es","insertES_readline.js"));
 var unit_date = require(path.join(__dirname,"js_unit","unit_date.js"));
 
+if(process.argv.length != 5){
+	process.exit(-1);
+}
+
 var filePath = process.argv[2];
-var presuff = process.argv[3];
+var yMd = process.argv[3];
+var presuff = process.argv[4];
+
+
 var main = function(){
 	var _self = this;
 	_self.offsetday = 0; // start 2016-09-01 2017-03-12
 	_self.subOffday = 0;  // 0-47
 	_self.date = new  Date("2016-12-01 00:00:00");
-	_self.date2 = new Date("2017-03-12 00:00:00");
 	_self.data = {"body":[]};
 	_self.alph = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
 	_self.fileName = [];
@@ -39,10 +45,6 @@ var main = function(){
 			_self.subOffday = 0;
 			_self.offsetday++;
 			_self.date.setDate(_self.date.getDate()+1);
-		}
-
-		if(_self.date.getTime() - _self.date2.getTime()>0){
-			return null;
 		}
 
 		return "http://10.130.211.60:8001/stock_data/"+pre+".data";
@@ -214,16 +216,21 @@ var main = function(){
 	}
 
 	_self.insertes = function(){
-		_self.client.bulk(_self.data, function (err, resp) {
-			_self.data.body = [];
-			return ;
-			if(err){
-				config.es.error(">>>",JSON.stringify(err).substring(0,300));
-			}
-		});
+		console.log("insertes");
+		if(_self.data.body.length>0){
+			_self.client.bulk(_self.data, function (err, resp) {
+				console.log("bulk over");
+				
+				if(err){
+					config.es.error(">>>",JSON.stringify(err).substring(0,300));
+				}
+				process.exit(-1);
+			});
+		}
 	}
 }
 
-var mainobj = exports.main = new main();
+var mainobj = new main();
 mainobj.pre=presuff;
+mainobj.date = new  Date(yMd+" 00:00:00");
 mainobj.readFile(filePath);
