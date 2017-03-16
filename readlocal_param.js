@@ -191,6 +191,7 @@ var main = function(){
 
 		objReadline.on('close', ()=>{
 		    console.log('readline close...');
+		    _self.insertes();
 		});
 	}
 
@@ -216,6 +217,7 @@ var main = function(){
 	_self.insertes = function(){
 		console.log("insertes");
 		console.log(_self.pre);
+		debugger;
 		if(_self.data.body.length>0){
 
 			_self.client.bulk(_self.data, function (err, resp) {
