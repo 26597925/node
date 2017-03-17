@@ -1,5 +1,5 @@
 # web server
-<li><a href="https://github.com/mysqljs/mysql">https://github.com/mysqljs/mysql</a></li>
+<p><li><a href="https://github.com/mysqljs/mysql">https://github.com/mysqljs/mysql</a></li>
 <li>
 js
 </li>
@@ -10,8 +10,9 @@ function(){<br />
 ALTER TABLE `tb_user_basic` ADD `userLastLogin` INT NULL DEFAULT NULL COMMENT '用户最后访问时间' AFTER `STATUS`;
 <br />
 <br />
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><br />
-
+</p>
+<br />
+<p>
 把代码整理一下，省的以后再下手写，直接copy<br />
 <br />
 var jsPackage = <br />
@@ -404,3 +405,4 @@ function(result){<br />
 } <br />
 <br />
 <br />
+</p>
