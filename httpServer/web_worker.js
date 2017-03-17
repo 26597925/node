@@ -56,12 +56,12 @@ exports.runPageServer = function( port )
  * All requests entries.
  */
 var handlerRequest = function(req, res){
-  debugger;
+  
   var actionInfo = route.getActionInfo(req.url, req.method);
     if(actionInfo.action){
-        debugger;
+       
         var controller = require(path.join(__dirname,'pageHandler','controllers',actionInfo.controller));
-        debugger;
+        
         if(controller[actionInfo.action]){
 
             var ct = new controllerContext(req, res);
@@ -140,7 +140,9 @@ var handler500 = function(req, res, err){
 	res.end(err);
 };
 
+var check_timeout = function(req, res){
 
+}
 
 /**
  * Static files handler.

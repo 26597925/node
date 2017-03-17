@@ -3,7 +3,7 @@ var util = require('util');
 var unit_date = require(path.join(__dirname, "..", "..", "..","js_unit","unit_date.js"));
 var config = require(path.join(__dirname,"..","..","..","config.js"));
 var _sessions = {};
-/*
+/****
 {"host":"127.0.0.1:20080"
 ,"connection":"keep-alive"
 ,"user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
@@ -40,7 +40,13 @@ var createSID = function () {
   return sId;
 };
 
+var create_uId = function(){
+  var id = "000"
+  return id;
+}
+
 exports.createAuthorize = function(req,res,uId){
+  uId = uId || create_uId();
   config.webserver.info(path.basename(__dirname),"createAuthorize",arguments);
   res.setHeader("Set-Cookie",["sId="+ createSID(),"uId="+uId,"Secure"]);
 }

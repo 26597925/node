@@ -1,3 +1,5 @@
+<script language="javascript" type="text/javascript" src="/public/js/jquery.min.js"></script>
+<script language="javascript" type="text/javascript" src="/public/js/jquery.jqplot.min.js"></script>
 <script type="text/javascript" src="/public/js/jquery-ui-1.8.21.custom.min.js"></script>
 <script type="text/javascript" src="/public/js/jquery.crypt.js"></script>
 <script type="text/javascript" src="/public/js/plugins/jqplot.pieRenderer.min.js"></script>
