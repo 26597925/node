@@ -14,48 +14,18 @@ var filePath = process.argv[2];
 var yMd = process.argv[3];
 var presuff = process.argv[4];
 
-
 var main = function(){
 	var _self = this;
 	_self.offsetday = 0; // start 2016-09-01 2017-03-12
 	_self.subOffday = 0;  // 0-47
 	_self.date = new  Date("2016-12-01 00:00:00");
 	_self.data = {"body":[]};
-	_self.alph = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
-	_self.fileName = [];
 	_self.index = 0;
 	_self.pre = "";
 	_self.filePath = "";
-
 	_self.client = new elasticsearch.Client({
 		hosts : [ '10.127.92.39:9200', '10.127.92.40:9200', '10.127.92.41:9200' ]
 	});
-
-	// _self.addNewdate = function(){
-	// 	var pre = unit_date.Format(_self.date,"yyyy-MM-dd");
-	// 	if(_self.subOffday<48){
-	// 		pre = pre
-	// 			+"-"
-	// 			+(_self.subOffday<=9?("0"+_self.subOffday):_self.subOffday);
-	// 	}
-		
-	// 	_self.subOffday++;
-	// 	if(_self.subOffday == 49){
-	// 		_self.subOffday = 0;
-	// 		_self.offsetday++;
-	// 		_self.date.setDate(_self.date.getDate()+1);
-	// 	}
-
-	// 	return "http://10.130.211.60:8001/stock_data/"+pre+".data";
-	// }
-	
-	// _self.createFileName = function(){
-	// 	for(var i=0;i<_self.alph.length;i++){
-	// 		for(var j=0; j<_self.alph.length;j++){
-	// 			_self.fileName.push("x"+_self.alph[i]+_self.alph[j]);
-	// 		}
-	// 	}
-	// }
 
 	_self.parseTableBody = function(param){
 
@@ -144,12 +114,10 @@ var main = function(){
 			result_obj.sellMount8=	field_arr[63];
 			result_obj.sellMount9=	field_arr[64];
 			result_obj.sellMount10=	field_arr[65];
-			
 		}else{
-			config.es.error("date formate err \n",JSON.stringify(result_obj),"\n market index name");
+			config.es.error("date formate err \n",_self.filePath,_self.index,_self.pre,param,"\n market index name");
 			return null;
 		}
-			
 		return result_obj;
 	}
 
@@ -210,7 +178,7 @@ var main = function(){
 					inserttime:unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss.S")
 					,list:body
 				}
-			);
+			)
 		}
 	}
 
@@ -219,7 +187,6 @@ var main = function(){
 		console.log(_self.pre);
 		debugger;
 		if(_self.data.body.length>0){
-
 			_self.client.bulk(_self.data, function (err, resp) {
 				console.log("bulk over");
 				
