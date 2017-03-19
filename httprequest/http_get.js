@@ -6,20 +6,24 @@ var unit_date = require(path.join(__dirname,"..","js_unit","unit_date.js"));
 var unit_string = require(path.join(__dirname,"..","js_unit","unit_string.js"));
 var config = require(path.join(__dirname,"..","config.js"));
 
+
 exports.request_readline = function (url,callback){
-	var objReadline;
+	// this.objReadline = null;
+	var _myself = this;
 	http.get(url,function(res){
 		res.setEncoding("utf8");
-		objReadline = readline.createInterface({  
+		_myself.objReadline = readline.createInterface({  
 		    input: res,
 		    output: null
 		});
 
-		objReadline.on('line', (line)=>{ 
+		_myself.objReadline.on('line', (line)=>{
+			debugger;
+			_myself.objReadline.pause();
 			callback(line);
 		});  
 
-		objReadline.on('close', ()=>{ 
+		_myself.objReadline.on('close', ()=>{ 
 			callback("readline >> close"); 
 		}); 
 	});

@@ -1,14 +1,17 @@
 # web server
 
-<p><li><a href="https://github.com/mysqljs/mysql">https://github.com/mysqljs/mysql</a></li>
+<p>
+  <li><a href="https://github.com/DoubleSpout/ccap">https://github.com/DoubleSpout/ccap</a></li>
+<li><a href="https://github.com/mysqljs/mysql">https://github.com/mysqljs/mysql</a></li>
+npm install ccap  <br />
 <li>
 js
 </li>
 function(){<br />
 	console.log(JSON.stringify(arguments));<br />
 }<br />
-
-ALTER TABLE `tb_user_basic` ADD `userLastLogin` INT NULL DEFAULT NULL COMMENT '用户最后访问时间' AFTER `STATUS`;
+ALTER TABLE `tb_user_basic` ADD `userLastLogin` INT NULL DEFAULT NULL COMMENT '用户最后访问时间' AFTER `STATUS`;<br />
+ALTER TABLE `tb_user_basic` CHANGE `userLastLogin` `userLastLogin` VARCHAR(256) NULL DEFAULT NULL COMMENT '用户最后访问';
 <br />
 <br />
 </p>

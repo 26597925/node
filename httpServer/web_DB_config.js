@@ -46,24 +46,26 @@ var web_DB_config = function()
     //========================================>
     this.mysql_pool_getConnection = function(callback){
         if(!this.pool){
+
             this.dbcfg['connectionLimit'] = 13;
+
             this.pool  = mysql.createPool(this.dbcfg);
 
             this.pool.on('acquire', function (connection) {
-                console.log('Connection %d acquired', connection.threadId);
-
+                // console.log('Connection %d acquired', connection.threadId);
             });
 
             this.pool.on('connection', function (connection) {
                 connection.query('SET SESSION auto_increment_increment=1')
+                // console.log('connection');
             });
 
             this.pool.on('enqueue', function () {
-                console.log('Waiting for available connection slot');
+                // console.log('Waiting for available connection slot');
             });
 
             this.pool.on('release', function (connection) {
-                console.log('Connection %d released', connection.threadId);
+                // console.log('Connection %d released', connection.threadId);
             });
         }
     }
@@ -71,6 +73,7 @@ var web_DB_config = function()
     this.mysql_pool_getConnection();
 
     this.query = function(sql,callback){
+        console.log("sql",sql);
         this.pool.getConnection(function(err, connection){
             // connected! (unless `err` is set) 
             if(!err){
@@ -80,11 +83,41 @@ var web_DB_config = function()
                 .on('error', function(err) {
                     // Handle error, an 'end' event will be emitted after this as well 
                     callback('error',err);
-                     console.log("error");
+                    console.log("error");
                 })
                 .on('fields', function(fields) {
                     // the field packets for the rows to follow 
-                    console.log("fields>>"+fields);
+                    // console.log("fields>>"+JSON.stringify(fields));
+                    /**
+                    [
+                    {"catalog":"def"
+                    ,"db":"winners"
+                    ,"table":"tb_user_basic"
+                    ,"orgTable":"tb_user_basic"
+                    ,"name":"USERID"
+                    ,"orgName":"USERID"
+                    ,"charsetNr":63
+                    ,"length":11
+                    ,"type":3
+                    ,"flags":16419
+                    ,"decimals":0
+                    ,"zeroFill":false
+                    ,"protocol41":true}
+
+                    ,{"catalog":"def"
+                    ,"db":"winners"
+                    ,"table":"tb_user_basic"
+                    ,"orgTable":"tb_user_basic"
+                    ,"name":"GROUPID"
+                    ,"orgName":"GROUPID"
+                    ,"charsetNr":63
+                    ,"length":11
+                    ,"type":3
+                    ,"flags":0
+                    ,"decimals":0
+                    ,"zeroFill":false
+                    ,"protocol41":true}.....]
+                    */
                 })
                 .on('result', function(row) {
                     // Pausing the connnection is useful if your processing involves I/O 
@@ -96,25 +129,38 @@ var web_DB_config = function()
                     if(callback){
                         callback(row)
                     }
-                    console.log("result");
+                    // console.log("result");
                 })
                 .on('end', function() {
-                // all rows have been received 
+                // all rows have been received
+                   
+                    if(callback){
+                        callback()
+                    }
                     query = null;   
                     callback = null;
                     connection.release();
-                    console.log("end");
+                    // console.log("end");
                 });
+            }else{
+                callback('error2',err);
             }
         });
     }
-    this.query(
-        "SELECT  `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER` FROM tb_user_basic", 
-        function (){
-            console.log("arguments.length:"+arguments.length);
-            console.log("JSON.stringify(arguments):"+JSON.stringify(arguments));
-        }
-    );
-    // mycon.query("SELECT  `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER` FROM tb_user_basic", function (error, results, fields) {
+
+    // this.query(
+    //     "SELECT * FROM tb_user_account", 
+    //     function (){
+    //         console.log("arguments.length:"+arguments.length);
+    //         console.log("JSON.stringify(arguments):"+JSON.stringify(arguments));
+    //     }
+    // );
+    // this.query(
+    //     "SELECT  `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER` FROM tb_user_basic", 
+    //     function (){
+    //         console.log("arguments.length:"+arguments.length);
+    //         console.log("JSON.stringify(arguments):"+JSON.stringify(arguments));
+    //     }
+    // );
 };
 module.exports = new web_DB_config();

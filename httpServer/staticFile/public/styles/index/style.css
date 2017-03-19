@@ -75,8 +75,26 @@ a:hover {
 }
 .page {
 }
-.header {
-	border-bottom: 1px solid #bb7400;
+
+/*border-bottom: 1px solid #034596;
+    border-top: 1px solid #034596;
+    height: 50px;
+    width: 100%;
+    background: #150ab5;
+    color: #fff;
+    margin: 0;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.4);
+    -moz-box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.4);
+    box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.4);
+    background-image: -webkit-linear-gradient(bottom, #EEC91E, #EEC900);
+    background-image: -moz-linear-gradient(bottom, #EEC91E, #EEC900);
+    background-image: -o-linear-gradient(bottom, #EEC91E, #EEC900);
+    background-image: -ms-linear-gradient(bottom, #EEC91E, #EEC900);
+    background-image: linear-gradient(to top, #085cb5, #085cb5);
+    overflow: hidden;
+
+
+border-bottom: 1px solid #bb7400;
 	border-top: 1px solid #bb7400;
 	height: 50px;
 	width: 100%;
@@ -92,6 +110,26 @@ a:hover {
 	background-image: -ms-linear-gradient(bottom, #EEC91E, #EEC900);
 	background-image: linear-gradient(to top, #EEC91E, #EEC900);
 	overflow:hidden;
+
+    */
+
+.header {
+	border-bottom: 1px solid #034596;
+	border-top: 1px solid #034596;
+	height: 50px;
+	width: 100%;
+	background: #150ab5;
+	color: #fff;
+	margin: 0;
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.4);
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.4);
+	box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.4);
+	background-image: -webkit-linear-gradient(bottom, #150ab5, #150ab0);
+	background-image: -moz-linear-gradient(bottom, #150ab5, #150ab0);
+	background-image: -o-linear-gradient(bottom, #150ab5, #150ab0);
+	background-image: -ms-linear-gradient(bottom, #150ab5, #150ab0);
+	background-image: linear-gradient(to top, #150ab5, #150ab0);
+	overflow:hidden;
 }
 .header h1 {
 	font-size: 22px;
@@ -99,9 +137,11 @@ a:hover {
 	margin: 0 0 0 20px;
 	text-shadow: 0 1px rgba(0,0,0,.24);
 }
+
+/*#825d00;#825d00;*/
 .header a {
-	color: #825d00;
-	text-shadow: 0 1px rgba(255,255,255,.3);
+	color: #9a7a12;
+	text-shadow: 0 1px rgba(255,255,255,.2);
 	line-height: 25px;
 }
 .header .nodec {

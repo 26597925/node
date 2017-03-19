@@ -9,13 +9,6 @@ route.map({
     action:'index'
 });
 
-route.map({
-    method:'get',
-    url:/^\/exit\/?$/i,
-    controller:'common',
-    action:'exit'
-});
-
 // User behavior 
 route.map({
     method:'get',
@@ -24,6 +17,28 @@ route.map({
     action:'login'
 });
 
+// User behavior 
+route.map({
+    method:'get',
+    url:/^\/logup\/?$/i,
+    controller:'common',
+    action:'logup'
+});
+
+// User behavior 
+route.map({
+    method:'post',
+    url:/^\/logup_submit\/?$/i,
+    controller:'common',
+    action:'logup_submit'
+});
+
+route.map({
+    method:'get',
+    url:/^\/updateLoginTime\/?$/i,
+    controller:'common',
+    action:'updateLoginTime'
+});
 
 route.map({
     method:'get',
@@ -31,6 +46,21 @@ route.map({
     controller:'common',
     action:'main'
 });
+
+
+
+//=============================
+route.map({
+    method:'get',
+    url:/^\/exit\/?$/i,
+    controller:'common',
+    action:'exit'
+});
+
+
+
+
+
 
 //add user
 route.map({
