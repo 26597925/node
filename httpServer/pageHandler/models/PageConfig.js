@@ -48,19 +48,60 @@ route.map({
 });
 
 
+route.map({
+    method:'get',
+    url:/^\/select_dictTrade\/?$/i,
+    controller:'dict_trade',
+    action:'select_dictTrade'
+});
 
-//=============================
+
+route.map({
+    method:'get',
+    url:/^\/select_userAccount\/?$/i,
+    controller:'user_account',
+    action:'select_userAccount'
+});
+
+route.map({
+    method:'post',
+    url:/^\/delete_userAccount\/?$/i,
+    controller:'user_account',
+    action:'delete_userAccount'
+});
+
+route.map({
+    method:'post',
+    url:/^\/add_userAccount\/?$/i,
+    controller:'user_account',
+    action:'add_userAccount'
+});
+
+route.map({
+    method:'post',
+    url:/^\/modify_userAccount\/?$/i,
+    controller:'user_account',
+    action:'modify_userAccount'
+});
+
+
+//================================
+
+
+
+
+
+
+
+
+
+
 route.map({
     method:'get',
     url:/^\/exit\/?$/i,
     controller:'common',
     action:'exit'
 });
-
-
-
-
-
 
 //add user
 route.map({

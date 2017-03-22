@@ -1,5 +1,12 @@
 # web server
-
+<p>
+<ul>
+  <li>https://www.datatables.net/</li>
+  <li>http://www.jqplot.com/</li>
+  <li>http://jqueryui.com/tabs/</li>
+  <li>http://jqueryui.com/accordion/</li>
+</ul>
+</p>
 <p>
   <li><a href="https://github.com/DoubleSpout/ccap">https://github.com/DoubleSpout/ccap</a></li>
 <li><a href="https://github.com/mysqljs/mysql">https://github.com/mysqljs/mysql</a></li>
@@ -10,6 +17,7 @@ js
 function(){<br />
 	console.log(JSON.stringify(arguments));<br />
 }<br />
+ALTER TABLE `tb_user_basic` CHANGE `USERID` `USERID` INT(11) UNSIGNED NULL DEFAULT NULL AUTO_INCREMENT COMMENT '用户ID,可登录使用';<br />
 ALTER TABLE `tb_user_basic` ADD `userLastLogin` INT NULL DEFAULT NULL COMMENT '用户最后访问时间' AFTER `STATUS`;<br />
 ALTER TABLE `tb_user_basic` CHANGE `userLastLogin` `userLastLogin` VARCHAR(256) NULL DEFAULT NULL COMMENT '用户最后访问';
 <br />

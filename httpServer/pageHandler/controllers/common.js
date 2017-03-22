@@ -1,14 +1,16 @@
-var util = require('util');
-var path = require('path');
-var sessions = require(path.join(__dirname,"sessions.js"));
-var db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
+const util = require('util');
+const path = require('path');
+const fs = require('fs');
+const ejs = require('ejs');
+const sessions = require(path.join(__dirname,"sessions.js"));
+const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
+
 
 exports.index = function(){
     this.render(['login.html','login.js'], {message:''});
 };
 
 exports.logup =function(){
-
     this.render(['login_up.html','login_up.js'], {message:''});
 }
 
@@ -35,8 +37,12 @@ var add_newUser = function(context){
                 +self.req.post["ZIPCODE"]+"')";
             db.query(sql,function(){
                 console.log("insert",JSON.stringify(arguments));
-                result = {'success':false,'message':'数据非法2'};
-                self.responseDirect(200,"text/json",JSON.stringify(result));
+                if(arguments.length==1){
+                    updateUserLoginTime(self.req.post["UENAME"],self,"UENAME");
+                }else{
+                    result = {'success':false,'message':'数据存在问题，请联系管理员'};
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }
             })
         }else{
             result = {'success':false,'message':'数据非法1'};
@@ -51,7 +57,7 @@ exports.logup_submit = function(){
     if(self.req.post){
         var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `winners`.`tb_user_basic` where `UENAME`='"+this.req.post["UENAME"]+"' and `PASSWORD`='"+this.req.post["PASSWORD"]+"'";
         db.query(sql,function(){
-            debugger
+            
             if(arguments.length==0){
                 add_newUser(self);
             }else if(arguments.length==1){
@@ -85,6 +91,7 @@ exports.exit = function(){
 };
 
 exports.login = function(args){
+    
 	var self = this;
     var usr = args["usr"] || null;
     var psw = args["psw"] || null;
@@ -94,10 +101,10 @@ exports.login = function(args){
     
     if(usr && psw){
         var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `winners`.`tb_user_basic` where `UENAME`='"+usr+"' and `PASSWORD`='"+psw+"'";
+        var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){
-            var result = {'success':true,'message':'登录成功'};
             if(arguments.length==1){
-                require("./common.js").updateLoginTime(arguments[0]['USERID'],self);
+                updateUserLoginTime(arguments[0][0]['USERID'],self);
             }else{
                 result = {'success':false,'message':'用户名或密码错误，请重新登录'};
                 self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -109,17 +116,23 @@ exports.login = function(args){
 	}
 };
 
-exports.updateLoginTime = function(USERID,context){
-   
-    var self = this;
+var updateUserLoginTime = function(USERID,context){
+    console.log(arguments.length)
+    var self = null;
     if(context){self = context;}
-    var req = this.req || context.req;
-    var res = this.res || context.res;
+    var req = context.req;
+    var res = context.res;
     var SID = sessions.createSID();
     sessions.setCookie(req,res,SID,USERID);
     var sql2 = "UPDATE `tb_user_basic` SET `userLastLogin` = '"+SID+"' WHERE `tb_user_basic`.`USERID` = "+USERID+" "
+    
+    if(arguments.length==3){
+        sql2 = "UPDATE `tb_user_basic` SET `userLastLogin` = '"+SID+"' WHERE `tb_user_basic`.`"+arguments[2]+"` = '"+USERID+"' "
+    }
+
     var result = {'success':true,'message':'登录成功'};
     db.query(sql2,function(){
+        console.log("updateUserLoginTime",arguments)
         if(arguments.length==1){
             self.responseDirect(200,'text/json',JSON.stringify(result));
         }else{
@@ -127,57 +140,83 @@ exports.updateLoginTime = function(USERID,context){
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     });
+
 }
 
+exports.updateLoginTime = function(USERID){
+    updateUserLoginTime(USERID,this);
+}
 
+var renderPage = function(){
 
-// exports.modifypsw = function(args){
-// 	var thisObj = this;
-//     var sess = sessions.validate(this.req);
-//     if(sess){
-//         var old_psw = args['opsw'] || null;
-//         var new_psw = args['npsw'] || null;
-//         var usr = sess.get('user');       
-       
-//         if(usr && old_psw && new_psw){
-// 						var sql = util.format("update users set ptxt='%s' where name='%s' and ptxt='%s' ; ",new_psw,usr,old_psw);
-//             db.query(sql,function(err,rows){
-               
-//                 if(!err && rows && rows.affectedRows > 0){
-//                     thisObj.responseDirect(200,'text/html',JSON.stringify({'result':'success'}));
-//                 }else{
-//                     thisObj.responseDirect(200,'text/html',JSON.stringify({'result':'failed'}));
-//                 }
-//             });
-//         }else{
-//             thisObj.responseDirect(200,'text/html',JSON.stringify({'result':'failed'}));
-//         }
-//     }else{
-//         thisObj.responseDirect(200,'text/html',JSON.stringify({'result':'expired'}));
-//     }
-// };
+    var nvgJsonFile = fs.readFileSync(path.join(__dirname,"..",'views','navigation.json'),'utf-8');
+    var nvgJson = JSON.parse(nvgJsonFile);
+    // <h5><a href='#'>帐号管理</a></h5>
+    // <div>
+    // <a id="svr_rtmfp" href="#">用户券商管理 </a> <br />
+    // </div>
+    // <h5><a href='#'>历史数据</a></h5>
+    // <div>
+    // <a href='#' id='historydata_onlineuser_here'> 在线用户</a> <br />
+    // <a href='#' id='historydata_pl_here'> 卡顿率</a><br />
+    // </div>
+    var nvgHtml = "";
 
-var adminNav = "<h5><a href='#'>用户管理</a></h5>"
-        + "<div> <a href='#' id='aalluser'>用户一览</a> <br />  "
-        + "	     <a href='#' id='a_anu_full'>添加用户</a> <br />  </div>";
+    var jsRegist = "";
+    var jsState = "";
+    var htmlDoc = "";
+    //var hideAllPanel = function ()
+    // {
+    //     $("#historydata").hide();
+    //}
+    var hideAllPanel = "var hideAllPanel = function (){\n";
+    
+    for(var i = 0; i< nvgJson.length;i++){
+        for(var navigator in nvgJson[i]){
+            nvgHtml += "<h5><a href='#'>"+navigator+"</a></h5>";
+            nvgHtml += "<div>"
+            for(var element in nvgJson[i][navigator]){
+                nvgHtml += 
+                "<a id=\""+nvgJson[i][navigator][element]["id"]
+                +"\" href=\""+nvgJson[i][navigator][element]["href"]
+                +"\">"+nvgJson[i][navigator][element]["name"]
+                +" </a> <br />";
+                jsState += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsState"]),'utf-8');
+                jsRegist += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsRegist"]),'utf-8');
 
-var advPart = " <a id='svr_groupids' href='#'>GroupID </a> <br /> ";
-var advPartHis = "<a href='#' id='historydata_hgdd_here'>Group ID历史数据</a><br />";
+                hideAllPanel += '$("#'+(nvgJson[i][navigator][element]["id"]+"_panel")+'").hide();\n';
 
-var versionManager = "<a href='#' id='version_set'>上线版本号管理</a><br />";
+                htmlDoc += '<div id="'+(nvgJson[i][navigator][element]["id"]+"_panel")+'" class="content">'
+                htmlDoc += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["htmlDoc"]),'utf-8');
+                htmlDoc += '</div>'
+
+                jsState += "\n";
+                jsRegist += "\n";
+                htmlDoc += "\n";
+            }
+            nvgHtml += "</div>"
+        }
+    }
+
+    hideAllPanel += '}\n';
+    jsState += hideAllPanel;
+    var js_templates = fs.readFileSync(path.join(__dirname,"..",'views','main.js'),'utf-8');
+    var js_content = ejs.render(js_templates,{"jsState":jsState,"jsRegist":jsRegist});
+    
+    var html_templates = fs.readFileSync(path.join(__dirname,"..",'views','main.html'),'utf-8');
+    var html_content = ejs.render(html_templates,{panel:htmlDoc,navigation:nvgHtml});
+
+    
+    var layout = fs.readFileSync(path.join(__dirname,'..','views','layout.html'),'utf-8');
+    var output = ejs.render(layout,{script:js_content,body:html_content});
+    return output;
+}
 
 exports.main = function(){
     var self = this;
+    //get authority
+    //parse and set user browing context
     // var sess = sessions.validate(this.req);
-    // this.render(['main.html','main.js'], {admin:'', advpart: '', advparthis:'',versionManager:''} );
-    // if(sess){
-    //   if(sess.get('authority') == 0){
-    //       this.render(['main.html','main.js'], {admin:adminNav, advpart: '', advparthis: advPartHis,versionManager:versionManager  });
-    //   }else{
-    //       this.render(['main.html','main.js'], {admin:'', advpart: '', advparthis:'',versionManager:''} );
-    //   }
-    // }else{
-        sessions.invalidate(self.req);
-        self.render(['login.html','login.js'], {message:''});
-    // }
+    
+    self.responseDirect(200,"text/html",renderPage());
 };

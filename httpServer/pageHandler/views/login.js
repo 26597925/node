@@ -3,7 +3,27 @@
 <script language="javascript" type="text/javascript" src="/public/js/jquery.jqplot.min.js"></script>
 <script type="text/javascript">
   $(document).ready(function(){
-     $("#login").click(function(){
+
+    var showTopInfo = function(){
+        // if(document.cookie){
+        //     var usr;
+        //     var cookies = document.cookie.split(";");
+        //     for(var i = 0; i < cookies.length;i++){
+        //         var kv = cookies[i].split("=");
+        //         if(kv.length > 1 && $.trim(kv[0]) == "user"){
+        //             usr = $.trim(kv[1]);
+        //             break;
+        //         }
+        //     }
+        //     if(usr){
+        //         $("#topinfo").html("<a id='topinfousr' href='#'>" + usr + "</a>" +
+        //             "<a id='topinfoexit' href='#'>退出</a>");
+        //     }
+        // }
+        $("#topinfo").html("<a id='topinfousr' href='/logup#'>注册</a>")
+    };
+    showTopInfo();
+    $("#login").click(function(){
         $("#message").text("");
         var user = $("#username").val();
         if(user.length <= 0){
@@ -33,11 +53,13 @@
             }
         });
     });
+
     $("#reset").click(function(){
         $("#username").val("");
         $("#password").val("");
         $("#message").text("");
     });
+
     $("#findpsw").click(function(){
         window.location.href="/users/guidereset";
     });

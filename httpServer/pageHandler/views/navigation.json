@@ -1,0 +1,15 @@
+[
+	{"帐号管理":
+		[
+			{"id":"dict_trade","href":"#","name":"用户券商管理 ","htmlDoc":"dict_trade.html","jsState":"dict_trade_st.js","jsRegist":"dict_trade_rg.js"}
+			,
+			{"id":"dict_trade1","href":"#","name":"用户券商管理1 ","htmlDoc":"dict_trade1.html","jsState":"dict_trade_st1.js","jsRegist":"dict_trade_rg1.js"}
+		]
+	}
+	,
+	{"帐号管理2":
+		[
+			{"id":"dict_trade2","href":"#","name":"用户券商管理2 ","htmlDoc":"dict_trade2.html","jsState":"dict_trade_st2.js","jsRegist":"dict_trade_rg2.js"}
+		]
+	}
+]

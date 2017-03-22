@@ -74,6 +74,7 @@ var web_DB_config = function()
 
     this.query = function(sql,callback){
         console.log("sql",sql);
+        var rows = []
         this.pool.getConnection(function(err, connection){
             // connected! (unless `err` is set) 
             if(!err){
@@ -82,7 +83,11 @@ var web_DB_config = function()
                 query
                 .on('error', function(err) {
                     // Handle error, an 'end' event will be emitted after this as well 
-                    callback('error',err);
+                    if(callback){
+                        callback('error',err);
+                        // callback = null;
+                    }
+                    
                     console.log("error");
                 })
                 .on('fields', function(fields) {
@@ -126,24 +131,34 @@ var web_DB_config = function()
                     //   mycon.resume();
                     // });
                     
-                    if(callback){
-                        callback(row)
-                    }
-                    // console.log("result");
+                    rows.push(row);
+                    
                 })
                 .on('end', function() {
                 // all rows have been received
-                   
-                    if(callback){
-                        callback()
+                    console.log("mysql end ->result",rows);
+                    if(rows.length == 0){
+                        if(callback){
+                            callback();
+                            callback = null;
+                        }
+                    }else{
+                        console.log("callback")
+                        if(callback){
+                            callback(rows);
+                            callback = null;
+                        }
                     }
-                    query = null;   
-                    callback = null;
+                    
+                    query = null;
                     connection.release();
                     // console.log("end");
                 });
             }else{
-                callback('error2',err);
+                if(callback){
+                    callback('error2',err);
+                    callback = null;
+                }
             }
         });
     }

@@ -10,8 +10,8 @@ exports.createSID = function () {
   	,mm = unit_date.Format(now,"mm")
   	,ss = unit_date.Format(now,"ss");
   	// console.log("g-hms",HH,mm,ss);
-  	var sId = util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)), (Math.round(Math.random()*1000)) );
-  	return sId;
+  	var sID = util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)), (Math.round(Math.random()*1000)) );
+  	return sID;
 };
 
 var parseCookies = function(cookies){
@@ -59,6 +59,11 @@ var invertDate = function(sID){
   	,ss = parseInt(sIDs[1])%60;
 
   	// console.log("i-hms",HH,mm,ss);
+}
+
+exports.get_uID = function(req){
+	var cookies = parseCookies(req.headers.cookie);
+	return cookies.uID;
 }
 
 exports.invalidate = function(req){

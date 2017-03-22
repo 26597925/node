@@ -6,7 +6,6 @@ var ejs = require('ejs');
 var querystring = require("querystring");
 
 var web_DB_config = require(path.join(__dirname,"web_DB_config.js"));
-var mfm = require(path.join(__dirname,'pageHandler','controllers','mainFrame.js'));
 
 var pgconfig = require(path.join(__dirname,'pageHandler','models','PageConfig'));
 var route = require(path.join(__dirname,'pageHandler','models','Route'));
@@ -74,6 +73,8 @@ controllerContext.prototype.render = function(viewName, context){
     viewEngine.render(this.req, this.res, viewName, context);
 };
 
+
+
 controllerContext.prototype.renderJson = function(json){
     viewEngine.renderJson(this.req, this.res, json);
 };
@@ -86,27 +87,35 @@ controllerContext.prototype.responseDirect = function(status,content_type,data){
 
 var viewEngine = {
 	render:function(req,res,viewNames,ctx){
+		
 		var hfile = path.join(__dirname,'pageHandler','views',viewNames[0]);
 		var templates = fs.readFileSync(hfile,'utf-8');
 		var jsfile = viewNames.length > 1 ? path.join(__dirname,'pageHandler','views',viewNames[1]) : null;
 		var js = jsfile != null ? fs.readFileSync(jsfile,'utf-8') : '';
 	
 	// Use ejs render views
-	  try{
+		try{
 			var content = ejs.render(templates,ctx);
 			var layout = fs.readFileSync(path.join(__dirname,'pageHandler','views','layout.html'),'utf-8');
-	    var output = ejs.render(layout,{script:js,body:content});
-	    res.writeHead(200,{'Content-type' : 'text/html'});
+	    	var output = ejs.render(layout,{script:js,body:content});
+	    	res.writeHead(200,{'Content-type' : 'text/html'});
 			res.end(output);
-	  }catch(err){
-	      handler500(req, res, err);
-	      return;
- 	 }
-  },
+	  	}catch(err){
+	      	handler500(req, res, err);
+	      	return;
+ 	 	}
+	},
+	renderLayout:function(req,res,content_type,data){
+		var layout = fs.readFileSync(path.join(__dirname,'pageHandler','views','layout.html'),'utf-8');
+	    var output = ejs.render(layout,data);
+  		res.writeHead(200,{'Content-type' : 'text/html'});
+  		res.end(output);
+	},
 	responseDirect:function(req,res,status,content_type,data){
-  	res.writeHead(status,{'content-type':content_type});
-  	res.end(data);
-  }
+  		res.writeHead(status,{'content-type':content_type});
+  		res.end(data);
+	}
+
 };
 
 var handler404 = function(req, res){
