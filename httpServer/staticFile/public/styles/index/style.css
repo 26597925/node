@@ -9,7 +9,7 @@ body {
 	margin-bottom: 10px;
 }
 .box2 {
-	margin-bottom: 30px;
+    margin-bottom: 30px;
 }
 .clear {
 	clear: both;
@@ -88,9 +88,6 @@ a:hover {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
-
-docs.css:877
-
 .header {
 	border-bottom: 1px solid #e5e5e5;
 	border-top: 1px solid #e5e5e5;
@@ -116,10 +113,8 @@ docs.css:877
 	margin: 0 0 0 20px;
 	text-shadow: 0 1px rgba(0,0,0,.24);
 }
-
-/*#825d00;#825d00;*/
 .header a {
-	color: #9a7a12;
+	color: #825d00;
 	text-shadow: 0 1px rgba(255,255,255,.2);
 	line-height: 25px;
 }
@@ -152,6 +147,7 @@ docs.css:877
     padding: 5px;
     text-align: left;
 }
+
 .cellspacing {
 }
 .cellspacing td {
