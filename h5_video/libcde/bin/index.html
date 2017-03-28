@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="Access-Control-Allow-Origin" content="*"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <title>Html5 Client Test</title>
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <script language="javascript" type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/NameSpace.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/JClass.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/JObject.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/utils.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/ConsoleUtils.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Map.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Md5.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/String.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Number.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Enum.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Error.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/log.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Module.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/ParseUrl.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/entrance/VideoStream.js"></script>
+  
+  <script type="text/javascript" src="../src/com/webp2p/core/storage/Bucket.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/storage/MemoryBucket.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/storage/Pool.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/Url.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/Enviroment.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/Context.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/HttpDownloader.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/MetaPiece.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/MetaSegment.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/MetaData.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/Bitmap.js"></script>
+  <script type="text/javascript" src="../src/com/test/Test.js"></script>
+  <script type="text/javascript" src="../src/com/test/TestHttp.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/Global.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/logic/base/Manager.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/logic/base/Channel.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/logic/base/Peer.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/logic/base/StatData.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/logic/live/Channel.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/logic/vod/Channel.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/base/Pool.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/base/Manager.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/base/Session.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/base/Message.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/cdn/Session.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/cdn/Manager.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/cdn/RequestRange.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/cdn/DrmCrypto.js"></script>
+  
+  
+  
+  <script type="text/javascript" src="../src/com/webp2p/protocol/webrtc/Manager.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/webrtc/Session.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/webrtc/Peer.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/webrtc/Packet.js"></script>
+  
+  <script type="text/javascript" src="../src/com/webp2p/protocol/websocket/Session.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/websocket/Peer.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/protocol/websocket/Manager.js"></script>
+  
+  <script type="text/javascript" src="../src/com/webp2p/core/player/base/Player.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/base/PlayerCreator.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/base/Config.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/base/InitData.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/base/DataManager.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/base/PlayStates.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/live/Player.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/player/vod/Player.js"></script>
+
+   
+  <script type="text/javascript" src="../src/com/webp2p/tools/ts2mp4/Audio.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/ts2mp4/ByteArray.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/ts2mp4/FileHandler.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/ts2mp4/h264nalu.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/ts2mp4/ToMP4.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/ts2mp4/Video.js"></script>
+
+
+  <script type="text/javascript" src="../src/com/webp2p/tools/console/Index.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/console/Channel.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/tools/console/IpHelper.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+ </head>
+<script type="text/javascript">
+	$(document).ready(
+		function()
+		{
+			init();
+		}
+	);
+
+
+	function init() 
+	{
+		var ss = "中国-北京市-朝阳区-联通";
+		console.log("ss.length="+ss.length);
+		var buffer = new Uint8Array(ss.length * 4 );
+		var offset = 0;
+		var pos = 0;
+		for ( var i = 0; i < ss.length; i++) {
+			var val = ss.charCodeAt(i);
+			var b1, b2, b3, b4;
+			if (val < 0x80) {
+				b1 = val >> 0 & 0x7F | 0x00;
+				buffer[offset + pos++] = b1;
+			} else if (val < 0x0800) {
+				b1 = val >> 6 & 0x1F | 0xC0;
+				b2 = val >> 0 & 0x3F | 0x80;
+				buffer[offset + pos++] = b1;
+				buffer[offset + pos++] = b2;
+			} else if (val < 0x010000) {
+				b1 = val >> 12 & 0x0F | 0xE0;
+				b2 = val >> 6 & 0x3F | 0x80;
+				b3 = val >> 0 & 0x3F | 0x80;
+				buffer[offset + pos++] = b1;
+				buffer[offset + pos++] = b2;
+				buffer[offset + pos++] = b3;
+			} else if (val < 0x110000) {
+				b1 = val >> 18 & 0x07 | 0xF0;
+				b2 = val >> 12 & 0x3F | 0x80;
+				b3 = val >> 6 & 0x3F | 0x80;
+				b4 = val >> 0 & 0x3F | 0x80;
+				buffer[offset + pos++] = b1;
+				buffer[offset + pos++] = b2;
+				buffer[offset + pos++] = b3;
+				buffer[offset + pos++] = b4;
+			}
+		}
+		console.log(buffer.length);
+// 		var channelUrl = "http://g3.letv.cn/vod/v2/MTA2LzEyLzc4L2xldHYtdXRzLzE0L3Zlcl8wMF8yMi0zMTA4NjYzODAtYXZjLTg2ODEyNi1hYWMtNjQwMDAtMjcyODgwMC0zMjA5NjE3NDQtMDUzNjYwNTc0N2Q2M2U1NDJiODdmY2IzZjIyZGUxMWItMTQyNTM3OTcyOTUzNi5tcDQ=?b=940&mmsid=27556118&tm=1425878842&key=3dda8ebdad2c9e861ffc9f860af47748&platid=1&splatid=102&playid=0&tss=ios&vtype=22&cvid=1364804609726&pip=828930bd802cffea4e5afb84a5c3c046&ctv=pc&m3v=1&termid=1&format=1&hwtype=un&ostype=MacOS10.10.2&tag=letv&sign=letv&expect=3&p1=1&p2=10&p3=-&tn=0.4151888438500464&pay=1&uinfo=S2VaaVkVdBIK65SoFfPX6DN3QRJ3DXpnDYkQi2MmWPpUh1EM_6VWLQ==&iscpn=f9051&rateid=1300&key2=XXXX";
+// 		var channelUrl2 = "http://115.182.93.97/gslb?stream_id=bjws&tag=live&ext=m3u8&sign=live_web&format=2&expect=2&termid=1&pay=0&uid=6087402&uinfo=SjQPRRBSPEGwkJ4LvhsYRZ2F5ndwPipqDXeGWunBFAQY4KIn6ZLFBA==&ostype=Mac%20OS%2010.10.2&hwtype=un&platid=10&splatid=1001&playid=1&p1=1&p2=10&p3=-&tm=1428484584&key=3468cac71085d84a8a0d9d2d2fe2b12d";
+// 		var channelUrl3 = "http://g3.letv.cn/vod/v2/MTM2LzcvMjAvbGV0di11dHMvMTQvdmVyXzAwXzIyLTMxODMyMjAxNy1hdmMtMTc5NDI4Ni1hYWMtOTYwMDAtMjczNTMyMC02NTAzNTcyNjItM2Y3OGIwYTA1OGU4ODUwYWU4YzdhYWJiZTU5NWZmMGQtMTQzMDcyNzgyMTQ5Ny5tcDQ=?b=940&mmsid=27556118&tm=1425878842&key=3dda8ebdad2c9e861ffc9f860af47748&platid=1&splatid=102&playid=0&tss=ios&vtype=22&cvid=1364804609726&pip=828930bd802cffea4e5afb84a5c3c046&ctv=pc&m3v=1&termid=1&format=1&hwtype=un&ostype=MacOS10.10.2&tag=letv&sign=letv&expect=3&p1=1&p2=10&p3=-&tn=0.4151888438500464&pay=1&uinfo=S2VaaVkVdBIK65SoFfPX6DN3QRJ3DXpnDYkQi2MmWPpUh1EM_6VWLQ==&iscpn=f9051&rateid=1300&key2=XXXX";
+// 		///"http://g3.letv.cn/vod/v2/MTM2LzcvMjAvbGV0di11dHMvMTQvdmVyXzAwXzIyLTMxODMyMjAxNy1hdmMtMTc5NDI4Ni1hYWMtOTYwMDAtMjczNTMyMC02NTAzNTcyNjItM2Y3OGIwYTA1OGU4ODUwYWU4YzdhYWJiZTU5NWZmMGQtMTQzMDcyNzgyMTQ5Ny5tcDQ=?b=1902&cvid=409018809070&key=2ab69a8bfa67d4941ec47b55ea431103&lsbv=2bI&lsdg=2oUY4wanttREcnGEkRv0LmdtgfX&lsst=1&lssv=1zuuCM_T1_S85_Vd8G_PF710C8A317F66FB9CE4F161F5066FC3F_IW_M8ojjxHWm_LBc3F4&lstm=1YqHIE&mmsid=30317425&payff=0&pip=f24c132d7909a1041cc551489ab47037&platid=5&playid=0&splatid=501&tm=1430987790&token=97dbd03bb22fab27bca4a5305ca56bd8&tss=tvts&uid=35978477&uinfo=cx0pWSBPawUAXLAiYv1CE-l-NPe4tfXiaJJQj0spw6a8VvcMno6CBg==&vtype=51&key2=XXXX";
+// 		p2p$.com.webp2p.core.common.Log.init();
+// 		videoBox = document.getElementById("videobox");
+// 		 videoStream = new p2p$.com.webp2p.core.entrance.VideoStream();
+
+// 		creator = new p2p$.com.webp2p.core.player.base.PlayerCreator();
+// 		creator.initialize(channelUrl3,videoBox,videoStream);
+// 		cdePlayer = creator.createPlayer();
+// 		if(cdePlayer != null)
+// 		{
+// 			cdePlayer.play();
+// 		}else
+// 		{
+// 			console.log("channel create failed!!!!");
+// 		}
+// 		stateUrl = "state/current?cde=1&needCurrentProcess=1&needNetworkList=1&segmentStartWithPlayer=1&random=0.25380495679564774";
+// 		stateShow = $$root.cde.console.Index;
+// 		stateShow.start();
+// 		//
+// 		setStateCurrentTimeout(1000);
+		
+		
+	}
+	function setStateCurrentTimeout(timeoutMs)
+	{
+		var me = this;
+		this.timer_ = setTimeout(function(){
+			me.onStateCurrentTimeout(); 
+			}, timeoutMs );
+	};
+	function onStateCurrentTimeout()
+	{
+		stateCurrent = videoStream.requestStateCurrent(stateUrl);
+		stateShow.onAjaxDataResult(stateCurrent);
+		setStateCurrentTimeout(1000);
+	};
+	function startConnect()
+	{
+		var uir = document.getElementById("uir").value;
+		if(videoStream)
+		{
+			var uir=document.getElementById("uir").value;
+			var reg=/http:\/\/([\w|\d]+){1,}([\w|\d]+)/i;
+			if(reg.test(uir))
+			{
+				//creator.initialize(uir,videoBox,videoStream);
+				creator.changeChannel(uir);
+				cdePlayer = creator.createPlayer();
+				if(cdePlayer != null)
+				{
+					cdePlayer.play();
+				}else
+				{
+					console.log("channel create failed!!!!");
+				}
+			}
+		}
+	}
+	function videoPlayer(type,info)
+	{
+		console.log("-->click:",type);
+		switch(type)
+		{ 
+			case 'load':
+				break;
+			case 'play':
+				cdePlayer.play();
+				break;
+			case 'pause':
+				cdePlayer.pause();
+				break;
+			case 'mute':
+				var muted = videoStream.muted;
+				if(muted)
+					{
+					videoStream.muted = false;
+					document.getElementById("icon-mute").innerHTML="<i class='icon-volume-up'></i>";
+					}
+				else
+					{
+					videoStream.muted = true;
+					document.getElementById("icon-mute").innerHTML="<i class='icon-volume-off'></i>";
+					}
+				break;
+			case 'voladd':
+// 				console.log(videoStream.volume);
+// 				videoStream.volume += 0.1;
+// 				updateVolume();
+				break;
+			case 'volred':
+// 				videoStream.volume -= 0.1; 
+// 				updateVolume();
+				break;
+			case 'fullscreen':
+// 				videoStream.fullscreen=true;
+				break;
+			case 'big':
+// 				videoStream.videoHeight=400;
+// 				videoStream.videoWidth=600;
+				break;
+			case 'normal':
+// 				videoStream.videoWidth = 400;
+// 				videoStream.videoHeight=300;
+				break;
+			case 'backward_press':
+				//status="seek";
+// 				seekTime=parseInt(videoStream.currentTime);
+// 				timeID = setInterval(changeSeekTime,100,0);
+				break;
+			case 'backward_release':
+// 				status="play";
+// 				clearInterval(timeID);
+// 				videoStream.seek(seekTime);
+				break;
+			case 'forward_press':
+// 				status="seek";
+// 				seekTime=parseInt(videoStream.currentTime);
+// 				timeID = setInterval(changeSeekTime,100,1);
+				break;
+			case 'forward_release':
+// 				status="play";
+// 				clearInterval(timeID);
+// 				videoStream.seek(seekTime);
+				break;
+			case 'seek':
+				var time = document.getElementById("seekValue").value;
+				cdePlayer.seek(time);
+				break;
+		}
+	}
+	
+</script>
+	<body>
+	<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span8 offset2 text-center">
+			<div class="videoPlayer">
+				<div id="videobox">
+					<video id="player" width="400" height="300"></div>
+				<div class="progress" style="height:10px;">
+					<div id="slider" class="bar bar-success" style="width:0%"></div>
+					<div id="slider2" class="bar bar-info" style="width:0%"></div>
+				</div>
+				<div class="navbar">
+				<div class="navbar-inner">
+					<div class="row-fluid">
+					    <div class="span3">
+					    	<span class="btn btn-mini" title="播放" onclick="videoPlayer('play')"><i class="icon-play"></i></span>
+					    	<span class="btn btn-mini" onclick="videoPlayer('pause')"><i class="icon-pause"></i></span>
+					    	<span class="btn btn-mini" title="快退" onMouseDown="videoPlayer('backward_press')" onMouseUp="videoPlayer('backward_release')"><i class="icon-fast-backward"></i></span>
+					    </div>
+					    <div class="span2" style="padding-top:8px;">
+					    <span id="playtimes"></span>
+					    </div>
+					    <div class="span1">
+						    <span class="btn btn-mini" title="快进" onMouseDown="videoPlayer('forward_press')" onMouseUp="videoPlayer('forward_release')"><i class="icon-fast-forward"></i></span>
+					    </div>
+					    <div class="span5">
+					    	<div class="row-fluid">
+						    	<div class="span2"><div id="icon-mute" class="btn btn-mini" onclick="videoPlayer('mute')"><i class="icon-volume-up"></i></div></div>
+						    	<div class="span2"><div class="btn btn-mini" onclick="videoPlayer('volred')"><i class="icon-minus"></i></div></div>
+						    	<div class="span6" style="margin-top:10px;"><div class="progress" style="width:90px;height:10px;">
+									<div id="volumeSlider" class="bar bar-success" style="width:100%"></div>
+								</div></div>
+								<div class="span2"><div class="btn btn-mini" onclick="videoPlayer('voladd')"><i class="icon-plus"></i></div></div>
+							</div>
+						</div>
+					    <div class="span1"><span class="btn btn-mini" onclick="videoPlayer('fullscreen')"><i class="icon-fullscreen"></i></span></div>
+				    </div>
+			    </div>
+		   	    </div>
+		   	</div>
+		</div>
+	</div>
+	<div id="videoInfo"  class="text-center">
+		<div class="input-append">
+		   	<input id="uir" type="text" class="input-large" placeholder="输入调度地址" style="width:600px;">
+		   	<button class="btn" onclick="startConnect(); return false;" style="width:80px;font-size:14px;">打开</button>
+	   	</div>
+	</div>
+
+   <div id="channels-layer" ></div>
+</body>
+</html>

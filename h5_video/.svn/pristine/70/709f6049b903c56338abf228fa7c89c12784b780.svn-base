@@ -1,0 +1,85 @@
+body {color: black; background-color: white; font-family: Arial, sans-serif;height:100%;font-size:10px;}
+.piece-units{
+	display:inline-block;
+	width:6px;
+	height:10px;
+	border-top:solid #fff 1px;
+	border-right:solid #fff 1px;
+	cursor:pointer;
+	margin-top:12px;
+	color:#ffffff;
+	background-color:#eeeeee;
+	}
+.ts-units
+{
+	
+	display: inline-block;
+	width:1px;
+	height:12px;
+	margin-top:10px;
+	border-top:solid #fff 1px;
+	background-color:#aa0000;
+}
+.ts-units span
+{
+	-webkit-text-size-adjust: none;
+	-webkit-transform: scale(0.75);
+	float:left;
+	margin-top:-20px;
+	margin-left:-5px;
+	background:#aa0000;
+	font-size:9px;
+	padding:1px 3px;
+	border-radius:3px 3px 3px 0;
+	color:#fff;
+}
+.videoPlayer {
+position: relative;
+margin: 15px 0;
+padding: 39px 19px 14px;
+background-color: #fff;
+border: 1px solid #ddd;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+}
+.videoPlayer:after {
+content: "H5_Player";
+position: absolute;
+top: -1px;
+left: -1px;
+padding: 3px 7px;
+font-size: 12px;
+font-weight: bold;
+background-color: #f5f5f5;
+border: 1px solid #ddd;
+color: #9da0a4;
+-webkit-border-radius: 4px 0 4px 0;
+-moz-border-radius: 4px 0 4px 0;
+border-radius: 4px 0 4px 0;
+}
+.debugBar {
+position: relative;
+margin: 15px 0;
+padding: 39px 19px 14px;
+background-color: #fff;
+border: 1px solid #ddd;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+}
+.debugBar:after {
+content: "Debug面板：";
+position: absolute;
+top: -1px;
+left: -1px;
+padding: 3px 7px;
+font-size: 12px;
+font-weight: bold;
+background-color: #f5f5f5;
+border: 1px solid #ddd;
+color: #9da0a4;
+-webkit-border-radius: 4px 0 4px 0;
+-moz-border-radius: 4px 0 4px 0;
+border-radius: 4px 0 4px 0;
+}

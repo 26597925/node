@@ -1,0 +1,27 @@
+p2p$.ns("com.webp2p.core.common");
+
+p2p$.com.webp2p.core.common.ERROR_CODE = {
+	kErrorSuccess : 0,
+	kErrorAccessDenied : 1,
+	kErrorInvalidParameters : 2,
+	kErrorInternalError : 3,
+	kErrorDestUnreachable : 4,
+	kErrorServiceBusy : 5,
+	kErrorNetworkUnreachable : 6,
+	kErrorAlreadyExists : 7,
+	kErrorNoSuchGroup : 8,
+	kErrorNoSuchGroupItem : 9,
+	kErrorNoSuchSession : 10,
+	kErrorNoSuchItem : 11,
+	kErrorNetworkFailed : 12,
+	kErrorTimeout : 13,
+	kErrorNotReady : 14,
+	kErrorCanceled : 15,
+	kErrorAuthFailed : 16,
+	kErrorNoPrivileges : 17,
+	kErrorAlreadyLogin : 18,
+	kErrorServiceOffline : 19,
+	kErrorNotSupported : 20,
+	kErrorPasswordExpired : 21,
+	kErrorCodeMax : 22,
+};

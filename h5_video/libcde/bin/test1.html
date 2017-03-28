@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="Access-Control-Allow-Origin" content="*"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <title>Html5 Client Test</title>
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script language="javascript" type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/NameSpace.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/utils/JClass.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/entrance/VideoStream.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/supernode/HttpDownloader.js"></script>
+  <script type="text/javascript" src="../src/com/test/Test.js"></script>
+  <script type="text/javascript" src="../src/com/webp2p/core/common/String.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+ </head>
+<script type="text/javascript">
+	$(document).ready(
+		function()
+		{
+			init();
+		}
+	);
+	
+    
+ 	// 经过改造的jClass
+	function init() 
+	{
+ 		 var zhang = new p2p$.com.test.Employee("ZhangSan", "1234");
+// 	        console.log(zhang.getName());   // "Employee name: ZhangSan"
+// 	        console.log(zhang.getEmployeeIDName()); // "Employee name: ZhangSan, Employee ID: 1234"
+// 	        console.log(zhang.age); 
+// 	        console.log(zhang.getName()); 
+	        
+// 	      var video =  new p2p$.com.webp2p.core.entrance.VideoStream();
+// 	       console.log(video.getStun());
+// 	       console.log(video.getWebsocket());
+	       
+		var num = p2p$.com.webp2p.core.common.String.parseFloat("sss",zhang);
+		console.log(num);
+		console.log(isNaN(num));
+		
+		//var localMacAddress1 = p2p$.com.webp2p.core.common.String.urlEncode("1+2==3");
+		//var localMacAddress11 = p2p$.com.webp2p.core.common.String.str2asc2("你...我");
+		//var localMacAddress2 = p2p$.com.webp2p.core.common.String.urlEncode("你...我");
+	}
+	
+</script>
+<body>
+
+</body>
+</html>

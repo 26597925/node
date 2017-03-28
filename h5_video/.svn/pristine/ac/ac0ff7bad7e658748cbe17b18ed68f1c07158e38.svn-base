@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Access-Control-Allow-Origin" content="*"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTML5 Demo List</title>
+  <link rel="stylesheet" type="text/css" href="css/index.css" />
+  <style>
+  	table{border-collapse:collapse;}
+	td{padding:5px;}
+  </style>
+</head>
+<body>
+	<table align="center" border="1">
+         <tr valign="top">
+            <td>	
+	         <table border="1">
+			 <tr >
+	            <th colspan="1">点播</th>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&videoId=4">虎妈猫爸 第二集 720P</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=0">虎妈猫爸 第十七集 350P</a></td>
+	         </tr>
+	         <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=6">贝瓦儿歌1 350P</a></td>
+	         </tr>
+	         <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=7">小伴龙儿歌1</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=8">小伴龙 翻翻书1</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=9">失孤</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=10">西游记之大闹天宫</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=11">澳门风云</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=12">奔跑吧 兄弟0619 标清</a></td>
+	         </tr>
+	           <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=14">奔跑吧 兄弟0619 高清</a></td>
+	         </tr>
+	           <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=15">奔跑吧 兄弟0619 超清</a></td>
+	         </tr>
+	           <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=16">奔跑吧 兄弟0619 1080P</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=13">奔跑吧 兄弟0612 标清</a></td>
+	         </tr>
+	           <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=19">奔跑吧 兄弟0612 高清</a></td>
+	         </tr>
+	           <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=18">奔跑吧 兄弟0612 超清</a></td>
+	         </tr>
+	           <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=17">奔跑吧 兄弟0612 1080P</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=20">甄嬛传 01</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=21">甄嬛传 02</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=22">甄嬛传 03</a></td>
+	         </tr>
+	          <tr>
+	             <td><a target="blank" href="index.html?showConsole=true&videoId=23">甄嬛传 04</a></td>
+	         </tr>
+	        </table>
+        </td>
+            <td>        
+		        <table border="1">
+				 <tr>
+		            <th colspan="1">直播台</th>
+		         </tr>
+		          <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv1">cctv1</a></td>
+		         </tr>
+		         <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv1HD_1300">cctv1HD_1300</a></td>
+		         </tr>
+		         <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv1HD_1800">cctv1HD_1800</a></td>
+		         </tr>
+		         <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv2">cctv2</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv3">cctv3</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv4">cctv4</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv5_800">cctv5_800</a></td>
+		         </tr>
+		             <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv5_1300">cctv5_1300</a></td>
+		         </tr>
+		             <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv5_1800">cctv5_1800</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv6">cctv6</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv7">cctv7</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv8">cctv8</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv9">cctv9</a></td>
+		         </tr>
+		           <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=cctv10">cctv10</a></td>
+		         </tr>
+		         <tr>
+		            <td><a target="blank" href="index.html?showConsole=true&streamId=heilongjiangHD_350">heilongjiangHD_350 流畅</a></td>
+		         </tr>
+		          <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=heilongjiangHD_800">heilongjiangHD_800 高清</a></td>
+		         </tr>
+		         <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=heilongjiangHD_1300">heilongjiangHD_1300 超清</a></td>
+		         </tr>
+		         <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=heilongjiangHD_1800">heilongjiangHD_1800 720P</a></td>
+		         </tr>
+		         <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=anhui_350">安徽 流畅</a></td>
+		         </tr>
+		          <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=anhui">安徽 超清</a></td>
+		         </tr>
+		         <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=hebei">河北 流畅</a></td>
+		         </tr>
+		          <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=hebei_350">河北 超清</a></td>
+		         </tr>
+		          <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=henan">河南 流畅</a></td>
+		         </tr>
+		          <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=henan_350">河南 超清</a></td>
+		         </tr>
+		         <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=shandong">山东 流畅</a></td>
+		         </tr>
+		          <tr>
+		             <td><a target="blank" href="index.html?showConsole=true&streamId=shandong_350">山东 超清</a></td>
+		         </tr>
+		        </table>
+        </td>
+            <td>        
+             <table border="1">
+			 <tr>
+	            <th colspan="1">乐视轮播台</th>
+	         </tr>
+	                 <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_zonghe_350">综合频道 lb_zonghe_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_zonghe_1000">综合频道 lb_zonghe_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_zonghe_1300">综合频道 lb_zonghe_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_zonghe_720p">综合频道 lb_zonghe_720p</a></td>
+	         </tr>
+	        <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_movie_350">电影频道 lb_movie_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_movie_1000">电影频道 lb_movie_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_movie_1300">电影频道 lb_movie_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_movie_720p">电影频道 lb_movie_720p</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_mv_350">MV频道 lb_mv_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_mv_1000">MV频道 lb_mv_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_mv_1300">MV频道 lb_mv_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_mv_720p">MV频道 lb_mv_720p</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_erge_350">儿歌频道 lb_erge_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_erge_1000">儿歌频道 lb_erge_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_erge_1300">儿歌频道 lb_erge_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_erge_720p">儿歌频道 lb_erge_720p</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_tv_350">电视剧频道 lb_tv_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_tv_1000">电视剧频道 lb_tv_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_tv_1300">电视剧频道 lb_tv_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_tv_720p">电视剧频道 lb_tv_720p</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_make_350">自制剧频道  lb_make_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_make_1000">自制剧频道  lb_make_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_make_1300">自制剧频道  lb_make_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_make_720p">自制剧频道 lb_make_720p</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_1080P_1080p3m">1080P lb_1080P_1080p3m</a></td>
+	         </tr>
+	         	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_trailer_350">电影片花 lb_make_350</a></td>
+	         </tr>
+	          <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_trailer_1000">电影片花  lb_make_1000</a></td>
+	         </tr>
+	         <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_trailer_1300">电影片花  lb_make_1300</a></td>
+	         </tr>
+	           <tr>
+	            <td><a target="blank" href="index.html?showConsole=true&streamId=lb_trailer_720p">电影片花 lb_make_720p</a></td>
+	         </tr>
+	         
+	        </table>
+        </td>
+         </tr>
+	</table>
+
+
+        
+
+</body>
+</html>

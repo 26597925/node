@@ -1,0 +1,54 @@
+body {color: black; background-color: white; font-family: Arial, sans-serif;height:100%;font-size:10px;}
+.stat {padding-top:10px;}
+.stat td{border-bottom:solid 1px #ccc;}
+.stat .title{color:#666; font-weight:bold; background:#ccc; font-size:12px;}
+.stat .prefix{color:#666; font-weight:bold;}
+.stat .prefix2{color:#666;}
+.stat .extra{color:#999; font-size:9px; font-style:italic;}
+.stat .end{border-right:solid 1px #ccc;}
+.stat .value{color:#222;}
+
+.piece-units{
+	display:inline-block;
+	width:6px;
+	height:10px;
+	border-top:solid #fff 1px;
+	border-right:solid #fff 1px;
+	cursor:pointer;
+	margin-top:12px;
+	color:#ffffff;
+	background-color:#eeeeee;
+	}
+.ts
+{
+	position:relative;
+	width:1px;
+	display: inline-block;
+	height:11px;
+	background-color:#aa0000;
+}
+.ts span
+{
+	-webkit-text-size-adjust: none;
+	-webkit-transform: scale(0.75);
+	float:left;
+	margin-top:-11px;
+	margin-left:-5px;
+	background:#aa0000;
+	font-size:9px;
+	padding:1px 3px;
+	border-radius:3px 3px 3px 0;
+	color:#fff;
+}
+table { border: none; margin: auto; margin-top: 1ex;font-size:10px;}
+td {text-overflow:ellipsis; white-space:nowrap; overflow:hidden;}
+caption { background-color: #ccc; }
+thead th {  background-color: #ccc; }
+#events td { text-align: right; width: 4ex;}
+#properties td { }
+hr { clear: both; margin-top: 2em;}
+.true { background-color: #8f8 }
+.false { background-color: #faf }
+#buttons { text-align: center; }
+
+#m_video td, #m_video th, #tracks td, #tracks tth { text-align: center; padding-left: 0.5ex; padding-right: 0.5ex;}

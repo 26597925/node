@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="demo/js"/>
+	<classpathentry excluding="src/com/webp2p/logic/base/|src/com/webp2p/core/entrance/|src/com/webp2p/core/common/|src/com/webp2p/tools/collector/|src/com/webp2p/core/player/vod/|src/com/webp2p/core/player/|src/com/test/|src/com/webp2p/core/utils/|src/com/webp2p/logic/vod/|src/com/webp2p/tools/console/|src/com/webp2p/logic/live/|src/com/webp2p/protocol/websocket/|src/com/webp2p/core/storage/|src/com/webp2p/protocol/cdn/|src/com/webp2p/core/supernode/|src/com/webp2p/protocol/base/|src/com/webp2p/protocol/webrtc/|src/com/webp2p/tools/ts2mp4/|src/com/webp2p/core/player/live/|src/com/webp2p/t3party/|src/com/webp2p/core/player/base/|bin/js/" kind="src" path="libcde"/>
+	<classpathentry kind="src" path="libcde/bin/js"/>
+	<classpathentry kind="src" path="libcde/src/com/test"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/common"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/entrance"/>
+	<classpathentry excluding="vod/|live/|base/" kind="src" path="libcde/src/com/webp2p/core/player"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/player/base"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/player/live"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/player/vod"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/storage"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/supernode"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/core/utils"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/logic/base"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/logic/live"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/logic/vod"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/protocol/base"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/protocol/cdn"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/protocol/webrtc"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/protocol/websocket"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/t3party"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/tools/collector"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/tools/console"/>
+	<classpathentry kind="src" path="libcde/src/com/webp2p/tools/ts2mp4"/>
+	<classpathentry kind="src" path="sdk/src"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
