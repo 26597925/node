@@ -29,9 +29,11 @@ ALTER TABLE `tb_user_basic` CHANGE `USERLASTLOGIN` `USERLASTLOGIN` VARCHAR(256) 
 </p>
 <br />
 <p>
+  
 把代码整理一下，省的以后再下手写，直接copy<br />
 
-<p><br />
+
+<pre><br />
 //nameSpace<br />
 <br />
 var oojs$ = {<br />
@@ -166,7 +168,8 @@ oojs$.com.utils.Audio = oojs$.createClass(<br />
     this.reset();<br />
   }<br />
 }<br />
-</p><br />
+</pre>
+
 
 
 
