@@ -155,20 +155,22 @@ oojs$.com.utils.Audio = oojs$.createClass(
 
 </pre>
 </p>
+
+listenerjs.addEventListener("listnerName",function)
 <p>
 	<pre>
-listenerobj.addEventListener("listnerName",function)
-var listenerobj = function(){};
-listenerobj._events = {};
-listenerobj.addEventListener(eventName, callback)
+
+var listenerjs = function(){};
+listenerjs._events = {};
+listenerjs.addEventListener(eventName, callback)
 {
-    listenerobj._events[eventName] = listenerobj._events[eventName] || [];
-    listenerobj._events[eventName].push(callback);
+    listenerjs._events[eventName] = listenerjs._events[eventName] || [];
+    listenerjs._events[eventName].push(callback);
 };
 
-listenerobj.dispatch= function(eventName, _) 
+listenerjs.dispatch= function(eventName, _) 
 {    
-    var events = listenerobj ._events[eventName];
+    var events = listenerjs ._events[eventName];
     var args = Array.prototype.slice.call(arguments, 1);
     if (!events)
     {      
