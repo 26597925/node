@@ -127,10 +127,7 @@ var oojs$ = {
       }
     }
   }
-};
-
-oojs$.util = {
-  apply : function(dest, source) {
+  ,apply : function(dest, source) {
     for ( var name in source) {
       dest[name] = source[name];
     }
@@ -146,6 +143,7 @@ oojs$.util = {
     return dest;
   }
 };
+
 
 //use stage 
 oojs$.ns("com.utils");
@@ -163,16 +161,14 @@ oojs$.com.utils.Audio = oojs$.createClass(
   {
     this.fullscreen = true;
   },
-  __ctor: function()
+  __ctor: function(value)
   {
+    oojs$.apply(this,value);
     this.reset();
   }
 }
 
 </pre>
-
-
-
 
    
 <br />
