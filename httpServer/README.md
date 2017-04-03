@@ -128,6 +128,23 @@ var oojs$ = {
 		}
 		return dest;
 	}
+	,_events:{}
+	,addEventListener: function(eventName, callback){
+		this._events[eventName] = this._events[eventName] || [];
+		this._events[eventName].push(callback);
+	}
+	,dispatch:function(eventName, _){
+		var events = this._events[eventName];
+		var args = Array.prototype.slice.call(arguments, 1);
+		if (!events)
+		{
+			return;
+		}
+		for (var i = 0, len = events.length; i < len; i++) 
+		{
+			events[i].apply(null, args);
+		}
+	}
 };
 
 
@@ -156,30 +173,3 @@ oojs$.com.utils.Audio = oojs$.createClass(
 </pre>
 </p>
 
-listenerjs.addEventListener("listnerName",function)
-<p>
-	<pre>
-
-var listenerjs = function(){};
-listenerjs._events = {};
-listenerjs.addEventListener(eventName, callback)
-{
-    listenerjs._events[eventName] = listenerjs._events[eventName] || [];
-    listenerjs._events[eventName].push(callback);
-};
-
-listenerjs.dispatch= function(eventName, _) 
-{    
-    var events = listenerjs ._events[eventName];
-    var args = Array.prototype.slice.call(arguments, 1);
-    if (!events)
-    {      
-        return;    
-    }
-    for (var i = 0, len = events.length; i < len; i++) 
-    {      
-        events[i].apply(null, args);
-    }  
-};
-	</pre>
-</p>

@@ -1,7 +1,7 @@
-var path = require("path");
-var util = require('util');
-var unit_date = require(path.join(__dirname, "..", "..", "..","js_unit","unit_date.js"));
-var config = require(path.join(__dirname,"..","..","..","config.js"));
+const path = require("path");
+const util = require('util');
+const unit_date = require(path.join(__dirname, "..", "..", "..","js_unit","unit_date.js"));
+const config = require(path.join(__dirname,"..","..","..","config.js"));
 
 exports.createSID = function () {
 	var now = new Date();
@@ -62,7 +62,9 @@ var invertDate = function(sID){
 }
 
 exports.get_uID = function(req){
+	
 	var cookies = parseCookies(req.headers.cookie);
+	// console.log(path.basename(__dirname),cookies)
 	return cookies.uID;
 }
 

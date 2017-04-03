@@ -1,5 +1,7 @@
 # node
 <ul>
+<li>https://github.com/bminer/node-mysql-queues</li>
+<li>npm install mysql-queues</li>
 <li>https://craftpip.github.io/jquery-confirm/</li>
 <li>npm install jquery-confirm</li>
 <li>npm install -g pm2 </li>

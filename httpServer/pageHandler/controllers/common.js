@@ -4,7 +4,7 @@ const fs = require('fs');
 const ejs = require('ejs');
 const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
-
+const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
 exports.index = function(){
     this.render(['login.html','login.js'], {message:''});
@@ -26,19 +26,31 @@ var add_newUser = function(context){
             &&self.req.post["ZIPCODE"]
             // &&this.req.post.hasOwnProperty("")
             ){
-            //INSERT INTO `tb_user_basic` (`USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `userLastLogin`, `ONLINE`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES ('0', '0', 'test3', '测试3', '15801278254', '111111', 'zvxvc', 'qweqwe', '0', '0', NULL, '0', CURRENT_TIMESTAMP, '0000-00-00 00:00:00.000000', 'sdasdsda');
+
+            //INSERT INTO `tb_user_basic` (`USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `ONLINE`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES ('0', '0', 'test3', '测试3', '15801278254', '111111', 'zvxvc', 'qweqwe', '0', '0', NULL, '0', CURRENT_TIMESTAMP, '0000-00-00 00:00:00.000000', 'sdasdsda');
+            
             var sql = "INSERT INTO `tb_user_basic` "
-            +"( `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`)"
+            +"( `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`,`MODTIME`)"
             +" VALUES ( '"+self.req.post["UENAME"]+"', '"
                 +self.req.post["UCNAME"]+"', '"
                 +self.req.post["PHONENUMBER"]+"', '"
                 +self.req.post["PASSWORD"]+"', '"
                 +self.req.post["ADDRESS"]+"', '"
-                +self.req.post["ZIPCODE"]+"')";
+                +self.req.post["ZIPCODE"]+"', '"
+                +unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+"')";
             db.query(sql,function(){
                 console.log("insert",JSON.stringify(arguments));
                 if(arguments.length==1){
-                    updateUserLoginTime(self.req.post["UENAME"],self,"UENAME");
+                    var sql2 = "select USERID from tb_user_basic where `PHONENUMBER` = '"+self.req.post["PHONENUMBER"]+"' and `PASSWORD` = '"+self.req.post["PASSWORD"]+"'";
+                    db.query(sql2,function(){
+                        if(arguments.length==1){
+                            debugger
+                            updateUserLoginTime(arguments["USERID"],self,"USERID");
+                         }else{
+                            result = {'success':false,'message':'数据存在问题，请联系管理员'};
+                            self.responseDirect(200,"text/json",JSON.stringify(result));
+                        }
+                    });
                 }else{
                     result = {'success':false,'message':'数据存在问题，请联系管理员'};
                     self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -55,7 +67,7 @@ exports.logup_submit = function(){
     var self = this;
     var result = {'success':true,'message':'登录成功'};
     if(self.req.post){
-        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `winners`.`tb_user_basic` where `UENAME`='"+this.req.post["UENAME"]+"' and `PASSWORD`='"+this.req.post["PASSWORD"]+"'";
+        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='"+this.req.post["UENAME"]+"' and `PASSWORD`='"+this.req.post["PASSWORD"]+"'";
         db.query(sql,function(){
             
             if(arguments.length==0){
@@ -96,11 +108,11 @@ exports.login = function(args){
     var usr = args["usr"] || null;
     var psw = args["psw"] || null;
     // SELECT `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, 
-    //`PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `userLastLogin`, 
-    //`ONLINE`, `ADDTIME`, `MODTIME`, `REMARK` FROM `winners`.`tb_user_basic`
+    //`PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `MODTIME`, 
+    //`ONLINE`, `ADDTIME`, `MODTIME`, `REMARK` FROM `tb_user_basic`
     
     if(usr && psw){
-        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `winners`.`tb_user_basic` where `UENAME`='"+usr+"' and `PASSWORD`='"+psw+"'";
+        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='"+usr+"' and `PASSWORD`='"+psw+"'";
         var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){
             if(arguments.length==1){
@@ -124,10 +136,10 @@ var updateUserLoginTime = function(USERID,context){
     var res = context.res;
     var SID = sessions.createSID();
     sessions.setCookie(req,res,SID,USERID);
-    var sql2 = "UPDATE `tb_user_basic` SET `userLastLogin` = '"+SID+"' WHERE `tb_user_basic`.`USERID` = "+USERID+" "
+    var sql2 = "UPDATE `tb_user_basic` SET `LASTLOGIN` = '"+SID+"' WHERE `tb_user_basic`.`USERID` = "+USERID+" "
     
     if(arguments.length==3){
-        sql2 = "UPDATE `tb_user_basic` SET `userLastLogin` = '"+SID+"' WHERE `tb_user_basic`.`"+arguments[2]+"` = '"+USERID+"' "
+        sql2 = "UPDATE `tb_user_basic` SET `LASTLOGIN` = '"+SID+"' WHERE `tb_user_basic`.`"+arguments[2]+"` = '"+USERID+"' "
     }
 
     var result = {'success':true,'message':'登录成功'};
@@ -161,10 +173,11 @@ var renderPage = function(){
     // <a href='#' id='historydata_pl_here'> 卡顿率</a><br />
     // </div>
     var nvgHtml = "";
-
+    var nvgClick = "";
     var jsRegist = "";
     var jsState = "";
     var htmlDoc = "";
+    var firstPage = "";
     //var hideAllPanel = function ()
     // {
     //     $("#historydata").hide();
@@ -175,23 +188,34 @@ var renderPage = function(){
         for(var navigator in nvgJson[i]){
             nvgHtml += "<h5><a href='#'>"+navigator+"</a></h5>";
             nvgHtml += "<div>"
-            for(var element in nvgJson[i][navigator]){
+            for(var element=0; element < nvgJson[i][navigator].length; element++){
                 nvgHtml += 
                 "<a id=\""+nvgJson[i][navigator][element]["id"]
                 +"\" href=\""+nvgJson[i][navigator][element]["href"]
                 +"\">"+nvgJson[i][navigator][element]["name"]
                 +" </a> <br />";
-                jsState += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsState"]),'utf-8');
-                jsRegist += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsRegist"]),'utf-8');
 
-                hideAllPanel += '$("#'+(nvgJson[i][navigator][element]["id"]+"_panel")+'").hide();\n';
+                nvgClick += '  $("#'+nvgJson[i][navigator][element]["id"]+'").click(function(){\n'
+                    +'      hideAllPanel();\n'
+                    +'      $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
+                    +'    });\n';
+                // if(i==0&&element==0){
+                if(i==0&&element==1){
+                    // console.log(">>>>>>",nvgJson[i][navigator][element]["id"])
+                    firstPage = '   $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
+                }
+    
+
+                jsState += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsState"]),'utf-8');
+                // jsRegist += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsRegist"]),'utf-8');
+
+                hideAllPanel += '   $("#'+(nvgJson[i][navigator][element]["id"]+"_panel")+'").hide();\n';
 
                 htmlDoc += '<div id="'+(nvgJson[i][navigator][element]["id"]+"_panel")+'" class="content">'
                 htmlDoc += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["htmlDoc"]),'utf-8');
                 htmlDoc += '</div>'
 
-                jsState += "\n";
-                jsRegist += "\n";
+                // jsState += "\n";
                 htmlDoc += "\n";
             }
             nvgHtml += "</div>"
@@ -200,8 +224,11 @@ var renderPage = function(){
 
     hideAllPanel += '}\n';
     jsState += hideAllPanel;
+    jsRegist += nvgClick;
+    jsRegist += firstPage;
     var js_templates = fs.readFileSync(path.join(__dirname,"..",'views','main.js'),'utf-8');
     var js_content = ejs.render(js_templates,{"jsState":jsState,"jsRegist":jsRegist});
+    // var js_content = ejs.render(js_templates,{"jsState":jsState});
     
     var html_templates = fs.readFileSync(path.join(__dirname,"..",'views','main.html'),'utf-8');
     var html_content = ejs.render(html_templates,{panel:htmlDoc,navigation:nvgHtml});

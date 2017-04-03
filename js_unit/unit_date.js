@@ -23,7 +23,28 @@ var unit_date = function()
 			}
 		}
 		return fmt;
-	}
+	};
+
+	this.matchYMD = function(myd,type){
+        var yearReg = '(20[0-9][0-9]|20[0-9][0-9])';            ///< Allows a number between 2014 and 2029
+        var monthReg = '(0[1-9]|1[0-2])';               ///< Allows a number between 00 and 12
+        var dayReg = '(0[1-9]|1[0-9]|2[0-9]|3[0-1])';   ///< Allows a number between 00 and 31
+        var hourReg = '([0-1][0-9]|2[0-3])';            ///< Allows a number between 00 and 24
+        var minReg = '([0-5][0-9])';                    ///< Allows a number between 00 and 59
+        var reg1 = new RegExp('^' + yearReg + '-' + monthReg + '-' + dayReg + ' ' + hourReg + ':' + minReg + '$', 'g');
+        var reg2 = new RegExp('^' + yearReg + '-' + monthReg + '-' + dayReg + '$', 'g');
+        var reg = null;
+        if(type == 1){
+        	reg = reg1;
+		}else{
+            reg = reg2;
+		}
+        if( !myd.match(reg) ){
+        	return false;
+		}else{
+        	return true;
+		}
+	};
 
 	this.sortTime = function(date_str){
 		var _date = new Date("1970-1-1 0:0:0");
@@ -32,7 +53,7 @@ var unit_date = function()
 			_date2 = new Date(date_str);
 		}
 		return _date2.getTime() - _date.getTime();
-	}
+	};
 
 	this.toNumber = function(date_str){
 		// date_str = "1:1:1";

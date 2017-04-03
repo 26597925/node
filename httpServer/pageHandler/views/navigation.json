@@ -1,15 +1,15 @@
 [
 	{"帐号管理":
 		[
-			{"id":"dict_trade","href":"#","name":"用户券商管理 ","htmlDoc":"dict_trade.html","jsState":"dict_trade_st.js","jsRegist":"dict_trade_rg.js"}
+			{"id":"dictTrade","href":"#","name":"用户券商管理 ","htmlDoc":"dictTrade.html","jsState":"dictTrade.js"}
 			,
-			{"id":"dict_trade1","href":"#","name":"用户券商管理1 ","htmlDoc":"dict_trade1.html","jsState":"dict_trade_st1.js","jsRegist":"dict_trade_rg1.js"}
+			{"id":"policy","href":"#","name":"策略管理 ","htmlDoc":"policy.html","jsState":"policy.js"}
 		]
 	}
 	,
 	{"帐号管理2":
 		[
-			{"id":"dict_trade2","href":"#","name":"用户券商管理2 ","htmlDoc":"dict_trade2.html","jsState":"dict_trade_st2.js","jsRegist":"dict_trade_rg2.js"}
+			{"id":"dict_trade2","href":"#","name":"用户券商管理2 ","htmlDoc":"dictTrade2.html","jsState":"dictTrade_st2.js"}
 		]
 	}
 ]
