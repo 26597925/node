@@ -12,7 +12,7 @@ exports.select_dictTrade = function(){
     db.query(sql,function(){
        if(arguments.length==1){
             result['data'] = arguments[0];
-            console.log(arguments)
+            console.log(path.basename(__filename),'select_dictTrade',arguments);
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
             result = {'success':false,'message':'数据查询有问题，请联系管理员'};

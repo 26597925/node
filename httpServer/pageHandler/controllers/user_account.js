@@ -8,7 +8,7 @@ const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_dat
 exports.select_userAccount = function(){
 	
 	var self = this;
-    // console.log("arguments",arguments)
+
 	var ID = sessions.get_uID(self.req);
     // ID=10000;//test
 	var result = {'success':true,'data':''};
@@ -18,7 +18,7 @@ exports.select_userAccount = function(){
 	// var sql = "SELECT `USERID`, `TRADEID`, `ACCOUNTID`, `CANAME`,`PASSWORD` FROM `tb_user_account` where USERID='"+ID+"'";
 	// sql = "SELECT `USERID`, `TRADEID`, `ACCOUNTID` FROM `tb_user_account` where USERID='"+ID+"'";
     db.query(sql,function(){
-        console.log("arguments", arguments,arguments.length);
+        console.log(path.basename(__filename),"select_userAccount", arguments);
         if(arguments.length==1){
             result['data'] = arguments[0];
             self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -40,7 +40,7 @@ exports.modify_userAccount = function(){
             &&self.req.post["ACCOUNTID"]
             &&self.req.post["PASSWORD"]
         ){
-            console.log('modify_userAccount',JSON.stringify(self.req.post));
+            console.log(path.basename(__filename),'modify_userAccount',JSON.stringify(self.req.post));
             
             //UPDATE `tb_capital_conf` SET `MAXBUY` = '10000', `BUYAMOUNT` = '1', `BUYPERCENT` = '0.5', `SPLITCOUNT` = '9' WHERE `tb_capital_conf`.`ACCOUNTID` = '5890000049';
             //UPDATE `tb_user_account` SET `ACCOUNTID` = '1050099800', `PASSWORD` = '62279200', `CANAME` = '老秋' WHERE `tb_user_account`.`TRADEID` = 4 AND `tb_user_account`.`ACCOUNTID` = '10500998';
@@ -60,7 +60,7 @@ exports.modify_userAccount = function(){
                     self.responseDirect(200,"text/json",JSON.stringify(result));
                 });
             }catch(err){
-                console.log(JSON.stringify(err));
+                console.log(path.basename(__filename),'modify_userAccount',JSON.stringify(err));
                 result = {'success':false,'message':'非法请求数据，请联系管理员'};
                 self.responseDirect(200,"text/json",JSON.stringify(result));
             }
@@ -127,7 +127,7 @@ exports.add_userAccount = function(){
             &&self.req.post["BUYPERCENT"]
             &&self.req.post["SPLITCOUNT"]
         ){
-            console.log('add_userAccount',JSON.stringify(self.req.post));
+            console.log(path.basename(__filename),'add_userAccount',JSON.stringify(self.req.post));
             
             // var param = "tradeid="+self.req.post["TRADEID"]+"&accountid="+self.req.post["ACCOUNTID"]+"&password="+self.req.post["PASSWORD"]+"";
             // http_get("http://106.39.244.172:8080/account/gddm?"+param,
@@ -208,7 +208,7 @@ var insert_userAccount = function(context,account_result){
             context.responseDirect(200,"text/json",JSON.stringify(result));
         }); 
     }catch(err){
-        console.log("catch",err);
+        console.log(path.basename(__filename),"catch",err);
         result = {'success':false,'message':'操作数据库异常'};
         self.responseDirect(200,"text/json",JSON.stringify(result));
     }

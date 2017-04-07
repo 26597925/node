@@ -38,6 +38,7 @@ var oojs$ = {
 			objs = objs[subName] = objs[subName] || {};
 		}
 	}
+
 	,createClass:function(value)
 	{
 		var cls = function()
@@ -93,6 +94,7 @@ var oojs$ = {
 		}
 		return cls;
 	}
+
 	,distroyClass:function(namespace,className)
 	{
 		var names = (namespace + '').split(".");
@@ -117,7 +119,38 @@ var oojs$ = {
 			}
 		}
 	}
+
+	,Format: function(_date,fmt) { // author: meizz
+        var o = {
+            "M+" : _date.getMonth() + 1, // 月份
+            "d+" : _date.getDate(), // 日
+            "H+" : _date.getHours(), // 小时
+            "m+" : _date.getMinutes(), // 分
+            "s+" : _date.getSeconds(), // 秒
+            "q+" : Math.floor((_date.getMonth() + 3) / 3), // 季度
+            "S" : _date.getMilliseconds()
+            // 毫秒
+        };
+
+        if (/(y+)/.test(fmt)){
+            fmt = fmt.replace(RegExp.$1, (_date.getFullYear() + "")
+                .substr(4 - RegExp.$1.length));
+        }
+
+        for ( var k in o) {
+            if (new RegExp("(" + k + ")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
+                    : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+
 	,matchYMD: function(myd,type){
+		if(!myd){
+            return false;
+		}
+        type = type||2;
         var yearReg = '(20[0-9][0-9]|20[0-9][0-9])';            ///< Allows a number between 2014 and 2029
         var monthReg = '(0[1-9]|1[0-2])';               ///< Allows a number between 00 and 12
         var dayReg = '(0[1-9]|1[0-9]|2[0-9]|3[0-1])';   ///< Allows a number between 00 and 31
@@ -137,6 +170,66 @@ var oojs$ = {
             return true;
         }
     }
+
+    ,valideStock:function(){
+        if(arguments[0].match(/^[a-zA-Z0-9]{6}$/)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    ,generateHMDOption:function(){
+		var htmltag = arguments[0];
+        var hh_id = arguments[1];
+        var mm_id = arguments[2];
+        var ss_id = arguments[3];
+
+		htmltag.empty();
+		var tmpval = '';
+        var select=null;
+
+        select= $('<select ></select>',{
+            id:hh_id,
+            style:"width:30px;-webkit-appearance: none;"
+        });
+		for(var i = 0; i < 24; i++){
+
+            tmpval = i<=9?("0"+i):i;
+            select.append("<option value='"
+                +tmpval+"'>"
+                +tmpval+"</option>");
+		}
+        htmltag.append(select);
+
+        htmltag.append($('<label>:</label>'));
+        select= $('<select ></select>',{
+            id:mm_id,
+            style:"width:30px;-webkit-appearance: none;"
+        });
+        for(var i = 0; i < 60; i++){
+
+            tmpval = i<=9?("0"+i):i;
+            select.append("<option value='"
+                +tmpval+"'>"
+                +tmpval+"</option>");
+        }
+        htmltag.append(select);
+
+        htmltag.append($('<label>:</label>'));
+        select= $('<select></select>',{
+            id:ss_id,
+            style:"width:30px;-webkit-appearance: none;"
+        });
+        for(var i = 0; i < 60; i++){
+            tmpval = i<=9?("0"+i):i;
+            select.append("<option value='"
+                +tmpval+"'>"
+                +tmpval+"</option>");
+        }
+        htmltag.append(select);
+		return htmltag;
+	}
 
     ,showInfo:function (text,callback) {
 
@@ -228,6 +321,5 @@ $(document).ready(function(){
 <%- jsRegist %>
 
 });
-
 
 </script>

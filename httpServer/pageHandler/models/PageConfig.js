@@ -55,7 +55,7 @@ route.map({
     action:'select_dictTrade'
 });
 
-
+//=================================
 route.map({
     method:'get',
     url:/^\/select_userAccount\/?$/i,
@@ -84,6 +84,7 @@ route.map({
     action:'modify_userAccount'
 });
 
+//=================================
 
 route.map({
     method:'post',
@@ -96,10 +97,19 @@ route.map({
 
 route.map({
     method:'post',
-    url:/^\/select_unsubscrible\/?$/i,
+    url:/^\/select_alreadySubscrible\/?$/i,
     controller:'policy',
-    action:'select_unsubscrible'
+    action:'select_alreadySubscrible'
 });
+
+
+route.map({
+    method:'post',
+    url:/^\/update_subscrible\/?$/i,
+    controller:'policy',
+    action:'update_subscrible'
+});
+
 //================================
 
 

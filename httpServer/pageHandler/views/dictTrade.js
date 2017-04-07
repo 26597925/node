@@ -237,17 +237,19 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 					this.dictTrade_selectElement.append("<option value='"
 						+this.dictTrade_selectList[sId][0]
 						+"' title='"+this.dictTrade_selectList[sId][2]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
-				}else{
+				}
+				else{
 					this.dictTrade_selectElement.append("<option value='"
 						+this.dictTrade_selectList[sId][0]+"'>"
 						+this.dictTrade_selectList[sId][1]+"</option>");
 				}
 				
-			}else if( 2 == this.dictTrade_selectList[sId].length )
-			{
-				this.dictTrade_selectElement.append("<option value='"
-					+this.dictTrade_selectList[sId][0]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
 			}
+			// else if( 2 == this.dictTrade_selectList[sId].length )
+			// {
+			// 	this.dictTrade_selectElement.append("<option value='"
+			// 		+this.dictTrade_selectList[sId][0]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
+			// }
 		}
 
 		// this.dictTrade_selectElement.val("maxMem");

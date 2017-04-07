@@ -244,6 +244,5 @@ exports.main = function(){
     //get authority
     //parse and set user browing context
     // var sess = sessions.validate(this.req);
-    
     self.responseDirect(200,"text/html",renderPage());
 };

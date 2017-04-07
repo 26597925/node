@@ -1,6 +1,6 @@
-var util = require('util');
-var mysql = require('mysql');
-
+const util = require('util');
+const mysql = require('mysql');
+const path = require('path');
 var web_DB_config = function()
 {
     //"115.182.51.49","root","OGNkNGUyZmM3ZWE","winners",3306
@@ -25,13 +25,16 @@ var web_DB_config = function()
     };
     //========================================>
     this.mysql_connection = function(){
+        console.log(path.basename(__filename),"connection");
         this.connection = mysql.createConnection(this.dbcfg);
         this.connection.connect();
+
+
         // connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
         //     if (error) throw error;
         //     console.log('The solution is: ', results[0].solution);
         // });
-        return this.connection;
+        // return this.connection;
     }
 
     this.mysql_end =function(){
@@ -52,33 +55,34 @@ var web_DB_config = function()
             this.pool  = mysql.createPool(this.dbcfg);
 
             this.pool.on('acquire', function (connection) {
-                // console.log('Connection %d acquired', connection.threadId);
+                // console.log(path.basename(__filename),'Connection %d acquired', connection.threadId);
             });
 
             this.pool.on('connection', function (connection) {
                 connection.query('SET SESSION auto_increment_increment=1')
-                // console.log('connection');
+                // console.log(path.basename(__filename),'connection');
             });
 
             this.pool.on('enqueue', function () {
-                // console.log('Waiting for available connection slot');
+                // console.log(path.basename(__filename),'Waiting for available connection slot');
             });
 
             this.pool.on('release', function (connection) {
-                // console.log('Connection %d released', connection.threadId);
+                // console.log(path.basename(__filename),'Connection %d released', connection.threadId);
             });
         }
     }
 
+    
     this.mysql_pool_getConnection();
 
     this.query = function(sql,callback){
-        console.log("sql",sql);
+        console.log(path.basename(__filename),"query-sql",sql);
         var rows = []
         this.pool.getConnection(function(err, connection){
             // connected! (unless `err` is set) 
             if(!err){
-                connection.query()
+                // connection.query()
                 var query =  connection.query(sql);
                 query
                 .on('error', function(err) {
@@ -143,7 +147,7 @@ var web_DB_config = function()
                             callback = null;
                         }
                     }else{
-                        console.log("callback")
+                        console.log(path.basename(__filename),'query-end',rows)
                         if(callback){
                             callback(rows);
                             callback = null;
@@ -152,7 +156,7 @@ var web_DB_config = function()
                     
                     query = null;
                     connection.release();
-                    // console.log("end");
+
                 });
             }else{
                 if(callback){
@@ -163,6 +167,68 @@ var web_DB_config = function()
         });
     }
 
+    this.transaction = function(sql1, sql2, callback){
+        var self = this;
+        if(!self.connection){
+            self.mysql_connection();
+        }
+        
+        self.connection.beginTransaction(function(err) {
+            if (err) { throw err; }
+            // self.connection.query('INSERT INTO posts SET title=?', title, function (error, results, fields) {
+                console.log(path.basename(__filename),'transaction-sql1',sql1);
+                self.connection.query(sql1, function (error, results, fields) {
+                if (error) {
+                    return self.connection.rollback(function() {
+                        throw error;
+                    });
+                }
+
+                // results.insertId;
+                // self.connection.query('INSERT INTO log SET data=?', log, function (error, results, fields) {
+                console.log(path.basename(__filename),'transaction-sql2',sql2);
+                self.connection.query(sql2, function (error, results, fields) {
+
+                    if (error) {
+                        return self.connection.rollback(function() {
+                            throw error;
+                        });
+                    }
+                    console.log(path.basename(__filename),'transaction',JSON.stringify(results));
+                    self.connection.commit(function(err) {
+                        if (err) {
+                            return self.connection.rollback(function() {
+                                throw err;
+                            });
+                        }
+                        console.log(path.basename(__filename),'transaction','success!');
+                        callback('success');
+                    });
+                });
+            });
+        });
+    }
+// this.transaction("INSERT INTO `tb_capital_conf` (`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYAMOUNT`, `BUYPERCENT`, `SPLITCOUNT`, `ADDTIME`, `MODTIME`, `REMARK`)"+
+// "VALUES"+
+//  "   ('309219249820',20006,0,0,0.4,1,'2017-02-23 09:11:14','2017-02-23 09:10:06','')",
+//     "INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `VISIBLE`, `ADDTIME`, `MODTIME`, `REMARK`)"+
+// "VALUES"+
+// "    (20006,1,'309219249820','243167','老冬','A720722620','0156011732',1,1,'2017-03-21 21:43:45','0000-00-00 00:00:00',NULL)",
+// function(){
+//     console.log(arguments)
+// })
+// tb_user_account
+
+//     INSERT INTO `tb_capital_conf` (`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYAMOUNT`, `BUYPERCENT`, `SPLITCOUNT`, `ADDTIME`, `MODTIME`, `REMARK`)
+// VALUES
+//     ('309219249820',20006,0,0,0.4,1,'2017-02-23 09:11:14','2017-02-23 09:10:06','')
+// INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `VISIBLE`, `ADDTIME`, `MODTIME`, `REMARK`)
+// VALUES
+//     (20006,1,'309219249820','243167','老冬','A720722620','0156011732',1,1,'2017-03-21 21:43:45','0000-00-00 00:00:00',NULL)
+  
+
+ 
+    
     // this.query(
     //     "SELECT * FROM tb_user_account", 
     //     function (){
