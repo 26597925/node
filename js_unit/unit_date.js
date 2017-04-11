@@ -59,25 +59,56 @@ var unit_date = function()
 		// date_str = "1:1:1";
 		date_str = date_str.trim();
 		date_str = date_str.split(":");
-		date_str = parseInt(date_str[0])*60*60+parseInt(date_str[1])*60+parseInt(date_str[2])
+		date_str = parseInt(date_str[0])*60*60+parseInt(date_str[1])*60+parseInt(date_str[2]);
 		return date_str;
-	}
+	};
+
+    this.objToNumber = function(_obj){
+        console.log(">>>>>",JSON.stringify(_obj));
+        var obj = {hh:0,mm:0,ss:0};
+        obj = _obj;
+        console.log(">>>>>",JSON.stringify(obj));
+        debugger;
+        if(obj!=null){
+        	return parseInt(obj['hh'])*60*60+parseInt(obj['mm'])*60+parseInt(obj['ss']);
+        }else{
+        	return {hh:0,mm:0,ss:0};
+		}
+
+    };
+
+	this.toHMS = function(){
+		var shortTime = arguments[0];
+        var obj = {hh:0,mm:0,ss:0};
+        if( shortTime === undefined || shortTime === null ){
+        	return obj;
+		}
+		if(parseInt(shortTime)<0 || parseInt(shortTime)> 24*60*60 ){
+			return obj;
+		}
+
+		obj['hh'] = Math.floor( parseInt(shortTime)/(60*60) );
+        obj['mm'] = Math.floor( parseInt(shortTime)%(60*60)/60 );
+        obj['ss'] = parseInt(shortTime)%60;
+
+        return obj;
+	};
 	
 	this.test=function()
 	{
 		var status = ["TP","PQ","KJ","PZ","ZJ","LT","SJ","PH","WX"];
-		console.log(status.indexOf("PH"));
+		// console.log(status.indexOf("PH"));
 		// var _d = new Date("2016-2-12 2:4:45");
 		// console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
 		// var _d = new Date();
 		// console.log(this.Format(_d,"yyyy-MM-dd HH:mm:ss.S"));
 		// console.log(this.sortTime("2016-2-12 2:4:45"));
 		// console.log(">>>",JSON.stringify({aa:0,bb:1}).substring(0,200));
-	}
+	};
 
 	// this.test();
 	
-}
+};
 module.exports = new unit_date();
 //test-----------------------------------------------
 // var unit_date = require("./unit_date.js");

@@ -30,14 +30,16 @@ exports.runPageServer = function( port )
 			{
 				if(req.headers.accept.indexOf('application/json')!=-1)
 				{
+
 					reqData = querystring.parse(_bufData);
+
 				}
 			}
 			req.post = reqData;
 			handlerRequest(req, res);
 		});
 	}).listen(port);
-}
+};
 
 var handlerRequest = function(req, res){
   
@@ -119,7 +121,7 @@ var viewEngine = {
 };
 
 var handler404 = function(req, res){
-	console.log("404"+req.url);
+
 	res.writeHead(404, {'Content-Type': 'text/plain'});
 	res.end('Page Not Found');
 };

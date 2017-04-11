@@ -7,6 +7,7 @@ const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_dat
 
 
 exports.select_subscrible = function(){
+
     var self = this;
     var result = {'success':true,'data':''};
 
@@ -168,6 +169,7 @@ var combinePolicyResult=function(){
 
 
 exports.select_alreadySubscrible = function(){
+
     var self = this;
     var result = {'success':true,'data':''};
     var uID = sessions.get_uID(self.req);
@@ -224,15 +226,16 @@ exports.update_subscrible = function(){
             }
 
             self.req.post['POLICYPARAM'] = (!self.req.post['POLICYPARAM'])?"":self.req.post['POLICYPARAM'];
-            var STARTTIME = objToNumber(self.req.post['STARTTIME']); // (!self.req.post['STARTTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['STARTTIME'];
-            var ENDTIME = objToNumber(self.req.post['ENDTIME']); //(!self.req.post['ENDTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['ENDTIME'];
+            console.log("<<<<<",self.req.post['STARTTIME']);
+            var STARTTIME = unit_date.objToNumber(self.req.post['STARTTIME']); // (!self.req.post['STARTTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['STARTTIME'];
+            var ENDTIME = unit_date.objToNumber(self.req.post['ENDTIME']); //(!self.req.post['ENDTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['ENDTIME'];
 
 
             self.req.post['STOCKSET'] = (!self.req.post['STOCKSET'])?"":self.req.post['STOCKSET'];
             self.req.post['STATUS'] = (!self.req.post['STATUS'])?"":self.req.post['STATUS'];
             self.req.post['FALG'] = (!self.req.post['FALG'])?0:self.req.post['FALG'];
             console.log(path.basename(__filename),"update STARTTIME:",STARTTIME,'ENDTIME:',ENDTIME);
-            debugger;
+
 
 
             if(db_type == 'insert'){

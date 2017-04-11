@@ -208,40 +208,7 @@ var web_DB_config = function()
             });
         });
     }
-// this.transaction("INSERT INTO `tb_capital_conf` (`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYAMOUNT`, `BUYPERCENT`, `SPLITCOUNT`, `ADDTIME`, `MODTIME`, `REMARK`)"+
-// "VALUES"+
-//  "   ('309219249820',20006,0,0,0.4,1,'2017-02-23 09:11:14','2017-02-23 09:10:06','')",
-//     "INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `VISIBLE`, `ADDTIME`, `MODTIME`, `REMARK`)"+
-// "VALUES"+
-// "    (20006,1,'309219249820','243167','老冬','A720722620','0156011732',1,1,'2017-03-21 21:43:45','0000-00-00 00:00:00',NULL)",
-// function(){
-//     console.log(arguments)
-// })
-// tb_user_account
 
-//     INSERT INTO `tb_capital_conf` (`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYAMOUNT`, `BUYPERCENT`, `SPLITCOUNT`, `ADDTIME`, `MODTIME`, `REMARK`)
-// VALUES
-//     ('309219249820',20006,0,0,0.4,1,'2017-02-23 09:11:14','2017-02-23 09:10:06','')
-// INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `VISIBLE`, `ADDTIME`, `MODTIME`, `REMARK`)
-// VALUES
-//     (20006,1,'309219249820','243167','老冬','A720722620','0156011732',1,1,'2017-03-21 21:43:45','0000-00-00 00:00:00',NULL)
-  
 
- 
-    
-    // this.query(
-    //     "SELECT * FROM tb_user_account", 
-    //     function (){
-    //         console.log("arguments.length:"+arguments.length);
-    //         console.log("JSON.stringify(arguments):"+JSON.stringify(arguments));
-    //     }
-    // );
-    // this.query(
-    //     "SELECT  `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER` FROM tb_user_basic", 
-    //     function (){
-    //         console.log("arguments.length:"+arguments.length);
-    //         console.log("JSON.stringify(arguments):"+JSON.stringify(arguments));
-    //     }
-    // );
 };
 module.exports = new web_DB_config();

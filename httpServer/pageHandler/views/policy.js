@@ -3,13 +3,13 @@ oojs$.com.stock.policy = oojs$.createClass(
 {
 
 
-	policy_list_head:[
+	policy_list_head: [
 		// 'USERID',
 		['PGROUPID','策略类型'],
         ['PNAME','策略名称'],
         ['DIRTYPE','交易类型'],
         // 'POLICYID',
-        ['POLICYPARAM','策略参数'],
+        // ['POLICYPARAM','策略参数'],
         ['STARTTIME','开始时间'],
         ['ENDTIME','结束时间'],
         ['STOCKSET','自选股'],
@@ -21,10 +21,10 @@ oojs$.com.stock.policy = oojs$.createClass(
         ['PERCENT','交易比例']
 	]
 
-	,policy_list_body:[]
-    ,alreadySubscribe_body:[]
+	,policy_list_body: []
+    ,alreadySubscribe_body: []
 
-	,STOCKSET:"多个值，需要动态处理才能方便用户操作"
+	,STOCKSET: "多个值，需要动态处理才能方便用户操作"
 
 	,STOCKSET_TD1:null//td of table
 	,STOCKSET_USERID:""
@@ -44,7 +44,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 
     	$("#policy_tabs_a2").click(this.tab2PolicyClick);
 
-		this.load_Subscribe();
+		// this.load_Subscribe();
 
 	}
 
@@ -54,7 +54,6 @@ oojs$.com.stock.policy = oojs$.createClass(
 	}
 
 	,tab2PolicyClick:function(){
-
         console.log("tab2PolicyClick");
         policy.load_AlreadySubscribe();
     }
@@ -177,84 +176,45 @@ oojs$.com.stock.policy = oojs$.createClass(
 	}
 
 
+	,search_policyList_Item:function(USERID,POLICYID,list){
 
-	,search_policyList_Item:function(USERID,POLICYID){
-
-    	for(var i = 0; i < this.policy_list_body.length; i++){
-    		if(this.policy_list_body[i]['USERID']==USERID && this.policy_list_body[i]['POLICYID']==POLICYID){
-    			return this.policy_list_body[i];
-			}
-		}
-		return null;
-	}
-
-    ,search_alreadyPolicyList_Item:function(USERID,POLICYID){
-
-        for(var i = 0; i < this.alreadySubscribe_body.length; i++){
-            if(this.alreadySubscribe_body[i]['USERID']==USERID && this.alreadySubscribe_body[i]['POLICYID']==POLICYID){
-                return this.alreadySubscribe_body[i];
+        for(var i = 0; i < list.length; i++){
+            if( String(list[i]['USERID'])==String(USERID) &&  String(list[i]['POLICYID'])== String(POLICYID)){
+                return list[i];
             }
         }
 
         return null;
+
+	}
+
+
+
+    ,appendTB_add_head: function( parentID, USERID, POLICYID ){
+        var tb = $('<table></table>', {
+            class:"display dataTable"
+        });
+        return tb;
     }
 
-
-
-	,appendTB_changeSubscribe:function(){
-		var USERID = arguments[0], id = arguments[0]
-		,POLICYID = arguments[1], name = arguments[1],
-        type = arguments[3];
-
-
-        console.log("search_policyList_Item",USERID,POLICYID,type);
-        if( type == 1 ){
-            $('#policy_tabs_1').empty();
-        }else if( type == 2 ){
-            $('#policy_tabs_2').empty();
-        }
-
-
-    	var item = null;
-        if( type == 1 ){
-            item = this.search_policyList_Item(USERID,POLICYID);
-        }else if( type == 2 ){
-            item = this.search_alreadyPolicyList_Item(USERID,POLICYID);
-        }
-
-    	if(!item){
-    		return;
-		}
-		console.log("item:",item);
-		var tb = $('<table></table>', {
-			// 'style':"margin:0 auto;"
-			// ,
-			//'class':'dataTable cellspacing table'
-			class:"display dataTable"
-		});
-
-		if(type == 1){
-            tb.appendTo($('#policy_tabs_1'));
-        }else if(type==2){
-            tb.appendTo($('#policy_tabs_2'));
-        }
-
-
-    	var tr = null;
-
-		for(var i = 0; i < this.policy_list_head.length; i++){
-			if(i%2==0){
+    ,appendTB_add_body: function( tb, item,USERID,POLICYID ){
+        var tr = null;
+        for(var i = 0; i < this.policy_list_head.length; i++){
+            if(!item.hasOwnProperty(this.policy_list_head[i][0])){
+                continue;
+            }
+            if(i%2==0){
                 tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
-			}else{
+            }else{
                 tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
-			}
+            }
 
 
             if(this.policy_list_head[i][0] == "STOCKSET"){
                 $('<td></td>',{ class:"td",rowspan:2}).appendTo(tr).text(this.policy_list_head[i][1]+": ");
-			}else{
+            }else{
                 $('<td></td>',{ class:"td"}).appendTo(tr).text(this.policy_list_head[i][1]+": ");
-			}
+            }
 
 
             switch (this.policy_list_head[i][0]){
@@ -264,17 +224,17 @@ oojs$.com.stock.policy = oojs$.createClass(
 
                     break;
                 case "DIRTYPE":
-                   $('<td></td>',{ class:"td"}).appendTo(tr).text( this.getDirtype(item[this.policy_list_head[i][0]]) );
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text( this.getDirtype(item[this.policy_list_head[i][0]]) );
                     break;
-				// case "POLICYID":
-				// 	console.log("case",this.policy_list_head[i]);
-                 //    $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
+                // case "POLICYID":
+                // 	console.log("case",this.policy_list_head[i]);
+                //    $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
                 //
-                 //    break;
-                case 'POLICYPARAM':
-                    console.log("case",this.policy_list_head[i][0]);
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text("？？");
-                    break;
+                //    break;
+                // case 'POLICYPARAM':
+                //     console.log("case",this.policy_list_head[i][0]);
+                //     $('<td></td>',{ class:"td"}).appendTo(tr).text("？？");
+                //     break;
                 case 'STARTTIME':
                     var td =  $('<td></td>',{ class:"td"}).appendTo(tr);
                     // var td =  $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="policy_startDate" class="datepicker"></input>'));
@@ -294,7 +254,7 @@ oojs$.com.stock.policy = oojs$.createClass(
                 case 'ENDTIME':
                     console.log("case",this.policy_list_head[i][0]);
                     var td =  $('<td></td>',{ class:"td"}).appendTo(tr);
-                        //.append($('<input type="text" id="policy_stopDate" class="datepicker"></input>'));
+                    //.append($('<input type="text" id="policy_stopDate" class="datepicker"></input>'));
                     // $("#policy_stopDate").datepicker();
                     // if(oojs$.matchYMD(item[this.policy_list_head[i][0]],2)){
                     // 	$("#policy_stopDate").datepicker('setDate',new Date(item[this.policy_list_head[i][0]]));
@@ -309,7 +269,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 
                     this.STOCKSET = this.valideString(item[ this.policy_list_head[i][0] ]);
 
-                   	var td1 = $('<td></td>',{ class:"td"}).appendTo(tr);
+                    var td1 = $('<td></td>',{ class:"td"}).appendTo(tr);
                     if(i%2==0){
                         tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
                     }else{
@@ -325,38 +285,197 @@ oojs$.com.stock.policy = oojs$.createClass(
                 case 'PNAME':
                     $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
                     break;
-				case 'PERCENT':
+                case 'PERCENT':
                     var input = $('<input></input>',{
                         id:USERID+"_"+POLICYID
                         ,name:"PERCENT_input"
-                    })
-					input.val(item[this.policy_list_head[i][0]]);
+                    });
+                    input.val(item[this.policy_list_head[i][0]]);
 
                     $('<td></td>',{ class:"td"}).appendTo(tr).append(input);
                     break;
-				default:
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
-                    break;
+                // default:
+                //     $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
+                //     break;
 
-			}
-		}
+            }
+        }
 
-		tr = $('<tr></tr>').appendTo(tb);
-		var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
+        tr = $('<tr></tr>').appendTo(tb);
+    }
 
-		$('<input></input>',{'type':"button",id:"policy_change_btn",name:type,value:"提交"}).appendTo(td);
-		$("#policy_change_btn").click(
-			this.clickHandler
-		);
+    ,appendTB_add_control: function( tb, id, type ){
+        var tr = $('<tr></tr>').appendTo(tb);
+        var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
 
-        $('<input></input>',{'type':"button",id:"policy_changeBack_btn",name:type,value:"取消"}).appendTo(td);
+        $('<input></input>',{'type':"button",id:id+"_change_btn",name:type,value:"提交"}).appendTo(td);
+        $("#policy_change_btn").click(
+            this.clickHandler
+        );
+
+        $('<input></input>',{'type':"button",id:id+"_changeBack_btn",name:type,value:"取消"}).appendTo(td);
         $("#policy_changeBack_btn").click(
             this.clickHandler
         );
+
+    }
+
+	,appendTB_changeSubscribe: function(){
+		var USERID = arguments[0], id = arguments[0]
+		,POLICYID = arguments[1], name = arguments[1],
+        type = arguments[3];
+
+        console.log("search_policyList_Item",USERID,POLICYID,type);
+
+        if( type == 1 ){
+            $('#policy_tabs_1').empty();
+        }else if( type == 2 ){
+            $('#policy_tabs_2').empty();
+        }
+
+
+    	var item = null;
+        if( type == 1 ){
+            item = this.search_policyList_Item(USERID,POLICYID,this.policy_list_body);
+        }else if( type == 2 ){
+            item = this.search_policyList_Item(USERID,POLICYID,this.alreadySubscribe_body);
+        }
+
+    	if(!item){
+    		return;
+		}
+
+		console.log("item:",item);
+
+		var tb = this.appendTB_add_head();
+
+		if(type == 1){
+            tb.appendTo($('#policy_tabs_1'));
+        }else if(type==2){
+            tb.appendTo($('#policy_tabs_2'));
+        }
+
+
+        // var tr = null;
+        //
+		// for(var i = 0; i < this.policy_list_head.length; i++){
+		// 	if(i%2==0){
+         //        tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+		// 	}else{
+         //        tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
+		// 	}
+        //
+        //
+         //    if(this.policy_list_head[i][0] == "STOCKSET"){
+         //        $('<td></td>',{ class:"td",rowspan:2}).appendTo(tr).text(this.policy_list_head[i][1]+": ");
+		// 	}else{
+         //        $('<td></td>',{ class:"td"}).appendTo(tr).text(this.policy_list_head[i][1]+": ");
+		// 	}
+        //
+        //
+         //    switch (this.policy_list_head[i][0]){
+         //        case "PGROUPID":
+         //            console.log("case",this.policy_list_head[i][0]);
+         //            $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
+        //
+         //            break;
+         //        case "DIRTYPE":
+         //           $('<td></td>',{ class:"td"}).appendTo(tr).text( this.getDirtype(item[this.policy_list_head[i][0]]) );
+         //            break;
+		// 		// case "POLICYID":
+		// 		// 	console.log("case",this.policy_list_head[i]);
+         //         //    $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
+         //        //
+         //         //    break;
+         //        case 'POLICYPARAM':
+         //            console.log("case",this.policy_list_head[i][0]);
+         //            $('<td></td>',{ class:"td"}).appendTo(tr).text("？？");
+         //            break;
+         //        case 'STARTTIME':
+         //            var td =  $('<td></td>',{ class:"td"}).appendTo(tr);
+         //            // var td =  $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="policy_startDate" class="datepicker"></input>'));
+         //            //
+         //            // $("#policy_startDate").datepicker();
+         //            //
+         //            // if(oojs$.matchYMD(item[this.policy_list_head[i][0]],2)){
+         //            //     $("#policy_startDate").datepicker('setDate',new Date(item[this.policy_list_head[i][0]]));
+         //            // }else{
+         //            //     $("#policy_startDate").datepicker('setDate',new Date());
+         //            // }
+         //            //
+         //            // $("#policy_startDate").text($("#policy_startDate").datepicker('getDate'));
+         //            oojs$.generateHMDOption(td,"start_hh","start_mm","start_ss");
+        //
+         //            break;
+         //        case 'ENDTIME':
+         //            console.log("case",this.policy_list_head[i][0]);
+         //            var td =  $('<td></td>',{ class:"td"}).appendTo(tr);
+         //                //.append($('<input type="text" id="policy_stopDate" class="datepicker"></input>'));
+         //            // $("#policy_stopDate").datepicker();
+         //            // if(oojs$.matchYMD(item[this.policy_list_head[i][0]],2)){
+         //            // 	$("#policy_stopDate").datepicker('setDate',new Date(item[this.policy_list_head[i][0]]));
+         //            // }else{
+         //            //     $("#policy_stopDate").datepicker('setDate',new Date());
+         //            // }
+         //            // $("#policy_stopDate").text($("#policy_stopDate").datepicker('getDate'));
+         //            oojs$.generateHMDOption(td,"stop_hh","stop_mm","stop_ss");
+         //            break;
+         //        case 'STOCKSET':
+        //
+        //
+         //            this.STOCKSET = this.valideString(item[ this.policy_list_head[i][0] ]);
+        //
+         //           	var td1 = $('<td></td>',{ class:"td"}).appendTo(tr);
+         //            if(i%2==0){
+         //                tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+         //            }else{
+         //                tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
+         //            }
+         //            var td2 = $('<td></td>',{ class:"td"}).appendTo(tr);
+        //
+         //            this.appendCK_stockset(USERID,POLICYID,td1,td2);
+         //            break;
+         //        // case 'STATUS':
+         //        //     $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i]]);
+         //        //     break;
+         //        case 'PNAME':
+         //            $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
+         //            break;
+		// 		case 'PERCENT':
+         //            var input = $('<input></input>',{
+         //                id:USERID+"_"+POLICYID
+         //                ,name:"PERCENT_input"
+         //            })
+		// 			input.val(item[this.policy_list_head[i][0]]);
+        //
+         //            $('<td></td>',{ class:"td"}).appendTo(tr).append(input);
+         //            break;
+		// 		default:
+         //            $('<td></td>',{ class:"td"}).appendTo(tr).text(item[this.policy_list_head[i][0]]);
+         //            break;
+        //
+		// 	}
+		// };
+        this.appendTB_add_body(tb,item,USERID,POLICYID);
+        this.appendTB_add_control(tb,"policy",type);
+        // tr = $('<tr></tr>').appendTo(tb);
+        // var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
+        //
+        // $('<input></input>',{'type':"button",id:"policy_change_btn",name:type,value:"提交"}).appendTo(td);
+        // $("#policy_change_btn").click(
+			// this.clickHandler
+        // );
+        //
+        // $('<input></input>',{'type':"button",id:"policy_changeBack_btn",name:type,value:"取消"}).appendTo(td);
+        // $("#policy_changeBack_btn").click(
+        //     this.clickHandler
+        // );
 	}
 
 	,rander_stockTD1:function(){
         var myself = this;
+        var label = null;
+        var checkbox = null;
         console.log("rander_stockTD1",this.STOCKSET);
         if(this.STOCKSET_TD1){
         	console.log("rander_stockTD2",this.STOCKSET);
@@ -385,8 +504,6 @@ oojs$.com.stock.policy = oojs$.createClass(
 	,appendCK_stockset:function(USERID,POLICYID,td1,td2){
         var myself = this;
 
-		var checkbox = null;
-		var label = null;
 		this.STOCKSET_TD1 = td1;
 		this.STOCKSET_USERID =USERID;
 		this.STOCKSET_POLICYID =POLICYID;
@@ -562,6 +679,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 		if($('#policy_startDate').datepicker("getDate")>$('#policy_stopDate').datepicker("getDate")){
 			return oojs$.showError("日期选择不正确");
 		}
+		var subscrible;
         if(type == 1){
 		    subscrible = 0;
         }else if(type == 2){
@@ -623,7 +741,7 @@ oojs$.com.stock.policy = oojs$.createClass(
             $("<td></td>").appendTo(tr).text(this.alreadySubscribe_body[elm]['PNAME']);
             $("<td></td>").appendTo(tr).text( this.getDirtype(this.alreadySubscribe_body[elm]['DIRTYPE']));
             // $("<td></td>").appendTo(tr).text(this.alreadySubscribe_body[elm]['POLICYID']);
-            $("<td></td>").appendTo(tr).text(this.alreadySubscribe_body[elm]['POLICYPARAM']);
+            // $("<td></td>").appendTo(tr).text(this.alreadySubscribe_body[elm]['POLICYPARAM']);
 
             $("<td></td>").appendTo(tr).text( this.valideDate(this.alreadySubscribe_body[elm]['STARTTIME']) );
             $("<td></td>").appendTo(tr).text( this.valideDate(this.alreadySubscribe_body[elm]['ENDTIME']) );
@@ -699,7 +817,7 @@ oojs$.com.stock.policy = oojs$.createClass(
             $("<td></td>").appendTo(tr).text( this.getDirtype(this.policy_list_body[elm]['DIRTYPE']));
 
             // $("<td></td>").appendTo(tr).text(this.policy_list_body[elm]['POLICYID']);
-            $("<td></td>").appendTo(tr).text(this.policy_list_body[elm]['POLICYPARAM']);
+            // $("<td></td>").appendTo(tr).text(this.policy_list_body[elm]['POLICYPARAM']);
             $("<td></td>").appendTo(tr).text( this.valideDate(this.policy_list_body[elm]['STARTTIME']) );
             $("<td></td>").appendTo(tr).text( this.valideDate(this.policy_list_body[elm]['ENDTIME']) );
             $("<td></td>").appendTo(tr).text( this.valideString(this.policy_list_body[elm]['STOCKSET']) );
@@ -742,7 +860,6 @@ oojs$.com.stock.policy = oojs$.createClass(
 var policy = new oojs$.com.stock.policy();
 oojs$.addEventListener("ready",function(){
 	policy.init();
-
 });
 
 

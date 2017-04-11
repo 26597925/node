@@ -26,7 +26,7 @@
 <script type="text/javascript">
 //nameSpace
 var oojs$ = {
-	ns : function(space) {
+	ns: function(space) {
 		var names = (space + '').split(".");
 		var objs = this;
 		for ( var i = 0; i < names.length; i++) {
@@ -39,7 +39,7 @@ var oojs$ = {
 		}
 	}
 
-	,createClass:function(value)
+	,createClass: function(value)
 	{
 		var cls = function()
 		{
@@ -95,7 +95,7 @@ var oojs$ = {
 		return cls;
 	}
 
-	,distroyClass:function(namespace,className)
+	,distroyClass: function(namespace,className)
 	{
 		var names = (namespace + '').split(".");
 		var objs = this;
@@ -171,7 +171,7 @@ var oojs$ = {
         }
     }
 
-    ,valideStock:function(){
+    ,valideStock: function(){
         if(arguments[0].match(/^[a-zA-Z0-9]{6}$/)){
             return true;
         }else{
@@ -179,7 +179,7 @@ var oojs$ = {
         }
     }
 
-    ,generateHMDOption:function(){
+    ,generateHMDOption: function(){
 		var htmltag = arguments[0];
         var hh_id = arguments[1];
         var mm_id = arguments[2];
@@ -189,6 +189,7 @@ var oojs$ = {
 		var tmpval = '';
         var select=null;
 
+        htmltag.append($('<label>时</label>'));
         select= $('<select ></select>',{
             id:hh_id,
             style:"width:30px;-webkit-appearance: none;"
@@ -202,7 +203,8 @@ var oojs$ = {
 		}
         htmltag.append(select);
 
-        htmltag.append($('<label>:</label>'));
+        htmltag.append($('<label>:分</label>'));
+
         select= $('<select ></select>',{
             id:mm_id,
             style:"width:30px;-webkit-appearance: none;"
@@ -216,7 +218,8 @@ var oojs$ = {
         }
         htmltag.append(select);
 
-        htmltag.append($('<label>:</label>'));
+        htmltag.append($('<label>:秒</label>'));
+
         select= $('<select></select>',{
             id:ss_id,
             style:"width:30px;-webkit-appearance: none;"
@@ -261,22 +264,20 @@ var oojs$ = {
             }
         });
     }
-	,showError:function (text,callback) {
-        // $("#dialogtext").text('text');
-        // $("#dialog").dialog({
-        //     buttons: {"Ok":function(){$(this).dialog("close");}},
-        //     modal:true,
-        //     close:function(event,ui){
-        //
-        //     }
-        // });
 
+	,showError:function (text,callback) {
+        /**
+         *<div id="dialog" title="提示" style="display:none;">
+         *<p id="dialogtext" style=""></p>
+         *</div>
+         * */
         $("#dialogtext").text(text);
         $("#dialog").dialog({
             buttons: {"Ok":function(){$(this).dialog("close");if(callback){callback()};}},
             modal:true
         });
     }
+
 	,apply : function(dest, source) {
 		for ( var name in source) {
 			dest[name] = source[name];
@@ -284,8 +285,7 @@ var oojs$ = {
 		return dest;
 	}
 	
-	,
-	applyIf : function(dest, source) {
+	,applyIf : function(dest, source) {
 		for ( var name in source) {
 			if (typeof (dest[name]) == 'undefined') {
 				dest[name] = source[name];
@@ -293,11 +293,14 @@ var oojs$ = {
 		}
 		return dest;
 	}
+
 	,_events:{}
+
 	,addEventListener: function(eventName, callback){
 		this._events[eventName] = this._events[eventName] || [];
 		this._events[eventName].push(callback);
 	}
+
 	,dispatch:function(eventName, _){
 		var events = this._events[eventName];
 		var args = Array.prototype.slice.call(arguments, 1);
@@ -310,6 +313,38 @@ var oojs$ = {
 			events[i].apply(null, args);
 		}
 	}
+
+	,heartID:null
+
+	,heartTime:function(){
+		if(this.heartID==null){
+			this.heartID = setInterval(function(){
+				$.ajax({
+					type:"get",
+					url:"/heartTime",
+					async:false,
+					dataType:"json",
+					success:function(result,textStatus){
+
+						if(result.success){
+							console.log( "success!" );
+						}else{
+							oojs$.showError(result.message)
+						}
+					},
+					beforeSend: function(xhr){
+						xhr.withCredentials = true;
+					}
+				});
+			},30000);
+		}
+	}
+
+    ,closeHeartTime:function(){
+		clearInterval( this.heartID);
+        this.heartID = null;
+    }
+
 };
 
 <%- jsState %>
@@ -320,6 +355,7 @@ $(document).ready(function(){
 
 <%- jsRegist %>
 
+//oojs$.heartTime();
 });
 
 </script>

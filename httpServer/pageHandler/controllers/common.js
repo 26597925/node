@@ -115,7 +115,7 @@ exports.login = function(args){
         var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='"+usr+"' and `PASSWORD`='"+psw+"'";
         var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){
-            if(arguments.length==1){
+            if( arguments.length==1 ){
                 updateUserLoginTime(arguments[0][0]['USERID'],self);
             }else{
                 result = {'success':false,'message':'用户名或密码错误，请重新登录'};
@@ -129,22 +129,18 @@ exports.login = function(args){
 };
 
 var updateUserLoginTime = function(USERID,context){
-    console.log(arguments.length)
+    console.log(path.basename(__filename),'updateUserLoginTime',arguments.length);
     var self = null;
     if(context){self = context;}
-    var req = context.req;
-    var res = context.res;
+    var req = self.req;
+    var res = self.res;
     var SID = sessions.createSID();
     sessions.setCookie(req,res,SID,USERID);
-    var sql2 = "UPDATE `tb_user_basic` SET `LASTLOGIN` = '"+SID+"' WHERE `tb_user_basic`.`USERID` = "+USERID+" "
-    
-    if(arguments.length==3){
-        sql2 = "UPDATE `tb_user_basic` SET `LASTLOGIN` = '"+SID+"' WHERE `tb_user_basic`.`"+arguments[2]+"` = '"+USERID+"' "
-    }
+    var sql2 = "UPDATE `tb_user_basic` SET `LASTLOGIN` = '"+SID+"' WHERE `tb_user_basic`.`USERID` = "+USERID+" ";
 
     var result = {'success':true,'message':'登录成功'};
     db.query(sql2,function(){
-        console.log("updateUserLoginTime",arguments)
+        console.log("updateUserLoginTime",arguments);
         if(arguments.length==1){
             self.responseDirect(200,'text/json',JSON.stringify(result));
         }else{
@@ -153,11 +149,11 @@ var updateUserLoginTime = function(USERID,context){
         }
     });
 
-}
+};
 
 exports.updateLoginTime = function(USERID){
     updateUserLoginTime(USERID,this);
-}
+};
 
 var renderPage = function(){
 
@@ -200,7 +196,8 @@ var renderPage = function(){
                     +'      $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
                     +'    });\n';
                 // if(i==0&&element==0){
-                if(i==0&&element==1){
+                // if(i==0&&element==1){
+                if(i==1 && element==0){
                     // console.log(">>>>>>",nvgJson[i][navigator][element]["id"])
                     firstPage = '   $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
                 }
@@ -211,11 +208,11 @@ var renderPage = function(){
 
                 hideAllPanel += '   $("#'+(nvgJson[i][navigator][element]["id"]+"_panel")+'").hide();\n';
 
-                htmlDoc += '<div id="'+(nvgJson[i][navigator][element]["id"]+"_panel")+'" class="content">'
+                htmlDoc += '<div id="'+(nvgJson[i][navigator][element]["id"]+"_panel")+'" class="content">';
                 htmlDoc += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["htmlDoc"]),'utf-8');
                 htmlDoc += '</div>'
 
-                // jsState += "\n";
+                jsState += "\n";
                 htmlDoc += "\n";
             }
             nvgHtml += "</div>"
@@ -223,9 +220,10 @@ var renderPage = function(){
     }
 
     hideAllPanel += '}\n';
-    jsState += hideAllPanel;
-    jsRegist += nvgClick;
-    jsRegist += firstPage;
+    jsState += hideAllPanel+"\n";
+    jsRegist += nvgClick+"\n";
+    jsRegist += firstPage+"\n";
+
     var js_templates = fs.readFileSync(path.join(__dirname,"..",'views','main.js'),'utf-8');
     var js_content = ejs.render(js_templates,{"jsState":jsState,"jsRegist":jsRegist});
     // var js_content = ejs.render(js_templates,{"jsState":jsState});
@@ -237,7 +235,7 @@ var renderPage = function(){
     var layout = fs.readFileSync(path.join(__dirname,'..','views','layout.html'),'utf-8');
     var output = ejs.render(layout,{script:js_content,body:html_content});
     return output;
-}
+};
 
 exports.main = function(){
     var self = this;

@@ -7,9 +7,9 @@
 		]
 	}
 	,
-	{"帐号管理2":
+	{"交易管理":
 		[
-			{"id":"dict_trade2","href":"#","name":"用户券商管理2 ","htmlDoc":"dictTrade2.html","jsState":"dictTrade_st2.js"}
+			{"id":"pre_order","href":"#","name":"预埋单 ","htmlDoc":"pre_order.html","jsState":"pre_order.js"}
 		]
 	}
 ]

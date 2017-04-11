@@ -42,6 +42,13 @@ route.map({
 
 route.map({
     method:'get',
+    url:/^\/heartTime\/?$/i,
+    controller:'heartTime',
+    action:'heartTime'
+});
+//=============================
+route.map({
+    method:'get',
     url:/^\/main\/?$/i,
     controller:'common',
     action:'main'
@@ -54,6 +61,16 @@ route.map({
     controller:'dict_trade',
     action:'select_dictTrade'
 });
+
+
+route.map({
+    method:'get',
+    url:/^\/select_policyGID\/?$/i,
+    controller:'policyGID',
+    action:'select_policyGID'
+});
+
+
 
 //=================================
 route.map({
@@ -112,7 +129,25 @@ route.map({
 
 //================================
 
+route.map({
+    method:'get',
+    url:/^\/select_preorder\/?$/i,
+    controller:'order',
+    action:'select_preorder'
+});
 
+
+
+
+route.map({
+    method:'get',
+    url:/^\/select_userPolicyGID\/?$/i,
+    controller:'order',
+    action:'select_userPolicyGID'
+});
+
+
+//================================
 route.map({
     method:'get',
     url:/^\/exit\/?$/i,

@@ -27,7 +27,7 @@ var getRecord_dt_list = function(TRADEID,ACCOUNTID){
 			}
 		}
 	}
-}
+};
 var getRecord_dt_selectList = function(TRADEID){
 	if(dictTrade_selectList.length>0){
 		for(var i =0; i< dictTrade_selectList.length; i++){
@@ -36,7 +36,7 @@ var getRecord_dt_selectList = function(TRADEID){
 			}
 		}
 	}
-}
+};
 
 var delete_dictTrade_Account = function(){
 	console.log('delete_dictTrade_Account',arguments)

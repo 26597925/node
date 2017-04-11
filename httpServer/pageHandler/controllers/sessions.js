@@ -9,12 +9,12 @@ exports.createSID = function () {
         ,HH = unit_date.Format(now,"HH")
         ,mm = unit_date.Format(now,"mm")
         ,ss = unit_date.Format(now,"ss");
-    // console.log("g-hms",HH,mm,ss);
+
     var sID = util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)), (Math.round(Math.random()*1000)) );
     return sID;
 };
 
-var parseCookies = function(cookies){
+exports.parseCookies = function(cookies){
     var obj = {};
     if(cookies){
         var data = cookies.split(';');
@@ -37,7 +37,8 @@ var invertParseCookies = function(obj){
 };
 
 exports.setCookie = function(req,res,sID,uID){
-	var cookies = parseCookies(req.headers.cookie);
+	var cookies = this.parseCookies(req.headers.cookie);
+
 	cookies["sID"] = sID;
 	cookies["uID"] = uID;
 	// res.setHeader("Set-Cookie",["sID=" + sID,"user=" + usr,"authorized=true","Secure"]);
@@ -50,27 +51,42 @@ exports.setCookie = function(req,res,sID,uID){
 	cookies = null;
 };
 
-
-
-var invertDate = function(sID){
+exports.invertDate = function(sID){
 	var sIDs = sID.split("_");
-	var yMd = sIDs[0]
-  	,HH = Math.floor( parseInt(sIDs[1])/(60*60) )
-  	,mm = Math.floor( parseInt(sIDs[1])%(60*60)/60 )
-  	,ss = parseInt(sIDs[1])%60;
+	if(sIDs.length == 3){
+
+		return {yMd: sIDs[0]
+	  	,HH: Math.floor( parseInt(sIDs[1])/(60*60) )
+	  	,mm: Math.floor( parseInt(sIDs[1])%(60*60)/60 )
+	  	,ss: parseInt(sIDs[1])%60};
+	  	
+  	}else{
+  		return null;
+  	}
 };
 
+exports.invertTimestamp = function(sID){
+    var sID_Obj = this.invertDate(sID);
 
+    if(sID_Obj!=null){
+        var ymd = sID_Obj['yMd'].toString().substr(0,4)+"-"+sID_Obj['yMd'].toString().substr(4,2)+"-"+sID_Obj['yMd'].toString().substr(6,2);
+        var hms = sID_Obj['HH']+":"+sID_Obj['mm']+":"+sID_Obj['ss'];
+        // console.log(path.basename(__filename),ymd,hms);
+        return new Date(ymd+" "+hms).getTime();
+
+    }else{
+        return 0;
+    }
+
+};
 
 exports.get_uID = function(req){
 	
-	var cookies = parseCookies(req.headers.cookie);
-
+	var cookies = this.parseCookies(req.headers.cookie);
 	return cookies.uID;
 };
 
 exports.invalidate = function(req){
-	var cookies = parseCookies(req.headers.cookie);
-
-	invertDate(cookies.sID);
+	var cookies = this.parseCookies(req.headers.cookie);
+	this.invertDate(cookies.sID);
 };

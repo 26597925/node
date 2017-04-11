@@ -12,7 +12,7 @@ exports.select_userAccount = function(){
 	var ID = sessions.get_uID(self.req);
     // ID=10000;//test
 	var result = {'success':true,'data':''};
-	var sql = "select `tb_capital_conf`.`USERID`,`tb_user_account`.`TRADEID`, `tb_capital_conf`.`ACCOUNTID`, `CANAME`, `PASSWORD`, `MAXBUY`, `BUYAMOUNT`, `BUYPERCENT`, `SPLITCOUNT` from `tb_capital_conf` "
+	var sql = "select `tb_capital_conf`.`USERID`,`tb_user_account`.`TRADEID`, `tb_capital_conf`.`ACCOUNTID`, `CANAME`, `PASSWORD`, `MAXBUY`, `BUYAMOUNT`, `PERCENT`, `SPLITCOUNT` from `tb_capital_conf` "
     +"inner join `tb_user_account` on `tb_capital_conf`.`ACCOUNTID`=`tb_user_account`.`ACCOUNTID`"
     sql += " and `tb_capital_conf`.`USERID`='"+ID+"' and `VISIBLE` = '1'";
 	// var sql = "SELECT `USERID`, `TRADEID`, `ACCOUNTID`, `CANAME`,`PASSWORD` FROM `tb_user_account` where USERID='"+ID+"'";
@@ -42,14 +42,14 @@ exports.modify_userAccount = function(){
         ){
             console.log(path.basename(__filename),'modify_userAccount',JSON.stringify(self.req.post));
             
-            //UPDATE `tb_capital_conf` SET `MAXBUY` = '10000', `BUYAMOUNT` = '1', `BUYPERCENT` = '0.5', `SPLITCOUNT` = '9' WHERE `tb_capital_conf`.`ACCOUNTID` = '5890000049';
+            //UPDATE `tb_capital_conf` SET `MAXBUY` = '10000', `BUYAMOUNT` = '1', `PERCENT` = '0.5', `SPLITCOUNT` = '9' WHERE `tb_capital_conf`.`ACCOUNTID` = '5890000049';
             //UPDATE `tb_user_account` SET `ACCOUNTID` = '1050099800', `PASSWORD` = '62279200', `CANAME` = '老秋' WHERE `tb_user_account`.`TRADEID` = 4 AND `tb_user_account`.`ACCOUNTID` = '10500998';
-            //TRADEID ACCOUNTID PASSWORD MAXBUY BUYAMOUNT BUYPERCENT SPLITCOUNT
+            //TRADEID ACCOUNTID PASSWORD MAXBUY BUYAMOUNT PERCENT SPLITCOUNT
 
             var sql1 = "UPDATE `tb_capital_conf` SET "
             +"`MAXBUY` = '"+self.req.post["MAXBUY"]+"', "
             +"`BUYAMOUNT` = '"+self.req.post["BUYAMOUNT"]+"', "
-            +"`BUYPERCENT` = '"+self.req.post["BUYPERCENT"]+"', "
+            +"`PERCENT` = '"+self.req.post["PERCENT"]+"', "
             +"`SPLITCOUNT` = '"+self.req.post["SPLITCOUNT"]+"' WHERE `tb_capital_conf`.`ACCOUNTID` = '"+self.req.post["ACCOUNTID"]+"';";
             var sql2 = "UPDATE `tb_user_account` SET "
             // +"`ACCOUNTID` = '"+self.req.post["ACCOUNTID"]+"', "
@@ -112,9 +112,9 @@ exports.add_userAccount = function(){
     // ,PASSWORD:$("#dictTrade_pwd").val()
     // ,MAXBUY:$("#dictTrade_MAXBUY")
     // ,BUYAMOUNT:$("#dictTrade_BUYAMOUNT")
-    // ,BUYPERCENT:$("#dictTrade_BUYPERCENT")
+    // ,PERCENT:$("#dictTrade_PERCENT")
     // ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT")
-
+debugger;
     var self = this;
     
     var result = {'success':true,'data':''};
@@ -124,14 +124,14 @@ exports.add_userAccount = function(){
             &&self.req.post["PASSWORD"]
             &&self.req.post["MAXBUY"]
             &&self.req.post["BUYAMOUNT"]
-            &&self.req.post["BUYPERCENT"]
+            &&self.req.post["PERCENT"]
             &&self.req.post["SPLITCOUNT"]
         ){
             console.log(path.basename(__filename),'add_userAccount',JSON.stringify(self.req.post));
             
-            // var param = "tradeid="+self.req.post["TRADEID"]+"&accountid="+self.req.post["ACCOUNTID"]+"&password="+self.req.post["PASSWORD"]+"";
-            // http_get("http://106.39.244.172:8080/account/gddm?"+param,
-            // function(result,url){
+            var param = "tradeid="+self.req.post["TRADEID"]+"&accountid="+self.req.post["ACCOUNTID"]+"&password="+self.req.post["PASSWORD"]+"";
+            http_get("http://106.39.244.172:8080/account/gddm?"+param,
+            function(result,url){
                 
                 var result = JSON.parse('{ "status": 200, "tradeid": 2, "accountid": "5890000249", "shanghai_code": "A738685727", "shenzhen_code": "0125561330", "account_name": "夏彦刚", "detail": "successful" }');
                 if(result['status'] == 200){
@@ -147,24 +147,16 @@ exports.add_userAccount = function(){
                 //{ "status": 200, "tradeid": 2, "accountid": "5890000049", "shanghai_code": "A738685727", "shenzhen_code": "0125561330", "account_name": "夏彦刚", "detail": "successful" }
                 //{ "status": 403, "tradeid": 4, "accountid": "10500998", "shanghai_code": "", "shenzhen_code": "", "account_name": "", "detail": "连接交易服务器失败, 请尝试其它交易服务器。" }
 
-            // });            
+            });
+        }else{
+            result = {'success':false,'message':'请求数据参数错误'};
+            self.responseDirect(200,"text/json",JSON.stringify(result));
         }
+    }else{
+        result = {'success':false,'message':'请求数据类型错误'};
+        self.responseDirect(200,"text/json",JSON.stringify(result));
     }
-    // console.log("arguments",arguments)
-    // var sql =
-    // INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES
-    // (20000, 1, '301719804403', '289187', 'ÕÅÂ¶', 'A113947213', '0171338378', 1, '2017-02-14 05:28:12', '0000-00-00 00:00:00', NULL)
-    //INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES ('20000', '4', '390100060686', '341911', '老夏', 'A572339544', '0208582535', '1', '2017-03-23 00:00:00', '2017-03-23 00:00:00', 'test');
-    //INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `MODTIME`, `REMARK`) VALUES ('20000', '0', '390100060687', '341912', '老夏', 'A572339544', '0208582535', '1', '2017-03-23 00:00:00', 'test')
-    // db.query(sql,function(){
-    //    if(arguments.length==1){
-    //         result['data'] = arguments[0];
-    //         self.responseDirect(200,"text/json",JSON.stringify(result));
-    //     }else{
-    //         result = {'success':false,'message':'数据查询有问题，请联系管理员'};
-    //         self.responseDirect(200,"text/json",JSON.stringify(result));
-    //     }
-    // })
+
 };
 
 // insert_userAccount(self,self.req.post,result)
@@ -174,13 +166,7 @@ var insert_userAccount = function(context,account_result){
     var ID = sessions.get_uID(context.req);
 
     var result = {'success':true,'data':''};
-    
-    // account_result['status']
-    // account_result['detail']
 
-//     INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, `CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `CANUSAGE`, `VISIBLE`, `ADDTIME`, `MODTIME`, `REMARK`)
-// VALUES
-//     (20000,1,'309219249819','243167','Íõ¾ê','A720722620','0156011732',1,1,'2017-03-21 21:43:45','0000-00-00 00:00:00',NULL)
     var sql1 = "INSERT INTO `tb_user_account` (`USERID`, `TRADEID`, `ACCOUNTID`, `PASSWORD`, "
         +"`CANAME`, `EXCHGID_SH`, `EXCHGID_SZ`, `MODTIME`) ";
     sql1 +="VALUES ";
@@ -195,13 +181,13 @@ var insert_userAccount = function(context,account_result){
         +unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+"')";
 
     var sql2 = "INSERT INTO `tb_capital_conf` ("
-        +"`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYAMOUNT`, `BUYPERCENT`, `SPLITCOUNT`)";
+        +"`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYAMOUNT`, `PERCENT`, `SPLITCOUNT`)";
     sql2 += "VALUES";
     sql2 +="('"
         +account_result['accountid']+"',"
         +ID+","
         +post["MAXBUY"]+","
-        +post["BUYAMOUNT"]+","+post["BUYPERCENT"]+","+
+        +post["BUYAMOUNT"]+","+post["PERCENT"]+","+
         +post["SPLITCOUNT"]+")";
     try{
         db.transaction(sql1,sql2,function(){
@@ -209,10 +195,10 @@ var insert_userAccount = function(context,account_result){
         }); 
     }catch(err){
         console.log(path.basename(__filename),"catch",err);
-        result = {'success':false,'message':'操作数据库异常'};
+        result = {'success':false,'message':'操作数据库异常'+path.basename(__filename)};
         self.responseDirect(200,"text/json",JSON.stringify(result));
     }
-}
+};
 
 var http_get=function(url,callback,param){
     http.get(url,function(res){

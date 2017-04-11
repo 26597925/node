@@ -6,7 +6,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	]
 	,dictTrade_list_head: ["id","所属的券商","券商的登录帐号","券商的登录密码","最大额度","最大数量","买入比例","拆分数","操作"]
 	,dictTrade_list_body: [
-	//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","BUYPERCENT","SPLITCOUNT"
+	//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
 	//btn[name,value,id+'_dict']
 	]
 	,dictTrade_record:null
@@ -46,11 +46,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
         }else if(this.type == "button"){
             if(this.value == "新增"){
-                var r = confirm("请检查信息填写是否正确");
-                if (r == true) {
-                    this.add_userAccount();
-                }
 
+                dictTrade.add_userAccount();
                 // console.log("select",$("#dictTrade_account").val());
                 // console.log("select",$("#dictTrade_pwd").val());
                 // console.log("select",dictTrade_selectElement.val());
@@ -112,15 +109,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	, modify_userAccount : function(){
 		
 	    var sendData = {
-	    	TRADEID:dictTrade_selectElement.val()
+	    	TRADEID:this.dictTrade_selectElement.val()
 	        ,ACCOUNTID:$("#dictTrade_account").val()
 	        ,PASSWORD:$("#dictTrade_pwd").val()
 	        // ,PASSWORD:$("#dictTrade_pwd").val()
 	        ,MAXBUY:$("#dictTrade_MAXBUY").val()
 	        ,BUYAMOUNT:$("#dictTrade_BUYAMOUNT").val()
-	        ,BUYPERCENT:$("#dictTrade_BUYPERCENT").val()
+	        ,PERCENT:$("#dictTrade_PERCENT").val()
 	        ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
-	    }
+	    };
 	    var myself = this;
 	    $.ajax({
 	        type:"post",
@@ -140,16 +137,16 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	    });
 	}
 	, add_userAccount : function(){
-		console.log(arguments)
+		console.log(arguments);
 
 		var sendData = {
-	        TRADEID:dictTrade_selectElement.val()
-	        ,ACCOUNTID:$("#dictTrade_account").val()
-	        ,PASSWORD:$("#dictTrade_pwd").val()
-	        ,MAXBUY:$("#dictTrade_MAXBUY").val()
-	        ,BUYAMOUNT:$("#dictTrade_BUYAMOUNT").val()
-	        ,BUYPERCENT:$("#dictTrade_BUYPERCENT").val()
-	        ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
+	        TRADEID:this.dictTrade_selectElement.val()
+            ,ACCOUNTID:$("#dictTrade_account").val()
+            ,PASSWORD:$("#dictTrade_pwd").val()
+            ,MAXBUY:$("#dictTrade_MAXBUY").val()
+            ,BUYAMOUNT:$("#dictTrade_BUYAMOUNT").val()
+            ,PERCENT:$("#dictTrade_PERCENT").val()
+            ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
 	    };
 	    console.log("add_userAccount",JSON.stringify(sendData))
 	    var  myself = this;
@@ -172,26 +169,28 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	, reset_dictTrade_Account : function(){
 		$("#dictTrade_account").val('');
 		$("#dictTrade_pwd").val('');
-		dictTrade_selectElement.val(0)
+		this.dictTrade_selectElement.val(0)
 	}
+
 	, init_addvalue : function(){
 		$("#dictTrade_account").val(Math.ceil(2147483647*Math.random()));
 		$("#dictTrade_pwd ").val('12345678');
 		$("#dictTrade_MAXBUY").val(2147480000);
 		$("#dictTrade_BUYAMOUNT").val(2147480000);
-		$("#dictTrade_BUYPERCENT").val('0.5');
+		$("#dictTrade_PERCENT").val('0.5');
 		$("#dictTrade_SPLITCOUNT").val('1');
 	}
+
 	, init_modifyvalue : function(record)
 	{
-		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","BUYPERCENT","SPLITCOUNT"
+		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
 		// $("#dictTrade_account").val(record['TRADEID']);
 		this.dictTrade_selectElement.val(record['TRADEID'])
 		$("#dictTrade_account").val(record['ACCOUNTID']);
 		$("#dictTrade_pwd ").val(record['PASSWORD']);
 		$("#dictTrade_MAXBUY").val(record['MAXBUY']);
 		$("#dictTrade_BUYAMOUNT").val(record['BUYAMOUNT']);
-		$("#dictTrade_BUYPERCENT").val(record['BUYPERCENT']);
+		$("#dictTrade_PERCENT").val(record['PERCENT']);
 		$("#dictTrade_SPLITCOUNT").val(record['SPLITCOUNT']);
 	}
 	, load_dictTrade : function(){
@@ -226,12 +225,12 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		
 		this.dictTrade_selectElement = $('<select></select>',{
 			id:'dictTrade_select'
-		})
+		});
 
 		for(var sId = 0; sId < this.dictTrade_selectList.length; sId++)
 		{
 			if( 3 <= this.dictTrade_selectList[sId].length )
-			{
+			{//3以上的情况
 				if(this.dictTrade_selectList[sId][2])
 				{
 					this.dictTrade_selectElement.append("<option value='"
@@ -245,11 +244,11 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 				}
 				
 			}
-			// else if( 2 == this.dictTrade_selectList[sId].length )
-			// {
-			// 	this.dictTrade_selectElement.append("<option value='"
-			// 		+this.dictTrade_selectList[sId][0]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
-			// }
+			else if( 2 == this.dictTrade_selectList[sId].length )
+			{//只有两个参数的情况
+				this.dictTrade_selectElement.append("<option value='"
+					+this.dictTrade_selectList[sId][0]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
+			}
 		}
 
 		// this.dictTrade_selectElement.val("maxMem");
@@ -257,23 +256,20 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		// $("#dict_trade_opt").append(this.dictTrade_selectElement);
 	}
 
-	, appendTB_modify : function( TRADEID, ACCOUNTID ){
-		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","BUYPERCENT","SPLITCOUNT"
-		var myself = this;
-		var record =  this.getRecord_dt_list(TRADEID,ACCOUNTID);
-		console.log("appendTB_modify",JSON.stringify(record));
-
-        $("#dictTrade_tabs_1").empty();
-        var tb = $('<table></table>', {
+    , appendTB_add_head: function(){
+		return   $('<table></table>', {
             'style':"margin:0 auto;"
             ,'class':'dataTable cellspacing table'
-        }).appendTo($('#dictTrade_tabs_1'));
+        })
+	}
 
+    , appendTB_add_body: function( tb ){
         var tr = $('<tr></tr>').appendTo(tb);
         $('<td></td>',{ class:"td"}).appendTo(tr).text('所属的券商：');
         $('<td></td>',{ class:"td"}).appendTo(tr).append($('<div id="dictTrade_opt_modify" ></div>'));
         $("#dictTrade_opt_modify").append(myself.create_dictTrade_Select());
         tr = $('<tr></tr>').appendTo(tb);
+
         $('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录帐号：');
         $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_account" value="" />'));
 
@@ -284,24 +280,26 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         tr = $('<tr></tr>').appendTo(tb);
         $('<td></td>',{ class:"td"}).appendTo(tr).text('最大额度：');
         $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_MAXBUY" value="" />'));
+
         tr = $('<tr></tr>').appendTo(tb);
         $('<td></td>',{ class:"td"}).appendTo(tr).text('最大数量：');
         $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_BUYAMOUNT" value="" />'));
 
         tr = $('<tr></tr>').appendTo(tb);
         $('<td></td>',{ class:"td"}).appendTo(tr).text('买入比例：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_BUYPERCENT" value="" />'));
+        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_PERCENT" value="" />'));
 
         tr = $('<tr></tr>').appendTo(tb);
         $('<td></td>',{ class:"td"}).appendTo(tr).text('拆分数：');
         $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_SPLITCOUNT" value="" />'));
 
-        tr = $('<tr></tr>').appendTo(tb);
+    }
+
+    , appendTB_add_control: function( tb ){
+        var tr = $('<tr></tr>').appendTo(tb);
         var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
         $('<input></input>',{type:"button",id:"user_account_submit",name:"",value:"提交"}).appendTo(td);
         $('<input></input>',{type:"button",id:"user_account_back",name:"",value:"返回"}).appendTo(td);
-
-        this.init_modifyvalue(record);
 
         $("#user_account_submit").click(
             this.dictTrade_clickHandler
@@ -310,7 +308,20 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         $("#user_account_back").click(
             this.dictTrade_clickHandler
         );
+	}
 
+	, appendTB_modify : function( TRADEID, ACCOUNTID ){
+		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
+		var myself = this;
+		var record =  this.getRecord_dt_list(TRADEID,ACCOUNTID);
+		console.log("appendTB_modify",JSON.stringify(record));
+
+        $("#dictTrade_tabs_1").empty();
+        this.appendTB_add_head().appendTo($('#dictTrade_tabs_1'));
+		this.appendTB_add_body(tb);
+		this.appendTB_add_control(tb);
+
+        this.init_modifyvalue(record);
 	}
 	, appendTB_add : function( TRADEID, ACCOUNTID ){
 		var myself = this;
@@ -343,7 +354,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 		tr = $('<tr></tr>').appendTo(tb);
 		$('<td></td>',{ class:"td"}).appendTo(tr).text('买入比例：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_BUYPERCENT" value="" />'));
+		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_PERCENT" value="" />'));
 
 		tr = $('<tr></tr>').appendTo(tb);
 		$('<td></td>',{ class:"td"}).appendTo(tr).text('拆分数：');
@@ -363,7 +374,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         $("#user_account_reset").click(
             this.dictTrade_clickHandler
         );
-		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","BUYPERCENT","SPLITCOUNT"
+		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
 		
 		
 	}
@@ -399,7 +410,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['PASSWORD']);
 			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['MAXBUY']);
 			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['BUYAMOUNT']);
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['BUYPERCENT']);
+			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['PERCENT']);
 			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['SPLITCOUNT']);
 			var td = $('<td></td>').appendTo(tr);
 			var button = $('<button></button>',{
