@@ -1,9 +1,9 @@
 oojs$.ns("com.stock.dictTrade");
 oojs$.com.stock.dictTrade=oojs$.createClass({
-	dictTrade_selectList: [ 
+	select_trade: [ 
 	//[id,label,title]
 	//[id,label]
-	]
+	]//券商关联表
 	,dictTrade_list_head: ["id","所属的券商","券商的登录帐号","券商的登录密码","最大额度","最大数量","买入比例","拆分数","操作"]
 	,dictTrade_list_body: [
 	//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
@@ -11,13 +11,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	]
 	,dictTrade_record:null
 	,dictTrade_selectElement: null
+
 	,init:function(){
-        // oojs$.showInfo("",function(){
-        // 	console.log("showInfo",arguments)
-        // });
-        // oojs$.showError("",function(){
-        //
-        // });
 		$( "#dictTrade_tabs" ).tabs();
 		this.load_dictTrade();
         this.appendTB_add();
@@ -73,37 +68,29 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			}
 		}
 	}
+
 	, getRecord_dt_selectList : function(TRADEID){
-		if(this.dictTrade_selectList.length>0){
-			for(var i =0; i< this.dictTrade_selectList.length; i++){
-				if( this.dictTrade_selectList[i][0]==TRADEID ){
-					return this.dictTrade_selectList[i][1];
+		if(this.select_trade.length>0){
+			for(var i =0; i< this.select_trade.length; i++){
+				if( this.select_trade[i]["ID"]==TRADEID ){
+					return this.select_trade[i]["NAME"];
 				}
 			}
 		}
 	}
 	, delete_userAccount : function(){
-		console.log('this.delete_userAccount',arguments)
+		console.log('this.delete_userAccount',arguments);
 		var sendData = {
 	        TRADEID:arguments[0]
 	        ,ACCOUNTID:arguments[1]
 	    };
-	    var myself = this;
-	    $.ajax({
-	        type:"post",
-	        url:"/delete_userAccount",
-	        async:false,
-	        dataType:"json",
-	        data:sendData,
-	        success:function(data,textStatus){
-	            if(data.success){
-	            	myself.load_userAccount(); 
-	            }
-	        },
-	        beforeSend: function(xhr){
-	            xhr.withCredentials = true;
-	        }
-	    });
+	    var self = this;
+	    oojs$.httpPost_json("/delete_userAccount",sendData,function(result,textStatus,token){
+            if(result.success){
+                self.load_userAccount();
+            }
+		});
+
 	}
 
 	, modify_userAccount : function(){
@@ -118,27 +105,19 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	        ,PERCENT:$("#dictTrade_PERCENT").val()
 	        ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
 	    };
-	    var myself = this;
-	    $.ajax({
-	        type:"post",
-	        url:"/modify_userAccount",
-	        async:false,
-	        dataType:"json",
-	        data:sendData,
-	        success:function(data,textStatus){
-	            
-	            if(data.success){
-	                myself.load_userAccount(); 
-	            }
-	        },
-	        beforeSend: function(xhr){
-	            xhr.withCredentials = true;
-	        }
-	    });
+	    var self = this;
+        oojs$.httpPost_json("/modify_userAccount",sendData,function(result,textStatus,token){
+            if(result.success){
+                self.load_userAccount();
+            }else{
+                oojs$.showError(result.message);
+            }
+        });
+
 	}
 	, add_userAccount : function(){
 		console.log(arguments);
-
+        var  self = this;
 		var sendData = {
 	        TRADEID:this.dictTrade_selectElement.val()
             ,ACCOUNTID:$("#dictTrade_account").val()
@@ -148,23 +127,16 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             ,PERCENT:$("#dictTrade_PERCENT").val()
             ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
 	    };
-	    console.log("add_userAccount",JSON.stringify(sendData))
-	    var  myself = this;
-	    $.ajax({
-	        type:"post",
-	        url:"/add_userAccount",
-	        async:false,
-	        dataType:"json",
-	        data:sendData,
-	        success:function(data,textStatus){
-	            if(data.success){
-	            	myself.load_userAccount();
-	            }
-	        },
-	        beforeSend: function(xhr){
-	            xhr.withCredentials = true;
-	        }
-	    });
+	    console.log("add_userAccount",JSON.stringify(sendData));
+
+        oojs$.httpPost_json("/add_userAccount",sendData,function(result,textStatus,token){
+            if(result.success){
+                self.load_userAccount();
+            }else{
+                oojs$.showError(result.message);
+            }
+        });
+
 	}
 	, reset_dictTrade_Account : function(){
 		$("#dictTrade_account").val('');
@@ -195,30 +167,24 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	}
 	, load_dictTrade : function(){
 		this.init_addvalue();
-		var myself = this;
-		if(this.dictTrade_selectList.length==0){
-			
-			$.ajax({
-		        type:"get",
-		        url:"/select_dictTrade",
-		        async:false,
-		        dataType:"json",
-		        success:function(data,textStatus){
-		            if(data.success){
-		            	myself.dictTrade_selectList = [];
-		            	for(var i in data.data){
-		            		myself.dictTrade_selectList.push([data.data[i]["ID"],data.data[i]["NAME"]]);
-		            	}
-                        $("#dict_trade_opt").append(myself.create_dictTrade_Select());
-		            	myself.load_userAccount();
-		            }
-		        },
-		        beforeSend: function(xhr){
-		            xhr.withCredentials = true;
-		        }
-		    });
+		var self = this;
+		if(this.select_trade.length==0){
+
+            oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
+
+				if(result.success){
+					self.select_trade = [];
+                    self.select_trade = result.data;
+					$("#dict_trade_opt").append(self.create_dictTrade_Select());
+					self.load_userAccount();
+                }else{
+                    oojs$.showError(result.message);
+                }
+
+            });
+
 		}else{
-			myself.load_userAccount();
+			self.load_userAccount();
 		}
 	}
 	, create_dictTrade_Select: function(){
@@ -227,28 +193,12 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			id:'dictTrade_select'
 		});
 
-		for(var sId = 0; sId < this.dictTrade_selectList.length; sId++)
+		for(var sId = 0; sId < this.select_trade.length; sId++)
 		{
-			if( 3 <= this.dictTrade_selectList[sId].length )
-			{//3以上的情况
-				if(this.dictTrade_selectList[sId][2])
-				{
-					this.dictTrade_selectElement.append("<option value='"
-						+this.dictTrade_selectList[sId][0]
-						+"' title='"+this.dictTrade_selectList[sId][2]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
-				}
-				else{
-					this.dictTrade_selectElement.append("<option value='"
-						+this.dictTrade_selectList[sId][0]+"'>"
-						+this.dictTrade_selectList[sId][1]+"</option>");
-				}
-				
-			}
-			else if( 2 == this.dictTrade_selectList[sId].length )
-			{//只有两个参数的情况
-				this.dictTrade_selectElement.append("<option value='"
-					+this.dictTrade_selectList[sId][0]+"'>"+this.dictTrade_selectList[sId][1]+"</option>");
-			}
+
+			this.dictTrade_selectElement.append("<option value='"
+				+this.select_trade[sId]["ID"]+"'>"+this.select_trade[sId]["NAME"]+"</option>");
+
 		}
 
 		// this.dictTrade_selectElement.val("maxMem");
@@ -264,10 +214,11 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	}
 
     , appendTB_add_body: function( tb ){
+    	var self = this;
         var tr = $('<tr></tr>').appendTo(tb);
         $('<td></td>',{ class:"td"}).appendTo(tr).text('所属的券商：');
         $('<td></td>',{ class:"td"}).appendTo(tr).append($('<div id="dictTrade_opt_modify" ></div>'));
-        $("#dictTrade_opt_modify").append(myself.create_dictTrade_Select());
+        $("#dictTrade_opt_modify").append(self.create_dictTrade_Select());
         tr = $('<tr></tr>').appendTo(tb);
 
         $('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录帐号：');
@@ -312,19 +263,19 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	, appendTB_modify : function( TRADEID, ACCOUNTID ){
 		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
-		var myself = this;
+		var self = this;
 		var record =  this.getRecord_dt_list(TRADEID,ACCOUNTID);
 		console.log("appendTB_modify",JSON.stringify(record));
 
         $("#dictTrade_tabs_1").empty();
-        this.appendTB_add_head().appendTo($('#dictTrade_tabs_1'));
+        var tb = this.appendTB_add_head().appendTo($('#dictTrade_tabs_1'));
 		this.appendTB_add_body(tb);
 		this.appendTB_add_control(tb);
 
         this.init_modifyvalue(record);
 	}
 	, appendTB_add : function( TRADEID, ACCOUNTID ){
-		var myself = this;
+		var self = this;
 		$("#dictTrade_tabs_2").empty();
 		var tb = $('<table></table>', {
 			'style':"margin:0 auto;"
@@ -334,7 +285,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		var tr = $('<tr></tr>').appendTo(tb);
 		$('<td></td>',{ class:"td"}).appendTo(tr).text('所属的券商：');
 		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<div id="dictTrade_opt_add" ></div>'));
-        $("#dictTrade_opt_add").append(myself.create_dictTrade_Select());
+        $("#dictTrade_opt_add").append(self.create_dictTrade_Select());
 
 		tr = $('<tr></tr>').appendTo(tb);
 		$('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录帐号：');
@@ -432,45 +383,29 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 		this.show_dictTrade_Page();
 	}
+
 	, show_dictTrade_Page : function(){
 		$("#dict_trade_panel").show();
 	}
+
 	, load_userAccount : function(){
-		var myself = this;
-		$.ajax({
-		    type:"get",
-		    url:"/select_userAccount",
-		    async:false,
-		    dataType:"json",
-		    success:function(data,textStatus){
-		        
-		        if(data.success){
-		        	console.log(data.data);
-		        	myself.dictTrade_list_body = [];
-		        	for(var i=0; i<data.data.length; i++){
-		        		myself.dictTrade_list_body.push(data.data[i]);
-		        	}
-		        }
-		        myself.appendTB_list();
-		    },
-		    beforeSend: function(xhr){
-		        xhr.withCredentials = true;
-		    }
-		});
-		// var progressBar = document.getElementById("p"),
-		// var client = new XMLHttpRequest();
-		// client.open("GET", "select_userAccount");
-		// client.setRequestHeader("Content-Type", "text/json;charset=UTF-8");
-		// client.onprogress = function(pe) {
-		// 	if(pe.lengthComputable) {
-		//  		progressBar.max = pe.total
-		//  		progressBar.value = pe.loaded
-		// 	}
-		// }
-		// client.onloadend = function(pe) {
-		// 	progressBar.value = pe.loaded
-		// }
-		// client.send()
+		var self = this;
+
+        oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
+
+			if(result.success){
+				console.log(result.data);
+				self.dictTrade_list_body = [];
+				for(var i=0; i<result.data.length; i++){
+					self.dictTrade_list_body.push(result.data[i]);
+				}
+			}else{
+                oojs$.showError(result.message);
+			}
+			self.appendTB_list();
+
+        });
+
 	}
 	,__ctor: function(){
 		

@@ -183,7 +183,7 @@ var renderPage = function(){
     for(var i = 0; i< nvgJson.length;i++){
         for(var navigator in nvgJson[i]){
             nvgHtml += "<h5><a href='#'>"+navigator+"</a></h5>";
-            nvgHtml += "<div>"
+            nvgHtml += "<div>";
             for(var element=0; element < nvgJson[i][navigator].length; element++){
                 nvgHtml += 
                 "<a id=\""+nvgJson[i][navigator][element]["id"]
@@ -197,20 +197,23 @@ var renderPage = function(){
                     +'    });\n';
                 // if(i==0&&element==0){
                 // if(i==0&&element==1){
-                if(i==1 && element==0){
+                if(i==2 && element==0){
                     // console.log(">>>>>>",nvgJson[i][navigator][element]["id"])
                     firstPage = '   $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
                 }
     
-
-                jsState += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsState"]),'utf-8');
+                if(String(nvgJson[i][navigator][element]["jsState"]).length>1){
+                    jsState += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsState"]),'utf-8');
+                }
                 // jsRegist += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsRegist"]),'utf-8');
 
                 hideAllPanel += '   $("#'+(nvgJson[i][navigator][element]["id"]+"_panel")+'").hide();\n';
 
                 htmlDoc += '<div id="'+(nvgJson[i][navigator][element]["id"]+"_panel")+'" class="content">';
-                htmlDoc += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["htmlDoc"]),'utf-8');
-                htmlDoc += '</div>'
+                if(String(nvgJson[i][navigator][element]["htmlDoc"]).length>1){
+                    htmlDoc += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["htmlDoc"]),'utf-8');
+                }
+                htmlDoc += '</div>';
 
                 jsState += "\n";
                 htmlDoc += "\n";

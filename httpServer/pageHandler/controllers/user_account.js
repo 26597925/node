@@ -12,8 +12,10 @@ exports.select_userAccount = function(){
 	var ID = sessions.get_uID(self.req);
     // ID=10000;//test
 	var result = {'success':true,'data':''};
+
 	var sql = "select `tb_capital_conf`.`USERID`,`tb_user_account`.`TRADEID`, `tb_capital_conf`.`ACCOUNTID`, `CANAME`, `PASSWORD`, `MAXBUY`, `BUYAMOUNT`, `PERCENT`, `SPLITCOUNT` from `tb_capital_conf` "
-    +"inner join `tb_user_account` on `tb_capital_conf`.`ACCOUNTID`=`tb_user_account`.`ACCOUNTID`"
+    +"inner join `tb_user_account` on `tb_capital_conf`.`ACCOUNTID`=`tb_user_account`.`ACCOUNTID`";
+
     sql += " and `tb_capital_conf`.`USERID`='"+ID+"' and `VISIBLE` = '1'";
 	// var sql = "SELECT `USERID`, `TRADEID`, `ACCOUNTID`, `CANAME`,`PASSWORD` FROM `tb_user_account` where USERID='"+ID+"'";
 	// sql = "SELECT `USERID`, `TRADEID`, `ACCOUNTID` FROM `tb_user_account` where USERID='"+ID+"'";
@@ -54,7 +56,7 @@ exports.modify_userAccount = function(){
             var sql2 = "UPDATE `tb_user_account` SET "
             // +"`ACCOUNTID` = '"+self.req.post["ACCOUNTID"]+"', "
             +"`PASSWORD` = '"+self.req.post["PASSWORD"]+"' "
-            +"WHERE `tb_user_account`.`TRADEID` = "+ID+" AND `tb_user_account`.`ACCOUNTID` = '"+self.req.post["ACCOUNTID"]+"';"
+            +"WHERE `tb_user_account`.`TRADEID` = "+ID+" AND `tb_user_account`.`ACCOUNTID` = '"+self.req.post["ACCOUNTID"]+"';";
             try{
                 db.transaction(sql1,sql2,function(){
                     self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -130,10 +132,11 @@ debugger;
             console.log(path.basename(__filename),'add_userAccount',JSON.stringify(self.req.post));
             
             var param = "tradeid="+self.req.post["TRADEID"]+"&accountid="+self.req.post["ACCOUNTID"]+"&password="+self.req.post["PASSWORD"]+"";
+            console.log(path.basename(__filename),'param',param);
             http_get("http://106.39.244.172:8080/account/gddm?"+param,
             function(result,url){
                 
-                var result = JSON.parse('{ "status": 200, "tradeid": 2, "accountid": "5890000249", "shanghai_code": "A738685727", "shenzhen_code": "0125561330", "account_name": "夏彦刚", "detail": "successful" }');
+                // var result = JSON.parse('{ "status": 200, "tradeid": 2, "accountid": "5890000249", "shanghai_code": "A738685727", "shenzhen_code": "0125561330", "account_name": "夏彦刚", "detail": "successful" }');
                 if(result['status'] == 200){
                     insert_userAccount(self,result);
                 }else if(result['status'] == 403){

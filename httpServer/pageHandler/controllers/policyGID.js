@@ -13,10 +13,9 @@ exports.select_policyGID = function(){
     db.query(sql,function(){
         if(arguments.length==1){
             result['data'] = arguments[0];
-            console.log(path.basename(__filename),'select_policyGID',arguments);
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
-            result = {'success':false,'message':'数据查询有问题，请联系管理员 -'+path.basename(__filename)};
+            result = {'success':false,'message':'数据查询有问题，请联系管理员 ->'+path.basename(__filename)};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     })

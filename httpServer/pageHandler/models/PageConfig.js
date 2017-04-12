@@ -104,7 +104,7 @@ route.map({
 //=================================
 
 route.map({
-    method:'post',
+    method:'get',
     url:/^\/select_subscrible\/?$/i,
     controller:'policy',
     action:'select_subscrible'
@@ -113,7 +113,7 @@ route.map({
 
 
 route.map({
-    method:'post',
+    method:'get',
     url:/^\/select_alreadySubscrible\/?$/i,
     controller:'policy',
     action:'select_alreadySubscrible'
@@ -130,10 +130,10 @@ route.map({
 //================================
 
 route.map({
-    method:'get',
-    url:/^\/select_preorder\/?$/i,
+    method:'post',
+    url:/^\/insert_preorder\/?$/i,
     controller:'order',
-    action:'select_preorder'
+    action:'insert_preorder'
 });
 
 

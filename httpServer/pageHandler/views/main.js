@@ -120,6 +120,41 @@ var oojs$ = {
 		}
 	}
 
+	,httpPost_json: function( send_url, send_jsonObj, callback, token ){
+        $.ajax({
+            type:"post",
+            url:send_url,
+            async:false,
+            dataType:"json",
+            data:JSON.stringify(send_jsonObj),
+            success:function(result, textStatus){
+				if(callback){
+                    callback(result, textStatus, token);
+                }
+            },
+            beforeSend: function(xhr){
+                xhr.withCredentials = true;
+            }
+        });
+	}
+
+	,httpGet: function(send_url, callback, token){
+        $.ajax({
+            type:"get",
+            url:send_url,
+            async:false,
+            dataType:"json",
+            success:function(result, textStatus){
+                if(callback){
+                    callback(result, textStatus, token);
+                }
+            },
+            beforeSend: function(xhr){
+                xhr.withCredentials = true;
+            }
+        });
+	}
+
 	,Format: function(_date,fmt) { // author: meizz
         var o = {
             "M+" : _date.getMonth() + 1, // 月份
@@ -231,6 +266,8 @@ var oojs$ = {
                 +tmpval+"</option>");
         }
         htmltag.append(select);
+
+
 		return htmltag;
 	}
 

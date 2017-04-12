@@ -85,6 +85,7 @@ var select_combinePolicy = function(){
 };
 
 var combinePolicyResult=function(){
+
     var result1=arguments[0];
     var result2=arguments[1];
     var obj = {};
@@ -103,7 +104,13 @@ var combinePolicyResult=function(){
     // SUBSCRBLE
     // PNAME
 //
+    var MODTIME = "";
     for(var i = 0; i < result2.length; i++){
+        MODTIME = result2[i]['MODTIME'];
+        if(!unit_date.matchYMD(MODTIME,1))
+        {
+            MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
+        }
         obj[ result2[i]['USERID']+"_"+result2[i]['POLICYID'] ] =
         {
             USERID:result2[i]['USERID'],
@@ -122,10 +129,10 @@ var combinePolicyResult=function(){
             SUBSCRBLE :result2[i]['SUBSCRBLE'],
             PERCENT :result2[i]['PERCENT'],
             PRICES :result2[i]['PRICES'],
-            ADDTIME :result2[i]['ADDTIME'],
-            MODTIME :result2[i]['MODTIME']
+            ADDTIME :unit_date.Format(new Date(result2[i]['ADDTIME']),"yyyy-MM-dd HH:mm:ss"),
+            MODTIME :MODTIME
         };
-
+//
     }
 
     for(var i = 0; i < result1.length; i++){
@@ -133,6 +140,12 @@ var combinePolicyResult=function(){
         if(obj.hasOwnProperty(result1[i]['USERID']+"_"+result1[i]['POLICYID'])){
             continue;
         }else{
+            MODTIME = result1[i]['MODTIME'];
+            if(!unit_date.matchYMD(MODTIME,1))
+            {
+                MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
+            }
+
             obj[ result1[i]['USERID']+"_"+result1[i]['POLICYID'] ] = {
                 USERID:result1[i]['USERID'],
                 PGROUPID:result1[i]['PGROUPID'],
@@ -150,8 +163,8 @@ var combinePolicyResult=function(){
                 SUBSCRBLE :0,
                 PERCENT :result1[i]['PERCENT'],
                 PRICES :result1[i]['PRICES'],
-                ADDTIME :result1[i]['ADDTIME'],
-                MODTIME :result1[i]['MODTIME']
+                ADDTIME :unit_date.Format(new Date(result1[i]['ADDTIME']),"yyyy-MM-dd HH:mm:ss"),
+                MODTIME :MODTIME
             }
         }
     }
@@ -159,21 +172,23 @@ var combinePolicyResult=function(){
     var arr = [];
     for(var elm in obj){
         if(obj[elm]['SUBSCRBLE']==0){
-
             arr.push(obj[elm])
         }
     }
-    // console.log(path.basename(__filename),'combinePolicyResult ',obj);
+
+    console.log(path.basename(__filename),'combinePolicyResult ',JSON.stringify(obj));
+    debugger;
     return arr;
 };
 
 
 exports.select_alreadySubscrible = function(){
 
+    console.log( path.basename(__filename),"alias select_alreadySubscrible:",JSON.stringify(this.alias) );
+
     var self = this;
     var result = {'success':true,'data':''};
     var uID = sessions.get_uID(self.req);
-
 
     var sql = "select  `USERID`, `PNAME`, `DIRTYPE`, `PGROUPID`, `POLICYID`, `POLICYPARAM`, `STARTTIME`,"
         +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `FALG`,"
@@ -186,8 +201,8 @@ exports.select_alreadySubscrible = function(){
             result.data = arguments[0];
 
             for(var i = 0; i < result.data.length; i++){
-                result.data[i]['STARTTIME'] = unit_date.toHMS(result.data['STARTTIME']);
-                result.data[i]['ENDTIME'] = unit_date.toHMS(result.data['ENDTIME']);
+                result.data[i]['STARTTIME'] = unit_date.toHMS(result.data[i]['STARTTIME']);
+                result.data[i]['ENDTIME'] = unit_date.toHMS(result.data[i]['ENDTIME']);
             }
 
             self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -232,35 +247,33 @@ exports.update_subscrible = function(){
 
 
             self.req.post['STOCKSET'] = (!self.req.post['STOCKSET'])?"":self.req.post['STOCKSET'];
-            self.req.post['STATUS'] = (!self.req.post['STATUS'])?"":self.req.post['STATUS'];
+            self.req.post['STATUS'] = (!self.req.post['STATUS'])?0:self.req.post['STATUS'];
             self.req.post['FALG'] = (!self.req.post['FALG'])?0:self.req.post['FALG'];
             console.log(path.basename(__filename),"update STARTTIME:",STARTTIME,'ENDTIME:',ENDTIME);
 
-
-
             if(db_type == 'insert'){
-                // INSERT INTO `tb_policy_usage` (`USERID`, `PNAME`, `PGROUPID`, `POLICYID`, `POLICYPARAM`, `DIRTYPE`, `STARTTIME`, `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `FALG`, `REMARK`, `SUBSCRBLE`, `BUYPERCENT`)
-                // VALUES
-                // (20000, '打板买入', 0, 12, '3000', 1, NULL, NULL, NULL, 1, 0, 0, NULL, NULL, 0.3);
+                sql = "INSERT INTO `tb_policy_usage` (" +
+                    "`USERID`, `PNAME`, `PGROUPID`," +
+                    " `POLICYID`, `POLICYPARAM`, `DIRTYPE`, " +
+                    "`STARTTIME`, `ENDTIME`, `STOCKSET`, " +
+                    "`ISTEST`, `STATUS`, `PRICES`, " +
+                    "`MODTIME`, `FALG`, `SUBSCRBLE`, `PERCENT`" +
+                    ")VALUES(" +
+                    "%s, '%s', %s, " +
+                    "%s, '%s', %s, " +
+                    "%s, %s, '%s', " +
+                    "%s, %s, %s, " +
+                    "'%s', %s, %s, " +
+                    "%s)";
+                sql = util.format(sql,
+                    self.req.post['USERID'],self.req.post['PNAME'],self.req.post['PGROUPID']
+                    ,self.req.post['POLICYID'],self.req.post['POLICYPARAM'], self.req.post['DIRTYPE']
+                    ,STARTTIME,ENDTIME,self.req.post['STOCKSET']
+                    ,self.req.post['ISTEST'],self.req.post['STATUS'],self.req.post['PRICES']
+                    ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss"),self.req.post['FALG'],self.req.post['SUBSCRBLE']
+                    ,self.req.post['PERCENT']
+                );
 
-//, `PRICES`, `ADDTIME`, `MODTIME`, `FALG`
-                sql = 'INSERT INTO `tb_policy_usage` ' +
-                    '(`USERID`, `PNAME`, `PGROUPID`, `POLICYID`, `POLICYPARAM`, `DIRTYPE`, `STARTTIME`, `ENDTIME`, ' +
-                    '`STOCKSET`, `ISTEST`, `STATUS`, `PRICES`, `ADDTIME`, `MODTIME`, `FALG`, ' +
-                    //'`REMARK`, ' +
-                    '`SUBSCRBLE`, `PERCENT`)' +
-                    'VALUES' +
-                    '('+
-                    self.req.post['USERID']+', "'+self.req.post['PNAME']+'", '+
-                    self.req.post['PGROUPID']+', ' +
-                    self.req.post['POLICYID']+', "'+self.req.post['POLICYPARAM']+'", '+
-                    self.req.post['DIRTYPE']+', "'+
-                    STARTTIME+'", "'+
-                    ENDTIME+'", "'+
-                    self.req.post['STOCKSET']+'", '+
-                    self.req.post['ISTEST']+', '+self.req.post['STATUS']+', '+self.req.post['FALG']+', '+
-                    //self.req.post['REMARK']+', '+
-                    self.req.post['SUBSCRBLE']+', '+self.req.post['PERCENT']+')';
 
                 db.query(sql,function(){
                     if(arguments.length==1){
@@ -273,15 +286,24 @@ exports.update_subscrible = function(){
 
             }else if( db_type == 'update' ){
 
-
                 sql = 'UPDATE `tb_policy_usage` SET ' +
-                    '`POLICYPARAM` = "'+
-                    self.req.post['POLICYPARAM']+'", `STARTTIME` = "'+
-                    STARTTIME+'",' +'`ENDTIME` = "'+
-                    ENDTIME +'", `STOCKSET` = "'+
-                    self.req.post['STOCKSET']+'",`SUBSCRBLE` = '+self.req.post['SUBSCRBLE']+' ,`PERCENT` = "'+self.req.post['PERCENT']+'" ' +
-                    'WHERE `tb_policy_usage`.`POLICYID` = '+
-                    self.req.post['POLICYID']+' and `tb_policy_usage`.`USERID` = '+self.req.post['USERID']+' ';
+                    '`POLICYPARAM` = "%s", `STARTTIME` = %s,`ENDTIME` = %s, ' +
+                    '`STOCKSET` = "%s", ' +
+                    '`SUBSCRBLE` = %s, ' +
+                    '`PERCENT` = "%s", ' +
+                    '`MODTIME` = "%s" ' +
+                    'WHERE ' +
+                    '`tb_policy_usage`.`POLICYID` = %s ' +
+                    'and `tb_policy_usage`.`USERID` = %s';
+                sql = util.format(sql,
+                    self.req.post['POLICYPARAM'],STARTTIME,ENDTIME,
+                    self.req.post['STOCKSET'],
+                    self.req.post['SUBSCRBLE'],
+                    self.req.post['PERCENT'],
+                    unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss"),
+                    self.req.post['POLICYID'],
+                    self.req.post['USERID']);
+
                 db.query(sql,function(){
                     if(arguments.length==1){
                         self.responseDirect(200,"text/json",JSON.stringify(result));

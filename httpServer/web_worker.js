@@ -25,14 +25,18 @@ exports.runPageServer = function( port )
 		})
 		.on('end', function()
 		{
-			var reqData;
+			var reqData="";
 			if( "POST" == req.method.toUpperCase() )
 			{
 				if(req.headers.accept.indexOf('application/json')!=-1)
 				{
-
-					reqData = querystring.parse(_bufData);
-
+					if(_bufData.length>0){
+						reqData = JSON.parse(_bufData);
+					}else{
+                        reqData = {};
+					}
+				}else{
+                    reqData = querystring.parse(_bufData);
 				}
 			}
 			req.post = reqData;
@@ -60,11 +64,19 @@ var handlerRequest = function(req, res){
     }
 };
 
-var controllerContext = function(req, res){
+var count = 0;
+var cumulation = function(){
+	if(count>=10000){
+		count = 0;
+	}
+	return count++;
+};
 
+var controllerContext = function(req, res){
+	this.alias = "root"
     this.req = req;
     this.res = res;
-
+	this.cumulation = cumulation;
     this.handler404 = handler404;
     this.handler500 = handler500;
 

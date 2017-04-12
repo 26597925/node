@@ -6,13 +6,24 @@ const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
 
 exports.select_dictTrade = function(){
-	var  self = this;
+    var self = this;
 	var result = {'success':true,'data':''};
-	var sql = "SELECT `ID`, `NAME` FROM `tb_dict_trade` ";
+
+	var sql = "SELECT " +
+        "`ID`, " +
+        "`NAME`, " +
+        // "`YYBID`, " +
+        "`BORROW` " +
+        // ", " +
+        // "`ENDPOINT`, " +
+        // "`VERSION`" +
+        // ", " +
+        // "`REMARK` " +
+        " FROM `tb_dict_trade` ";
+
     db.query(sql,function(){
-       if(arguments.length==1){
+        if(arguments.length==1){
             result['data'] = arguments[0];
-            console.log(path.basename(__filename),'select_dictTrade',arguments);
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
             result = {'success':false,'message':'数据查询有问题，请联系管理员'};
