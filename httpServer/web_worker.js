@@ -25,13 +25,17 @@ exports.runPageServer = function( port )
 		})
 		.on('end', function()
 		{
-			var reqData="";
+            var reqData="";
 			if( "POST" == req.method.toUpperCase() )
 			{
 				if(req.headers.accept.indexOf('application/json')!=-1)
 				{
 					if(_bufData.length>0){
-						reqData = JSON.parse(_bufData);
+						try{
+							reqData = JSON.parse(_bufData);
+						}catch (err){
+							console.log("not json format");
+						}
 					}else{
                         reqData = {};
 					}

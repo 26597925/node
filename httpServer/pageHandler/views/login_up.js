@@ -82,7 +82,7 @@ $(document).ready(function(){
             url:"/logup_submit",
             async:false,
             dataType:"json",
-            data:sendData,
+            data:JSON.stringify(sendData),
             success:function(data,textStatus){
                 $("#message").text(data.message);
                 if(data.success){

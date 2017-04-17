@@ -1,64 +1,101 @@
 oojs$.ns("com.stock.dictTrade");
 oojs$.com.stock.dictTrade=oojs$.createClass({
-	select_trade: [ 
-	//[id,label,title]
-	//[id,label]
-	]//券商关联表
-	,dictTrade_list_head: ["id","所属的券商","券商的登录帐号","券商的登录密码","最大额度","最大数量","买入比例","拆分数","操作"]
-	,dictTrade_list_body: [
-	//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
-	//btn[name,value,id+'_dict']
-	]
-	,dictTrade_record:null
-	,dictTrade_selectElement: null
-
+    // CANAME
+    // CANUSAGE
+    // VISIBLE
+    // USERID
+    list_benchmark_head: [
+        {
+            ID:"TRADEID",
+            NAME:"所属券商"
+        }
+        ,{
+            ID:"ACCOUNTID",
+            NAME:"券商帐号"
+        }
+        ,{
+            ID:"PASSWORD",
+            NAME:"券商密码"
+        }
+        ,{
+            ID:"MAXBUY",
+            NAME:"总额度"
+        }
+        ,{
+            ID:"BUYCOUNT",
+            NAME:"最大股数"
+        }
+        ,{
+            ID:"BUYAMOUNT",
+            NAME:"单次最大额度"
+        }
+        ,{
+            ID:"PERCENT",
+            NAME:"买入比例"
+        }
+        ,{
+            ID:"SPLITCOUNT",
+            NAME:"拆分数"
+        }
+        ,{
+            ID:"CTRL",
+            NAME:"操作"
+        }
+    ],//增加修改基准数据
+	select_trade: []//券商关联表
+	,dictTrade_list_body: []//券商列表数据
+	// ,dictTrade_record:null
+	// ,dictTrade_selectElement: null
 	,init:function(){
 		$( "#dictTrade_tabs" ).tabs();
 		this.load_dictTrade();
         this.appendTB_add();
         $("#dictTrade").click(this.nvgTradeClick);
 	}
+
 	,nvgTradeClick:function(){
         dictTrade.load_dictTrade();
 	}
-    , dictTrade_clickHandler : function(){
-        console.log(　'dictTrade_clickHandler id:',this.id,'name: ', this.name, 'value: ',this.value);
-		//订阅
-        if(this.type == "submit"){
 
-            if(this.textContent == "删除"){
-                var r = confirm("确定删除帐号!");
-                if (r == true) {
-                    dictTrade.delete_userAccount( this.value,this.id.replace("_dict","") );
-                }
+    ,handler_trd_del:function(){
+		var USERID = arguments[0];
+    	var ACCOUNTID = arguments[1];
+    	var TRADEID =  arguments[2];
 
-            }else if(this.textContent == "修改"){
-
-
-                $('#dictTrade_list_body').hide();
-                dictTrade.appendTB_modify(this.value, this.id.replace("_dict","") );
-
+        oojs$.showInfo("您确定删除帐号!",function(){
+            var result = arguments[0];
+            if( result == "yes" ){
+                dictTrade.delete_userAccount( TRADEID,ACCOUNTID );
+            }else if( result == "yes" ){
+                return;
             }
-        }else if(this.type == "button"){
-            if(this.value == "新增"){
+        })
 
-                dictTrade.add_userAccount();
-                // console.log("select",$("#dictTrade_account").val());
-                // console.log("select",$("#dictTrade_pwd").val());
-                // console.log("select",dictTrade_selectElement.val());
+	}
 
-            }else if(this.value == "提交"){
-                dictTrade.modify_userAccount();
-            }else if(this.value == "重置"){
-                console.log(this.name)
-                dictTrade.reset_dictTrade_Account();
-            }else if(this.value == "返回"){
-                dictTrade.init_addvalue();
-                dictTrade.appendTB_list();
-                $('#dictTrade_list_body').show();
-            }
-        }
+    ,handler_trd_chg:function(){
+        var USERID = arguments[0];
+        var ACCOUNTID = arguments[1];
+        var TRADEID =  arguments[2];
+        // console.log(JSON.stringify(arguments));
+        dictTrade.appendTB_modify( TRADEID,ACCOUNTID );
+	}
+    ,handler_trd_reset:function(event){
+        event.data = null;
+        dictTrade.appendTB_add();
     }
+    ,handler_trd_add:function(event){
+        dictTrade.sub_userAccount(dictTrade.list_benchmark_head,event.data,"add");
+    }
+
+    ,handler_trd_mdy:function(event){
+        dictTrade.sub_userAccount(dictTrade.list_benchmark_head,event.data,"mdy");
+    }
+
+	,handler_trd_reback:function(event){
+        dictTrade.appendTB_list();
+    }
+
 	, getRecord_dt_list : function(TRADEID,ACCOUNTID){
 		if(this.dictTrade_list_body.length>0){
 			for(var i = 0; i < this.dictTrade_list_body.length; i++){
@@ -78,7 +115,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			}
 		}
 	}
-	, delete_userAccount : function(){
+
+	,delete_userAccount : function(){
 		console.log('this.delete_userAccount',arguments);
 		var sendData = {
 	        TRADEID:arguments[0]
@@ -93,302 +131,323 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	}
 
-	, modify_userAccount : function(){
-		
-	    var sendData = {
-	    	TRADEID:this.dictTrade_selectElement.val()
-	        ,ACCOUNTID:$("#dictTrade_account").val()
-	        ,PASSWORD:$("#dictTrade_pwd").val()
-	        // ,PASSWORD:$("#dictTrade_pwd").val()
-	        ,MAXBUY:$("#dictTrade_MAXBUY").val()
-	        ,BUYAMOUNT:$("#dictTrade_BUYAMOUNT").val()
-	        ,PERCENT:$("#dictTrade_PERCENT").val()
-	        ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
-	    };
-	    var self = this;
-        oojs$.httpPost_json("/modify_userAccount",sendData,function(result,textStatus,token){
-            if(result.success){
-                self.load_userAccount();
-            }else{
-                oojs$.showError(result.message);
+    ,appendTB_trade_body: function( tb, head, body ){
+        var tr = null;
+        for(var i = 0; i < head.length; i++){
+            if(!body.hasOwnProperty( head[i]["ID"] )){
+                continue;
             }
-        });
+            tr = $('<tr></tr>').appendTo(tb);
+            // if(i%2==0){
+            //     tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+            // }else{
+            //     tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
+            // }
 
-	}
-	, add_userAccount : function(){
-		console.log(arguments);
-        var  self = this;
-		var sendData = {
-	        TRADEID:this.dictTrade_selectElement.val()
-            ,ACCOUNTID:$("#dictTrade_account").val()
-            ,PASSWORD:$("#dictTrade_pwd").val()
-            ,MAXBUY:$("#dictTrade_MAXBUY").val()
-            ,BUYAMOUNT:$("#dictTrade_BUYAMOUNT").val()
-            ,PERCENT:$("#dictTrade_PERCENT").val()
-            ,SPLITCOUNT:$("#dictTrade_SPLITCOUNT").val()
-	    };
-	    console.log("add_userAccount",JSON.stringify(sendData));
+            switch (head[i]["ID"]){
+                case "TRADEID":
 
-        oojs$.httpPost_json("/add_userAccount",sendData,function(result,textStatus,token){
-            if(result.success){
-                self.load_userAccount();
-            }else{
-                oojs$.showError(result.message);
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "ACCOUNTID":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "PASSWORD":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "MAXBUY":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "BUYCOUNT":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "BUYAMOUNT":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "PERCENT":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                case "SPLITCOUNT":
+
+
+                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
+                // default:
+                // 	$('<td></td>',{ class:"td"}).appendTo(tr);
+                // 	$('<td></td>',{ class:"td"}).appendTo(tr);
+                // 	break;;
             }
-        });
-
-	}
-	, reset_dictTrade_Account : function(){
-		$("#dictTrade_account").val('');
-		$("#dictTrade_pwd").val('');
-		this.dictTrade_selectElement.val(0)
-	}
-
-	, init_addvalue : function(){
-		$("#dictTrade_account").val(Math.ceil(2147483647*Math.random()));
-		$("#dictTrade_pwd ").val('12345678');
-		$("#dictTrade_MAXBUY").val(2147480000);
-		$("#dictTrade_BUYAMOUNT").val(2147480000);
-		$("#dictTrade_PERCENT").val('0.5');
-		$("#dictTrade_SPLITCOUNT").val('1');
-	}
-
-	, init_modifyvalue : function(record)
-	{
-		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
-		// $("#dictTrade_account").val(record['TRADEID']);
-		this.dictTrade_selectElement.val(record['TRADEID'])
-		$("#dictTrade_account").val(record['ACCOUNTID']);
-		$("#dictTrade_pwd ").val(record['PASSWORD']);
-		$("#dictTrade_MAXBUY").val(record['MAXBUY']);
-		$("#dictTrade_BUYAMOUNT").val(record['BUYAMOUNT']);
-		$("#dictTrade_PERCENT").val(record['PERCENT']);
-		$("#dictTrade_SPLITCOUNT").val(record['SPLITCOUNT']);
-	}
-	, load_dictTrade : function(){
-		this.init_addvalue();
-		var self = this;
-		if(this.select_trade.length==0){
-
-            oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
-
-				if(result.success){
-					self.select_trade = [];
-                    self.select_trade = result.data;
-					$("#dict_trade_opt").append(self.create_dictTrade_Select());
-					self.load_userAccount();
-                }else{
-                    oojs$.showError(result.message);
-                }
-
-            });
-
-		}else{
-			self.load_userAccount();
-		}
-	}
-	, create_dictTrade_Select: function(){
-		
-		this.dictTrade_selectElement = $('<select></select>',{
-			id:'dictTrade_select'
-		});
-
-		for(var sId = 0; sId < this.select_trade.length; sId++)
-		{
-
-			this.dictTrade_selectElement.append("<option value='"
-				+this.select_trade[sId]["ID"]+"'>"+this.select_trade[sId]["NAME"]+"</option>");
-
-		}
-
-		// this.dictTrade_selectElement.val("maxMem");
-		return this.dictTrade_selectElement;
-		// $("#dict_trade_opt").append(this.dictTrade_selectElement);
-	}
-
-    , appendTB_add_head: function(){
-		return   $('<table></table>', {
-            'style':"margin:0 auto;"
-            ,'class':'dataTable cellspacing table'
-        })
-	}
-
-    , appendTB_add_body: function( tb ){
-    	var self = this;
-        var tr = $('<tr></tr>').appendTo(tb);
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('所属的券商：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<div id="dictTrade_opt_modify" ></div>'));
-        $("#dictTrade_opt_modify").append(self.create_dictTrade_Select());
+        }
         tr = $('<tr></tr>').appendTo(tb);
-
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录帐号：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_account" value="" />'));
-
-        tr = $('<tr></tr>').appendTo(tb);
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录密码：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_pwd" value="" />'));
-
-        tr = $('<tr></tr>').appendTo(tb);
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('最大额度：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_MAXBUY" value="" />'));
-
-        tr = $('<tr></tr>').appendTo(tb);
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('最大数量：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_BUYAMOUNT" value="" />'));
-
-        tr = $('<tr></tr>').appendTo(tb);
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('买入比例：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_PERCENT" value="" />'));
-
-        tr = $('<tr></tr>').appendTo(tb);
-        $('<td></td>',{ class:"td"}).appendTo(tr).text('拆分数：');
-        $('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_SPLITCOUNT" value="" />'));
-
     }
 
-    , appendTB_add_control: function( tb ){
-        var tr = $('<tr></tr>').appendTo(tb);
-        var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
-        $('<input></input>',{type:"button",id:"user_account_submit",name:"",value:"提交"}).appendTo(td);
-        $('<input></input>',{type:"button",id:"user_account_back",name:"",value:"返回"}).appendTo(td);
+	,sub_userAccount : function(head,body,type){
+        var self = this;
+		var sendData = {};
 
-        $("#user_account_submit").click(
-            this.dictTrade_clickHandler
-        );
+        for(var i = 0; i < head.length; i++){
+            if(!body.hasOwnProperty( head[i]["ID"] )){
+                continue;
+            }
 
-        $("#user_account_back").click(
-            this.dictTrade_clickHandler
-        );
+            switch (head[i]["ID"]){
+                case "TRADEID":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if(String(sendData['TRADEID'])=="-1"){
+                        oojs$.showError("请选择所属券商");
+					}
+                    break;
+                case "ACCOUNTID":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if( String(sendData[head[i]["ID"]]).trim().length<3 ){
+                        oojs$.showError("请输入正确的券商帐号");
+                    }
+                    break;
+                case "PASSWORD":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if(String(sendData[head[i]["ID"]]).trim().length<3){
+                        oojs$.showError("请输入正确的密码");
+                    }
+                    break;
+                case "MAXBUY":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                	if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
+                        oojs$.showError("请输入正确的总额度数字");
+					}
+                    break;
+                case "BUYCOUNT":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
+                        oojs$.showError("请输入正确的最大股数数字");
+                    }
+                    break;
+                case "BUYAMOUNT":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
+                        oojs$.showError("请输入正确的单次最大额度数字");
+                    }
+                    break;
+                case "PERCENT":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    var test1 = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(Number(sendData[head[i]["ID"]]));
+                    if(!test1){
+                        oojs$.showError("请输入正确的比例");
+					}else{
+                    	if( String(sendData[head[i]["ID"]]).length > 3
+                            && String(sendData[head[i]["ID"]]).length-String(sendData[head[i]["ID"]]).indexOf('.') > 3){
+                            oojs$.showError("请输入正确的比例");
+                        }
+
+					}
+                    break;
+                case "SPLITCOUNT":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]])) || parseInt(sendData[head[i]["ID"]]) > 10000){
+                        oojs$.showError("请输入正确的单次最大额度数字");
+                    }
+                    break;
+            }
+        }
+
+        for(var i in body){
+            body[i] = null;
+            delete body[i];
+		}
+        body = null;
+
+		var url = "";
+		if(type == "add"){
+            url="/add_userAccount";
+		}else if(type == "mdy"){
+            url="/modify_userAccount";
+		}
+
+        oojs$.httpPost_json(url,sendData,function(result,textStatus,token){
+            if(result.success){
+                self.load_userAccount();
+            }else{
+                console.log("sub_userAccount result:",result.message);
+                oojs$.showError(result.message);
+            }
+        });
+
+	}
+
+	// ,reset_dictTrade_Account : function(){
+	// 	$("#dictTrade_account").val('');
+	// 	$("#dictTrade_pwd").val('');
+	// 	this.dictTrade_selectElement.val(0)
+	// }
+
+
+	, create_dictTrade_Select: function(optID){
+
+		var select_trade = $('<select></select>',{
+
+        });
+
+		select_trade.append("<option value='-1'>请选择券商</option>");
+
+        for(var sId = 0; sId < this.select_trade.length; sId++)
+        {
+
+            select_trade.append("<option value='"
+                +this.select_trade[sId]["ID"]+"'>"+this.select_trade[sId]["NAME"]+"</option>");
+        }
+
+        if(optID!=null){
+            select_trade.val(optID);
+		}
+
+		return select_trade;
+
 	}
 
 	, appendTB_modify : function( TRADEID, ACCOUNTID ){
-		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
+
 		var self = this;
 		var record =  this.getRecord_dt_list(TRADEID,ACCOUNTID);
+
 		console.log("appendTB_modify",JSON.stringify(record));
 
         $("#dictTrade_tabs_1").empty();
-        var tb = this.appendTB_add_head().appendTo($('#dictTrade_tabs_1'));
-		this.appendTB_add_body(tb);
-		this.appendTB_add_control(tb);
+        var tb = $('<table></table>', {
+            'style':"margin:0 auto;"
+            ,'class':'dataTable cellspacing table'
+        }).appendTo($('#dictTrade_tabs_1'));
 
-        this.init_modifyvalue(record);
+        var  head, body;
+        head = self.list_benchmark_head;
+		//{"USERID":20000,"TRADEID":3,"ACCOUNTID":"5890000049","CANAME":"xiayangang","PASSWORD":"207623","MAXBUY":1000,"BUYCOUNT":0,"BUYAMOUNT":0,"PERCENT":0.4,"SPLITCOUNT":1}
+        body = {
+            "TRADEID":self.create_dictTrade_Select(record["TRADEID"]).prop("disabled",true)
+            ,"ACCOUNTID":$('<input type="text" value="'+record["ACCOUNTID"]+'" ></input>').prop("disabled",true)
+            ,"PASSWORD":$('<input type="text" value="'+record["PASSWORD"]+'"></input>')
+            ,"MAXBUY":$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+            ,"BUYCOUNT":$('<input type="text" value="'+record["BUYCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+            ,"BUYAMOUNT":$('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+            ,"PERCENT":$('<input type="text" value="'+record["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
+            ,"SPLITCOUNT":$('<input type="text" value="'+record["SPLITCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
+        };
+
+        self.appendTB_trade_body ( tb, head, body );
+        tr = $('<tr></tr>').appendTo(tb);
+        var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
+        $('<input></input>',{type:"button", name:"",value:"提交"}).appendTo(td).click(
+            body,
+            this.handler_trd_sub
+        );;
+        $('<input></input>',{type:"button", name:"",value:"返回"}).appendTo(td).click(
+            body,
+            this.handler_trd_reback
+        );
+
 	}
+
 	, appendTB_add : function( TRADEID, ACCOUNTID ){
 		var self = this;
-		$("#dictTrade_tabs_2").empty();
-		var tb = $('<table></table>', {
-			'style':"margin:0 auto;"
-			,'class':'dataTable cellspacing table'
-		}).appendTo($('#dictTrade_tabs_2'));
-		
-		var tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('所属的券商：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<div id="dictTrade_opt_add" ></div>'));
-        $("#dictTrade_opt_add").append(self.create_dictTrade_Select());
+        $("#dictTrade_tabs_2").empty();
 
-		tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录帐号：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_account" value="" />'));
+        var tb = $('<table></table>', {
+            'style':"margin:0 auto;"
+            ,'class':'dataTable cellspacing table'
+        }).appendTo($('#dictTrade_tabs_2'));
 
-		tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('券商的登录密码：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_pwd" value="" />'));
 
-		tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('最大额度：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_MAXBUY" value="" />'));
+        var  head, body;
+        head = self.list_benchmark_head;
 
-		tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('最大数量：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_BUYAMOUNT" value="" />'));
+        body = {
+        	"TRADEID":self.create_dictTrade_Select("TRADEID_add")
+			,"ACCOUNTID":$('<input type="text" value="" ></input>')
+			,"PASSWORD":$('<input type="text" value=""></input>')
+			,"MAXBUY":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+            ,"BUYCOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+			,"BUYAMOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+			,"PERCENT":$('<input type="text" value="0.5" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
+			,"SPLITCOUNT":$('<input type="text" value="1" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
+        };
 
-		tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('买入比例：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_PERCENT" value="" />'));
-
-		tr = $('<tr></tr>').appendTo(tb);
-		$('<td></td>',{ class:"td"}).appendTo(tr).text('拆分数：');
-		$('<td></td>',{ class:"td"}).appendTo(tr).append($('<input type="text" id="dictTrade_SPLITCOUNT" value="" />'));
+        self.appendTB_trade_body ( tb, head, body );
 
 		tr = $('<tr></tr>').appendTo(tb);
 		var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
-		$('<input></input>',{type:"button",id:"user_account_add",name:"",value:"新增"}).appendTo(td);
+        $('<input></input>',{type:"button",id:"user_account_add",name:"",value:"新增"}).appendTo(td);
 		$('<input></input>',{type:"button",id:"user_account_reset",name:"",value:"重置"}).appendTo(td);
 
-        this.init_addvalue();
 
         $("#user_account_add").click(
-            this.dictTrade_clickHandler
+            body,
+			this.handler_trd_add
         );
 
         $("#user_account_reset").click(
-            this.dictTrade_clickHandler
+            body,
+			this.handler_trd_reset
         );
-		//"USERID","TRADEID","ACCOUNTID","PASSWORD","MAXBUY","BUYAMOUNT","PERCENT","SPLITCOUNT"
-		
-		
 	}
+
 	, appendTB_list : function(){
-		$("#dictTrade_tabs_1").empty();
-		var tb = $('<table></table>', {
-			'id': "dictTrade_list_body_tb",
-			'class':'display dataTable'
-		}).appendTo($('#dictTrade_tabs_1'));
+        var self = this;
+        var panel,list_head,list_body;
 
-		var thead = $('<thead></thead>').appendTo(tb);
-		var tr = $('<tr></tr>').appendTo(thead);
-		
-		for(var elm = 0; elm < this.dictTrade_list_head.length; elm++){
-			var th = $('<th></th>',
-			{class:"ui-state-default"
-			}).appendTo(tr).text(this.dictTrade_list_head[elm]);
+        panel = $('#dictTrade_tabs_1');
+        list_head = self.list_benchmark_head;
+        list_body = [];
+
+        for(var elm = 0; elm < this.dictTrade_list_body.length; elm++){
+            list_body[elm] = {};
+            list_body[elm]['TRADEID'] = {ELEMENT:this.getRecord_dt_selectList(this.dictTrade_list_body[elm]['TRADEID'])};
+            list_body[elm]['ACCOUNTID'] = {ELEMENT:this.dictTrade_list_body[elm]['ACCOUNTID']};
+            list_body[elm]['PASSWORD'] = {ELEMENT:this.dictTrade_list_body[elm]['PASSWORD']};
+            list_body[elm]['MAXBUY'] = {ELEMENT:this.dictTrade_list_body[elm]['MAXBUY']};
+            list_body[elm]['BUYCOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYCOUNT']};
+            list_body[elm]['BUYAMOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYAMOUNT']};
+            list_body[elm]['PERCENT'] = {ELEMENT:this.dictTrade_list_body[elm]['PERCENT']};
+            list_body[elm]['SPLITCOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['SPLITCOUNT']};
+            list_body[elm]['CTRL'] = {ELEMENT:$(
+            	'<input type="button" name="12" value="删除" ' +
+				'onclick="dictTrade.handler_trd_del('+
+					this.dictTrade_list_body[elm]['USERID']+','+
+					this.dictTrade_list_body[elm]['ACCOUNTID']+', '+
+					this.dictTrade_list_body[elm]['TRADEID']+
+				')"; >'
+				+
+                '<input type="button" name="12" value="修改"' +
+				' onclick="dictTrade.handler_trd_chg('+
+					this.dictTrade_list_body[elm]['USERID']+','+
+					this.dictTrade_list_body[elm]['ACCOUNTID']+', '+
+					this.dictTrade_list_body[elm]['TRADEID']+
+				');" >'
+			)};
 		}
 
-		var tbody = $('<tbody></tbody>').appendTo(tb);
-		
-		for(var elm = 0; elm < this.dictTrade_list_body.length; elm++){
-			var tr=null;
-			if(elm%2==0){
-				tr = $('<tr></tr>',{class:"odd"}).appendTo(tbody);
-			}else{
-				tr = $('<tr></tr>',{class:"even"}).appendTo(tbody);
-			}
 
-			$('<td></td>').appendTo(tr).text(elm);
-			$('<td></td>').appendTo(tr).text(this.getRecord_dt_selectList(this.dictTrade_list_body[elm]['TRADEID']));
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['ACCOUNTID']);
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['PASSWORD']);
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['MAXBUY']);
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['BUYAMOUNT']);
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['PERCENT']);
-			$('<td></td>').appendTo(tr).text(this.dictTrade_list_body[elm]['SPLITCOUNT']);
-			var td = $('<td></td>').appendTo(tr);
-			var button = $('<button></button>',{
-						'id':this.dictTrade_list_body[elm]['ACCOUNTID']+"_dict",
-					'name':this.dictTrade_list_body[elm]['USERID'],
-					'value':this.dictTrade_list_body[elm]['TRADEID'],
-					'text':'删除'
-				}).click(this.dictTrade_clickHandler);
-			td.append(button);
-            td.append(" ");
-			var button = $('<button></button>',{
-					'id':this.dictTrade_list_body[elm]['ACCOUNTID']+"_dict",
-					'name':this.dictTrade_list_body[elm]['USERID'],
-					'value':this.dictTrade_list_body[elm]['TRADEID'],
-					'text':'修改'
-				}).click(this.dictTrade_clickHandler);
-			td.append(button);
-		}
+        oojs$.appendTB_list(panel,list_head,list_body);
 
-		this.show_dictTrade_Page();
 	}
 
-	, show_dictTrade_Page : function(){
-		$("#dict_trade_panel").show();
-	}
-
-	, load_userAccount : function(){
+	,load_userAccount : function(){
 		var self = this;
 
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
@@ -407,13 +466,30 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         });
 
 	}
-	,__ctor: function(){
-		
-	}
+    , load_dictTrade : function(){
+
+        var self = this;
+        if(this.select_trade.length==0){
+
+            oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
+
+                if(result.success){
+                    self.select_trade = [];
+                    self.select_trade = result.data;
+                    self.load_userAccount();
+                }else{
+                    oojs$.showError(result.message);
+                }
+
+            });
+
+        }else{
+            self.load_userAccount();
+        }
+    }
 });
 
 var dictTrade = new oojs$.com.stock.dictTrade();
 oojs$.addEventListener("ready",function(){
 	dictTrade.init();
 });
-

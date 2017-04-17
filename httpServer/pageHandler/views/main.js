@@ -216,9 +216,9 @@ var oojs$ = {
 
     ,generateHMDOption: function(){
 		var htmltag = arguments[0];
-        var hh_id = arguments[1];
-        var mm_id = arguments[2];
-        var ss_id = arguments[3];
+        // var hh_id = arguments[1];
+        // var mm_id = arguments[2];
+        // var ss_id = arguments[3];
 
 		htmltag.empty();
 		var tmpval = '';
@@ -226,8 +226,8 @@ var oojs$ = {
 
         htmltag.append($('<label>时</label>'));
         select= $('<select ></select>',{
-            id:hh_id,
-            style:"width:30px;-webkit-appearance: none;"
+            // id:hh_id,
+            style:"height:25px;width:30px;-webkit-appearance: none;"
         });
 		for(var i = 0; i < 24; i++){
 
@@ -241,8 +241,8 @@ var oojs$ = {
         htmltag.append($('<label>:分</label>'));
 
         select= $('<select ></select>',{
-            id:mm_id,
-            style:"width:30px;-webkit-appearance: none;"
+            // id:mm_id,
+            style:"height:25px;width:30px;-webkit-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
 
@@ -256,8 +256,8 @@ var oojs$ = {
         htmltag.append($('<label>:秒</label>'));
 
         select= $('<select></select>',{
-            id:ss_id,
-            style:"width:30px;-webkit-appearance: none;"
+            // id:ss_id,
+            style:"height:25px;width:30px;-webkit-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
             tmpval = i<=9?("0"+i):i;
@@ -338,7 +338,15 @@ var oojs$ = {
 		this._events[eventName].push(callback);
 	}
 
+    ,removeEventListener: function(eventName, callback){
+       //??
+    }
+
 	,dispatch:function(eventName, _){
+        /**
+		 * oojs$.dispatch("ready");
+		 * oojs$.addEventListener("ready",function(){console.log("ready")});
+         */
 		var events = this._events[eventName];
 		var args = Array.prototype.slice.call(arguments, 1);
 		if (!events)
@@ -350,6 +358,183 @@ var oojs$ = {
 			events[i].apply(null, args);
 		}
 	}
+    /***
+     * usage
+     * oojs$.appendTB_list(panel,list_head,list_body)
+     * param
+     * panel: div
+     * list_head: [{ID:"COL1",NAME:"title1"},{ID:"COL2",NAME:"title2"}]
+     * list_body: [
+     * {
+     *      "COL1":{ ELEMENT:"value1" },
+     *      "COL2":{ ELEMENT:"value2" }
+     * }
+     * ,
+     * {
+     *      "COL1":{ ELEMENT:"value1" },
+     *      "COL2":{ ELEMENT:"value2" }
+     * }
+     * ]
+     *
+     */
+    ,appendTB_list : function(panel,list_head,list_body){
+        panel.empty();
+        if(list_head && list_head.length > 0
+            && list_body && list_body.length > 0){
+            var tb = $('<table></table>', {
+                'class':'display dataTable'
+            }).appendTo(panel);
+
+            var thead = $('<thead></thead>').appendTo(tb);
+            var tr = $('<tr></tr>').appendTo(thead);
+            for(var elm = 0; elm < list_head.length; elm++){
+                if(!list_body[0].hasOwnProperty( list_head[elm]["ID"] )){
+                    continue;
+                }
+                var th = $('<th></th>',{
+                    class:"ui-state-default"
+                }).appendTo(tr).text(list_head[elm]["NAME"]);
+            }
+
+            var tbody = $('<tbody></tbody>').appendTo(tb);
+            for( var elm = 0; elm < list_body.length; elm++ ){
+                var tr = null;
+                if(elm%2 == 0){
+                    tr = $('<tr></tr>',{class:"even"}).appendTo(tbody);
+                }else{
+                    tr = $('<tr></tr>',{class:"odd"}).appendTo(tbody);
+                }
+                var td = null;
+                for(var in_elm = 0; in_elm < list_head.length; in_elm++){
+                    if(!list_body[elm].hasOwnProperty( list_head[in_elm]["ID"] )){
+                        continue;
+                    }
+                    td = $('<td></td>').appendTo(tr);
+                    td.append(list_body[elm][ list_head[in_elm]["ID"] ]['ELEMENT']);
+                }
+            }
+        }
+    }
+    /***
+     * usage
+     * oojs$.appendTB_list(panel,list_head,list_body)
+     * param
+     * panel: div
+     * list_head: [{NAME:"title1"},{NAME:"title2"},{NAME:"button"}]
+     * list_body: [
+     * [{ELEMENT:"text11"},{ELEMENT:"text12"},{ELEMENT:$('<button></button>')}],
+     * [{ELEMENT:"text21"},{ELEMENT:"text22"},{ELEMENT:$('<button></button>')}]
+     * ]
+     *
+     *
+     */
+	// ,appendTB_list : function(panel,list_head,list_body){
+    //
+    //
+     //    panel.empty();
+     //    var tb = $('<table></table>', {
+     //        'class':'display dataTable'
+     //    }).appendTo(panel);
+    //
+     //    var thead = $('<thead></thead>').appendTo(tb);
+     //    var tr = $('<tr></tr>').appendTo(thead);
+     //    for(var elm = 0; elm < list_head.length; elm++){
+     //        // if(!list_body[0].hasOwnProperty( head[i]["ID"] )){
+     //        //     continue;
+     //        // }
+     //        var th = $('<th></th>',
+     //            {class:"ui-state-default"
+     //            }).appendTo(tr).text(list_head[elm]["NAME"]);
+     //    }
+    //
+     //    var tbody = $('<tbody></tbody>').appendTo(tb);
+     //    for( var elm = 0; elm < list_body.length; elm++ ){
+     //        var tr = null;
+     //        if(elm%2 == 0){
+     //            tr = $('<tr></tr>',{class:"even"}).appendTo(tbody);
+     //        }else{
+     //            tr = $('<tr></tr>',{class:"odd"}).appendTo(tbody);
+     //        }
+     //        var td = null;
+	// 		for(var in_elm = 0; in_elm < list_body[elm].length; in_elm++){
+     //            td = $('<td></td>').appendTo(tr);
+     //            td.append(list_body[elm][in_elm]['ELEMENT']);
+	// 		}
+	// 	}
+	// }
+    /***
+     * usage
+     * oojs$.appendTB_item_D2(tb,list_head,item)
+     * param
+     * panel: tb
+     * head: [{ID:"COL1",NAME:"title1"},{ID:"COL2",NAME:"title2"},{ID:"COL3",NAME:"title3"},{ID:"COL4",NAME:"title4"}]
+     * item: {
+	 * "COL1":{ ELEMENT:"value1" },
+	 * "COL2":{ ELEMENT:"value2" },
+	 * "COL3":{ ELEMENT:"left",ELEMENT1:'right-up',ELEMENT2:'right-down',ROWSPAN:2},//"COL3":{ ELEMENT:"left",ELEMENT1:'right-up'},ELEMENT2:'right-mid',ELEMENT3:'right-down',ROWSPAN:3},
+     * "COL4":{ ELEMENT:"only one cell",COLSPAN:2}
+     * }
+     *
+     *(D2 identify 2 col )
+     */
+    ,appendTB_item_D2 : function(tb,head,item){
+        var tr = null;
+        var ROWSPAN = "";
+        var COLSPAN = "";
+        var int_ROWSPAN = 0;
+        var tmpClass = "";
+        for(var i = 0; i < head.length; i++){
+
+            if(!item.hasOwnProperty(head[i]["ID"])){
+                continue;
+            }
+            ROWSPAN = "";
+            COLSPAN = "";
+            if(item[head[i]["ID"]].hasOwnProperty("ROWSPAN")){
+                ROWSPAN = String(item[head[i]["ID"]]["ROWSPAN"]);
+            }
+            if(item[head[i]["ID"]].hasOwnProperty("COLSPAN")){
+                COLSPAN = String(item[head[i]["ID"]]["COLSPAN"]);
+            }
+            if(ROWSPAN == ""){
+                if(i%2==0){
+                    tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+                }else{
+                    tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
+                }
+                if(COLSPAN == ""){
+                	//width:100px;
+                    $('<td></td>',{ class:"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]+": ");
+                    $('<td></td>',{ class:"td"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
+                }else if(COLSPAN == "2"){
+                    $('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
+                }else{
+                    throw "the value of COLSPAN not allowed"+COLSPAN;
+                }
+            }else{
+                int_ROWSPAN = parseInt(ROWSPAN);
+                if(int_ROWSPAN<2){
+                    throw "the value of ROWSPAN not allowed"+ROWSPAN;
+                }
+
+                if(i%2==0){
+                    tmpClass = "even";
+                }else{
+                    tmpClass = "odd";
+                }
+
+                tr = $('<tr></tr>',{class:tmpClass}).appendTo(tb);
+                $('<td></td>',{ rowspan:int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+": ");
+                $('<td></td>',{ }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT1"]);
+                for(var j = 0; j < int_ROWSPAN-1; j++)
+                {
+                    tr = $('<tr></tr>',{class:tmpClass}).appendTo(tb);
+                    $('<td></td>',{  }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT2"]);
+                }
+
+            }
+        }
+    }
 
 	,heartID:null
 
@@ -381,13 +566,75 @@ var oojs$ = {
 		clearInterval( this.heartID);
         this.heartID = null;
     }
+    ,valideString:function(val){
+        val = String(val);
+        return (val.trim() === 'undefined' || val.trim() == "null" || val.length <= 0) ? "" : val;
+    }
+    ,valideDate:function(){
+        var str_date = arguments[0];
+        if(oojs$.matchYMD(str_date))
+        {
+        	return str_date;
+        }else{
+        	return oojs$.Format(new Date(),"yyyy-MM-dd");
+        }
+    }
+    ,valide6letter:function(){
+        if(arguments[0].match(/^[a-zA-Z0-9]{6}$/)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 };
+oojs$.ns("com.stock.preload");
+oojs$.com.stock.preload=oojs$.createClass({
+    NAME:'preload'
+    ,DIRTIPE:'sell buy'
+    ,GROUP:'?dict_group?'
+    ,POLICY:''
+    ,TRADE:''
+    ,getDirtype:function(){
+        switch (parseInt(arguments[0])){
+            case 0:
+                return "买入";
+            case 1:
+                return "卖出";
+            case 2:
+                return "融资买入";
+            case 3:
+                return "融券卖出";
+            case 4:
+                return "买券还券";
+            case 5:
+                return "卖券还款";
+            case 6:
+                return "现券还券";
+            case 9:
+                return "撤单";
+        }
+    }
+
+});
+
+var preload = new oojs$.com.stock.preload();
+
+
 
 <%- jsState %>
 $(document).ready(function(){
+
+    var showTopInfo = function(){
+        $("#topinfo").html("<a id='topinfousr' href='/#'>退出</a>")
+    };
+    showTopInfo();
+
 	hideAllPanel();
-	$("#accordion").accordion();
+	// $("#accordion").accordion();
+    $("#accordion").accordion({
+        active: 2
+    });
 	oojs$.dispatch("ready");
 
 <%- jsRegist %>

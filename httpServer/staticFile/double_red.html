@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>children demo</title>
+    <style>
+        body {
+            font-size: 16px;
+            font-weight: bolder;
+        }
+        span {
+            color: blue;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+<p>Hello (this is a paragraph)</p>
+
+<div><span>Hello Again (this span is a child of the a div)</span></div>
+<p>And <span>Again</span> (in another paragraph)</p>
+
+<div>And One Last <span>Time</span> (most text directly in a div)</div>
+
+<script>
+    $( "div" ).children().css( "border-bottom", "3px double red" );
+</script>
+
+<ul class="topnav">
+    <li>Item 1</li>
+    <li>Item 2
+        <ul>
+            <li>Nested item 1</li>
+            <li>Nested item 2</li>
+            <li>Nested item 3</li>
+        </ul>
+    </li>
+    <li>Item 3</li>
+    <li id="i4">Item 4</li>
+</ul>
+
+<script>
+    $( "ul.topnav > li" ).css( "border", "3px double red" );
+    $( "li#i4" ).css( "border", "3px double blue" );
+</script>
+
+
+</body>
+</html>

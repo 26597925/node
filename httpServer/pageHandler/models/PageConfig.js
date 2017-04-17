@@ -13,7 +13,7 @@ route.map({
 route.map({
     method:'get',
     url:/^\/login\/?$/i,
-    controller:'common',
+    controller:'login',
     action:'login'
 });
 
@@ -29,14 +29,14 @@ route.map({
 route.map({
     method:'post',
     url:/^\/logup_submit\/?$/i,
-    controller:'common',
+    controller:'login',
     action:'logup_submit'
 });
 
 route.map({
     method:'get',
     url:/^\/updateLoginTime\/?$/i,
-    controller:'common',
+    controller:'login',
     action:'updateLoginTime'
 });
 
@@ -136,9 +136,6 @@ route.map({
     action:'insert_preorder'
 });
 
-
-
-
 route.map({
     method:'get',
     url:/^\/select_userPolicyGID\/?$/i,
@@ -146,12 +143,19 @@ route.map({
     action:'select_userPolicyGID'
 });
 
+route.map({
+    method:'post',
+    url:/^\/select_preorder\/?$/i,
+    controller:'order',
+    action:'select_preorder'
+});
+
 
 //================================
 route.map({
     method:'get',
     url:/^\/exit\/?$/i,
-    controller:'common',
+    controller:'login',
     action:'exit'
 });
 

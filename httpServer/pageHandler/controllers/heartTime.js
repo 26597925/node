@@ -23,7 +23,7 @@ exports.heartTime = function(){
                 if(arguments[0][0]['LASTLOGIN']){
                     var time = sessions.invertTimestamp(arguments[0][0]['LASTLOGIN']);
                     var cookieTime = sessions.invertTimestamp(cookies["sID"]);
-                    console.log(path.basename(__filename),"lastlogin:",cookieTime,time, (cookieTime-time)>30000);
+                    console.log(path.basename(__filename).replace('.js',''),"lastlogin:",cookieTime,time, (cookieTime-time)>30000);
                     self.responseDirect(200,'text/json',JSON.stringify(result));
                 }else{
                     result.success = false;

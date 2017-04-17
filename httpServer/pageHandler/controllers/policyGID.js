@@ -6,7 +6,7 @@ const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
 exports.select_policyGID = function(){
-    console.log(path.basename(__filename),">>>>>>>>\n",arguments);
+
     var  self = this;
     var result = {'success':true,'data':''};
     var sql = "SELECT `ID`, `NAME` FROM `tb_dict_policygid` ";
@@ -15,7 +15,7 @@ exports.select_policyGID = function(){
             result['data'] = arguments[0];
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
-            result = {'success':false,'message':'数据查询有问题，请联系管理员 ->'+path.basename(__filename)};
+            result = {'success':false,'message':'数据查询有问题，请联系管理员 ->'+path.basename(__filename).replace('.js','')};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     })

@@ -65,18 +65,68 @@ exports.insert_preorder = function(){
 
     }
 
-    result = {'success':false,'message':path.basename(__filename)+'请求失败，请联系管理员'};
-    result.count = ORDERID+"_"+STARTTIME+"_"+ENDTIME+"_"+sqldata+"_";
+    result = {'success':false,'message':path.basename(__filename).replace('.js','')+'请求失败，请联系管理员'};
+    // result.count = ORDERID+"_"+STARTTIME+"_"+ENDTIME+"_"+sqldata+"_";
     self.responseDirect(200,"text/json",JSON.stringify(result));
 };
+
+exports.select_preorder = function(){
+    this.alias = path.basename(__filename);
+    var self = this;
+    var uID = sessions.get_uID(self.req);
+    var result = {'success':true,'data':''};
+    var sql  = 'SELECT' +
+        ' `ORDERID`,' +
+        ' `USERID`,' +
+        ' `ACCOUNTID`,' +
+        ' `POLICYID`,' +
+        // ' `TRADEID`,' +
+        ' `POLICYPARAM`,' +
+        ' `DIRTYPE`,' +
+        ' `STOCKSET`,' +
+        ' `ISTEST`,' +
+        ' `BUYCOUNT`,' +
+        ' `BUYAMOUNT`,' +
+        ' `PERCENT`,' +
+        ' `STATUS`,' +
+        ' `FLAG`,' +
+        ' `ADDTIME`,' +
+        ' `FROMID`' +
+        ' FROM ' +
+        '`tb_order_id`' +
+        ' WHERE' +
+        ' `USERID`=%s';
+
+    sql = util.format(sql,uID);
+    db.query(sql,function(){
+        if(arguments.length==1){
+            result.data = arguments[0];
+
+            // for(var i = 0; i < result.data.length; i++){
+            //     result.data[i]['STARTTIME'] = unit_date.toHMS(result.data[i]['STARTTIME']);
+            //     result.data[i]['ENDTIME'] = unit_date.toHMS(result.data[i]['ENDTIME']);
+            // }
+
+            self.responseDirect(200,"text/json",JSON.stringify(result));
+        }else if(arguments.length==0){
+            result = {'success':true,'data':[]};
+            self.responseDirect(200,"text/json",JSON.stringify(result));
+        }else{
+            result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
+            self.responseDirect(200,"text/json",JSON.stringify(result));
+        }
+    });
+
+};
+
 
 
 exports.select_userPolicyGID = function(){
     this.alias = path.basename(__filename);
     this.callback = callback_userPolicyGID;
-    console.log( path.basename(__filename),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
-    // this.alias = "order";
+    console.log( path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
     policy.select_alreadySubscrible.apply(this,arguments[0],"test123_567");
+
 };
 
 

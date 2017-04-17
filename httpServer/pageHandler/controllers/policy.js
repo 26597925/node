@@ -17,8 +17,11 @@ exports.select_subscrible = function(){
     db.query(sql,function(){
         if(arguments.length==1){
             select_combinePolicy(arguments[0][0],ID,self);
-        }else{
-            result = {'success':false,'message':path.basename(__filename)+'数据查询失败，请联系管理员'};
+        }else if(arguments.length==0){
+            result = {'success':true,'data':[]};
+            self.responseDirect(200,"text/json",JSON.stringify(result));
+        } else{
+            result = {'success':false,'message':path.basename(__filename).replace('.js','')+'数据查询失败，请联系管理员'};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     })
@@ -37,22 +40,22 @@ var select_combinePolicy = function(){
 
     var sql = "select `POLICYID`, `PGROUPID`, `PNAME`, `DIRTYPE`,"
         +" `USERID`,`USETYPE`, `POLICYPARAM`, `STARTTIME`, `ENDTIME`,"
-        +" `STOCKSET`, `PERCENT`,  `ISTEST`, `PRICES`, `ADDTIME`, `MODTIME`, `FALG` "
+        +" `STOCKSET`, `PERCENT`,  `ISTEST`, `PRICES`, `ADDTIME`, `MODTIME`, `FLAG` "
         +"from  tb_policy_define where (`USERID`="+uID
-        +" and`FALG`=1) or (`USERID`=0 and ISTEST=0 and FALG=1)";
+        +" and`FLAG`=1) or (`USERID`=0 and ISTEST=0 and FLAG=1)";
 
     var sql2 = "select  `USERID`, `PNAME`, `DIRTYPE`, `PGROUPID`, `POLICYID`, `POLICYPARAM`, `STARTTIME`,"
-        +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `PRICES`, `ADDTIME`, `MODTIME`, `FALG`,"
+        +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `PRICES`, `ADDTIME`, `MODTIME`, `FLAG`,"
         +" `SUBSCRBLE`, `PERCENT` "
         +"from  tb_policy_usage where (`USERID`="+uID
-        +")  and `FALG`=1 or ( `USERID`=0 and ISTEST=0 and `FALG`=1)  ";
+        +")  and `FLAG`=1 or ( `USERID`=0 and ISTEST=0 and `FLAG`=1)  ";
 
     var result1,result2;
 
     db.query(sql,function(){
         if(arguments.length==1){
 
-            console.log(path.basename(__filename),"select_combinePolicy",arguments[0]);
+            console.log(path.basename(__filename).replace('.js',''),"select_combinePolicy",arguments[0]);
             //????????
             var groupList = [];
             for(var i=0; i < arguments[0].length; i++){
@@ -60,7 +63,7 @@ var select_combinePolicy = function(){
             }
 
             if(groupList.indexOf(groupID.toString())>=0){
-                console.log(path.basename(__filename),"groupList.indexOf(groupID)>=0");
+                console.log(path.basename(__filename).replace('.js',''),"groupList.indexOf(groupID)>=0");
                 result1= arguments[0];
                 db.query(sql2,function(){
                     if(arguments.length==1){
@@ -78,7 +81,7 @@ var select_combinePolicy = function(){
                 self.responseDirect(200,"text/json",JSON.stringify(result));
             }
         }else{
-            result = {'success':false,'message':path.basename(__filename)+'数据查询失败1，请联系管理员'};
+            result = {'success':false,'message':path.basename(__filename).replace('.js','')+'数据查询失败1，请联系管理员'};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     });
@@ -99,7 +102,7 @@ var combinePolicyResult=function(){
     // STOCKSET
     // ISTEST
     // STATUS
-    // FALG
+    // FLAG
     // REMARK
     // SUBSCRBLE
     // PNAME
@@ -124,7 +127,7 @@ var combinePolicyResult=function(){
             STOCKSET :result2[i]['STOCKSET'],
             ISTEST :result2[i]['ISTEST'],
             STATUS :result2[i]['STATUS'],
-            FALG :result2[i]['FALG'],
+            FLAG :result2[i]['FLAG'],
             REMARK :result2[i]['REMARK'],
             SUBSCRBLE :result2[i]['SUBSCRBLE'],
             PERCENT :result2[i]['PERCENT'],
@@ -158,7 +161,7 @@ var combinePolicyResult=function(){
                 STOCKSET :result1[i]['STOCKSET'],
                 ISTEST :result1[i]['ISTEST'],
                 STATUS :0,
-                FALG :result1[i]['FALG'],
+                FLAG :result1[i]['FLAG'],
                 REMARK :result1[i]['REMARK'],
                 SUBSCRBLE :0,
                 PERCENT :result1[i]['PERCENT'],
@@ -176,7 +179,7 @@ var combinePolicyResult=function(){
         }
     }
 
-    console.log(path.basename(__filename),'combinePolicyResult ',JSON.stringify(obj));
+    console.log(path.basename(__filename).replace('.js',''),'combinePolicyResult ',JSON.stringify(obj));
     debugger;
     return arr;
 };
@@ -184,17 +187,17 @@ var combinePolicyResult=function(){
 
 exports.select_alreadySubscrible = function(){
 
-    console.log( path.basename(__filename),"alias select_alreadySubscrible:",JSON.stringify(this.alias) );
+    console.log( path.basename(__filename).replace('.js',''),"alias select_alreadySubscrible:",JSON.stringify(this.alias) );
 
     var self = this;
     var result = {'success':true,'data':''};
     var uID = sessions.get_uID(self.req);
 
     var sql = "select  `USERID`, `PNAME`, `DIRTYPE`, `PGROUPID`, `POLICYID`, `POLICYPARAM`, `STARTTIME`,"
-        +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `FALG`,"
+        +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `FLAG`,"
         +" `SUBSCRBLE`, `PERCENT` "
         +"from  tb_policy_usage where ((`USERID`="+uID
-        +" and `FALG`=1) or (`USERID`=0 and ISTEST=0 and `FALG`=1) ) and SUBSCRBLE=1";
+        +" and `FLAG`=1) or (`USERID`=0 and ISTEST=0 and `FLAG`=1) ) and SUBSCRBLE=1";
 
     db.query(sql,function(){
         if(arguments.length==1){
@@ -206,8 +209,11 @@ exports.select_alreadySubscrible = function(){
             }
 
             self.responseDirect(200,"text/json",JSON.stringify(result));
+        }else if(arguments.length==0){
+            result = {'success':true,'data':[]};
+            self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
-            result = {'success':false,'message':path.basename(__filename)+'操作数据失败，请联系管理员'};
+            result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     });
@@ -218,7 +224,7 @@ exports.update_subscrible = function(){
     var result = {'success':true,'data':''};
 
     if(self.req.post){
-        console.log(path.basename(__filename),'update_subscrible ',self.req.post);
+        console.log(path.basename(__filename).replace('.js',''),'update_subscrible ',self.req.post);
         // { USERID: '20000',
         //     PNAME: '打板买入',
         //     POLICYID: '13',
@@ -230,7 +236,7 @@ exports.update_subscrible = function(){
         //     PERCENT: '0.3'
         //     }
 
-        console.log(path.basename(__filename),"update",self.req.post);
+        console.log(path.basename(__filename).replace('.js',''),"update",self.req.post);
         var sql = '';
         var db_type = 'insert';
         sql = "SELECT `USERID`, `POLICYID` FROM  tb_policy_usage where USERID="+
@@ -248,8 +254,8 @@ exports.update_subscrible = function(){
 
             self.req.post['STOCKSET'] = (!self.req.post['STOCKSET'])?"":self.req.post['STOCKSET'];
             self.req.post['STATUS'] = (!self.req.post['STATUS'])?0:self.req.post['STATUS'];
-            self.req.post['FALG'] = (!self.req.post['FALG'])?0:self.req.post['FALG'];
-            console.log(path.basename(__filename),"update STARTTIME:",STARTTIME,'ENDTIME:',ENDTIME);
+            self.req.post['FLAG'] = (!self.req.post['FLAG'])?0:self.req.post['FLAG'];
+            console.log(path.basename(__filename).replace('.js',''),"update STARTTIME:",STARTTIME,'ENDTIME:',ENDTIME);
 
             if(db_type == 'insert'){
                 sql = "INSERT INTO `tb_policy_usage` (" +
@@ -257,7 +263,7 @@ exports.update_subscrible = function(){
                     " `POLICYID`, `POLICYPARAM`, `DIRTYPE`, " +
                     "`STARTTIME`, `ENDTIME`, `STOCKSET`, " +
                     "`ISTEST`, `STATUS`, `PRICES`, " +
-                    "`MODTIME`, `FALG`, `SUBSCRBLE`, `PERCENT`" +
+                    "`MODTIME`, `FLAG`, `SUBSCRBLE`, `PERCENT`" +
                     ")VALUES(" +
                     "%s, '%s', %s, " +
                     "%s, '%s', %s, " +
@@ -270,7 +276,7 @@ exports.update_subscrible = function(){
                     ,self.req.post['POLICYID'],self.req.post['POLICYPARAM'], self.req.post['DIRTYPE']
                     ,STARTTIME,ENDTIME,self.req.post['STOCKSET']
                     ,self.req.post['ISTEST'],self.req.post['STATUS'],self.req.post['PRICES']
-                    ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss"),self.req.post['FALG'],self.req.post['SUBSCRBLE']
+                    ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss"),self.req.post['FLAG'],self.req.post['SUBSCRBLE']
                     ,self.req.post['PERCENT']
                 );
 
@@ -279,7 +285,7 @@ exports.update_subscrible = function(){
                     if(arguments.length==1){
                         self.responseDirect(200,"text/json",JSON.stringify(result));
                     }else{
-                        result = {'success':false,'message':path.basename(__filename)+'操作数据失败，请联系管理员'};
+                        result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
                         self.responseDirect(200,"text/json",JSON.stringify(result));
                     }
                 });
@@ -308,7 +314,7 @@ exports.update_subscrible = function(){
                     if(arguments.length==1){
                         self.responseDirect(200,"text/json",JSON.stringify(result));
                     }else{
-                        result = {'success':false,'message':path.basename(__filename)+'操作数据失败，请联系管理员'};
+                        result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
                         self.responseDirect(200,"text/json",JSON.stringify(result));
                     }
                 });
@@ -317,7 +323,7 @@ exports.update_subscrible = function(){
         });
 
     }else{
-        result = {'success':false,'message':path.basename(__filename)+'请求失败，请联系管理员'};
+        result = {'success':false,'message':path.basename(__filename).replace('.js','')+'请求失败，请联系管理员'};
         self.responseDirect(200,"text/json",JSON.stringify(result));
     }
 };
