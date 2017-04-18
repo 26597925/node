@@ -37,6 +37,11 @@ oojs$.com.stock.preOrder = oojs$.createClass(
             ID:'ACCOUNTID',
             NAME:"帐户"
         }
+        ,{
+            ID:'TRADEID',
+            NAME:"券商"
+        }
+
         // ,{
         //     ID:"STARTTIME",
         //     NAME:"开始时间"
@@ -74,13 +79,21 @@ oojs$.com.stock.preOrder = oojs$.createClass(
         ,{
             ID:"CTRL",
             NAME:"操作"
-        }]
+        }
+    ]
+
+    ,select_tradetype:[
+        {id:"BUYCOUNT",name:"交易股数"}
+        ,{id:"BUYAMOUNT",name:"交易金额"}
+        ,{id:"PERCENT",name:"交易比例"}
+    ]//帐户用
     ,preOrder_list: []
     ,new_div_ctrl:null
     ,new_div_body:null
     ,order_select1:null
     ,order_select2:null
     ,order_select3:null
+
     ,init:function(){
         $("#preOrder_tabs").tabs();
         $("#preOrder").click(this.preOrder_tab1_clk);
@@ -98,6 +111,9 @@ oojs$.com.stock.preOrder = oojs$.createClass(
         preOrder.load_alreadySubscrible();
         // preOrder.appendTB_new_preOrder();
     }
+    ,preOrder_btn_tail:function(){}
+    ,preOrder_btn_chg:function(){}
+    ,preOrder_btn_unsubscrible:function(){}
 
     ,load_alreadySubscrible:function(){
         preOrder.appendTB_new_preOrder();
@@ -109,32 +125,32 @@ oojs$.com.stock.preOrder = oojs$.createClass(
 
 
         if(self.new_div_ctrl==null){
+            var tb = $('<table></table>', {
+                'class':"display dataTable"
+            });
             self.new_div_ctrl = $('<div id="new_div_ctrl"></div>');
             self.new_div_ctrl.appendTo(container);
-            var tb = $('<table></table>', {
-                class:"display dataTable"
-            });
+
             self.new_div_ctrl.append(tb);
-            var tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+            var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
             var td =$('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
             //1----------------------------
             td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
             td.append($('<label></label>').text("交易类型:"));
-            td =$('<td></td>',{ class:"td"}).appendTo(tr);
+
             self.order_select1 = $('<select></select>',{
                 id:'order_select1'
             });
             self.order_select1.append(
                 "<option  value='-1'>请选择交易类型</option>"
             );
-
             // self.option_append(self.order_select1, self.select_title, policy.getDirtype);
             self.order_select1.change(self.handler_dirtype);
             td.append( self.order_select1 );
             //2----------------------------
             td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
             td.append($('<label></label>').text("策略类型:"));
-            td =$('<td></td>',{ class:"td"}).appendTo(tr);
+
             self.order_select2 = $('<select></select>',{
                 id:'order_select2'
             });
@@ -153,7 +169,7 @@ oojs$.com.stock.preOrder = oojs$.createClass(
             td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
             td.append($('<label></label>').text("策略名称:"));
 
-            td =$('<td></td>',{ class:"td"}).appendTo(tr);
+
             self.order_select3 = $('<select></select>',{
                 id:'order_select3'
             });
@@ -174,12 +190,80 @@ oojs$.com.stock.preOrder = oojs$.createClass(
         if(self.new_div_body==null){
             self.new_div_body = $('<div id="new_div_body"></div>');
             self.new_div_body.appendTo(container);
+            var tb = $('<table></table>', {
+                'class':"display dataTable"
+            });
+            self.new_div_body.append(tb);
+
+            var list_head = policy.list_benchmark_head;
+            var drawitem_data = null;
+            drawitem_data = {};
+
+            //drawitem_data["PGROUPID"] ={ELEMENT:self.find_item_policyGID(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
+            //drawitem_data["DIRTYPE"] ={ELEMENT:self.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
+
+            var STARTTIME = $('<div></div>');
+            oojs$.generateHMDOption(STARTTIME);
+            var kids = STARTTIME.find( "select" );
+            var hh = parseInt(0);
+            var mm = parseInt(0);
+            var ss = parseInt(0);
+            $(kids[0]).val(hh<=9?"0"+hh:hh);
+            $(kids[1]).val(mm<=9?"0"+mm:mm);
+            $(kids[2]).val(ss<=9?"0"+ss:ss);
+
+            var ENDTIME = $('<div></div>');
+            oojs$.generateHMDOption(ENDTIME);
+            var kids = ENDTIME.find( "select" );
+            var hh = parseInt(0);
+            var mm = parseInt(0);
+            var ss = parseInt(0);
+            $(kids[0]).val(hh<=9?"0"+hh:hh);
+            $(kids[1]).val(mm<=9?"0"+mm:mm);
+            $(kids[2]).val(ss<=9?"0"+ss:ss);
+
+            drawitem_data["STARTTIME"] ={ELEMENT:STARTTIME};
+            drawitem_data["ENDTIME"] = {ELEMENT:ENDTIME};
+            drawitem_data["STOCKSET"] = {ELEMENT:''};//STOCKSET;//{ELEMENT:STOCKSET};
+            //drawitem_data["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
+            //drawitem_data["CTRL"] = {ELEMENT:CTRL,COLSPAN:2};
+            oojs$.appendTB_item_D2(tb,list_head,drawitem_data);
+
+            // self.appendTB_accountHint(tb);
+
+            var itemD2_count = [{
+                'USERID': -1,
+                'TRADEID': -1,
+                'ACCOUNTID': "1234567890",
+                'CANAME': "",
+                'PASSWORD': "",
+                'MAXBUY': 0,
+                'BUYCOUNT': 0,
+                'BUYAMOUNT': 0,
+                'PERCENT': 0,
+                'SPLITCOUNT': 0
+            }];
+
+            self.appendTB_account_body(tb, itemD2_count, 0);
 
         }
 
 
 
     }
+
+    ,appendTB_accountHint:function(tb){
+        var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
+        var td = $('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
+        td.append($('<label></label>').text("请选择您帐户:"));
+        var label = $('<label></label>',{
+
+        }).text('(*注：只有选择了账户才能选择交易策略)');
+        label.css({ 'color': 'red', 'font-size': '80%' });
+        td.append(label);
+    }
+
+
 
     ,appendTB_preOrder:function(){
         var self = this;
@@ -253,21 +337,128 @@ oojs$.com.stock.preOrder = oojs$.createClass(
         });
     }
 
+    ,append_select_tradetype: function(){
+        var self = this;
+        var select = $('<select></select>',{
+            // id:'order_select2'
+        });
+
+        select.prop( "disabled", true );
+
+        select.append(
+            "<option value='-1'>请选择交易策略</option>"
+        );
+
+        for(var i = 0; i < self.select_tradetype.length; i++){
+            select.append(
+                "<option value='"
+                +self.select_tradetype[i]['id']
+                +"'>"
+                +self.select_tradetype[i]['name']+"</option>"
+            );
+        }
+        return select;
+    }
+
+    ,appendTB_account_body:function( tb, item, dirtype){
+        var self = this;
+        var item_D2 = [];
+        var div_col1 = null;
+        var div_col2 = null;
+        var checkbox = null;
+        var label_name = null;
+        var label_value = null;
+        var select_trade = null;
+        var select_dirtype = null;
+        var input = null;
+
+        for(var i = 0; i < item.length; i++ ){
+            item_D2[i] = {};
+            item_D2[i].ACCOUNTID = item[i]['ACCOUNTID'];
+            div_col1 = $('<div></div>');
+            div_col2 = $('<div></div>');
+            //column1
+            checkbox = $('<input></input>',{
+                'type':'checkbox'
+            }).change(
+                // {}
+                // self.handler_ck
+            );
+            checkbox.prop("disabled", true );
+            div_col1.append(checkbox);
+            label_name = $('<label></label>').text('帐户：');
+            div_col1.append(label_name);
+            //column2
+            label_value = $('<label></label>').text(item[i]['ACCOUNTID'])
+            div_col2.append(label_value);
+
+            var borrow = 1;
+            var newdirtype = 0;
+            if(dirtype == 0){//买入
+                if(borrow == 0){
+                    newdirtype = 0;
+                }else if(borrow == 1){
+                    //委托种类
+                    select_dirtype = $('<select></select>');
+                    select_dirtype.append(
+                        "<option value='0'>普通</option>"
+                    );
+                    select_dirtype.append(
+                        "<option value='2'>融资买入</option>"
+                    );
+                    select_dirtype.prop("disabled", true );
+                    div_col2.append(select_dirtype);
+                }
+            }else if(dirtype == 1){//卖出
+                if(borrow == 0){
+                    newdirtype = 1;
+                }else if(borrow == 1){
+                    //委托种类
+                    select_dirtype = $('<select></select>');
+                    select_dirtype.append(
+                        "<option value='1'>普通</option>"
+                    );
+                    select_dirtype.append(
+                        "<option value='5'>卖券还款</option>"
+                    );
+                    select_dirtype.prop("disabled", true );
+                    div_col2.append(select_dirtype);
+                }
+            }else if(dirtype == 9){//撤单
+                //??
+            }
+
+
+            select_trade = self.append_select_tradetype();
+            select_trade.change(
+                // {}
+                // self.handler_ck
+            );
+            div_col2.append(select_trade);
+            input = $('<input></input>',{type:'text'});
+            input.prop("disabled", true );
+            div_col2.append(input);
+
+            item_D2[i]["COLUMN1"] = div_col1;
+            item_D2[i]["COLUMN2"] = div_col2;
+        }
+
+        oojs$.appendTB_item_D2x(tb,item_D2)
+    }
 
 
 
 
 
-    //------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+        //------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     ,select_title:null
-    ,order_select1:null
-    ,order_select2:null
-    ,order_select3:null
+
     // ,td_first: null
     ,tb: null
     //,subscribe_body: []
-    ,select_tradetype:[{id:"BUYCOUNT",name:"交易股数"},{id:"BUYAMOUNT",name:"交易金额"},{id:"PERCENT",name:"交易比例"}]//帐户用
+
     ,account_body: []
     ,alreadySubscribe_body:[]
     ,tb_div1:null
@@ -390,108 +581,10 @@ oojs$.com.stock.preOrder = oojs$.createClass(
         self.appendTB_Rdiv_tb2(item);
     }
 
-    ,appendTB_Rdiv_tb2: function (item) {
-        var self = this;
-        self.tb_div2.empty();
-        self.acount_ctls = null;
-        self.acount_ctls = [];
-        self.tb = null;
-
-        self.tb = self.appendTB_add_head();
-        self.tb_div2.append(self.tb);
 
 
 
-        console.log("handler_policy",JSON.stringify(item));
-        //{"USERID":0,"PNAME":"打板买入12","DIRTYPE":0,"PGROUPID":3,"POLICYID":12,"POLICYPARAM":"1500","STARTTIME":{"hh":15,"mm":39,"ss":50},"ENDTIME":{"hh":15,"mm":39,"ss":59},"STOCKSET":"null","ISTEST":0,"STATUS":0,"FALG":1,"SUBSCRBLE":1,"PERCENT":0.3}
-        var obj = {};
-        for(var elm in item){
-            if(!(String(elm) == "PERCENT" || String(elm) == "PGROUPID" || String(elm) == "DIRTYPE" ||String(elm) == "PNAME")){
-                obj[elm] = item[elm];
-            }
-        }
 
-        // obj["PGROUPID"] = policy.find_item_policyGID(obj["PGROUPID"])['NAME'];
-        console.log("item:",item);
-        // policy.appendTB_add_body(self.tb,obj,USERID,POLICYID);
-
-        self.appendTB_account_body(USERID,POLICYID);
-        self.appendTB_add_control(self.tb, USERID, POLICYID);
-    }
-
-    ,appendTB_account_body:function(){
-        var self = this;
-        var checkbox = null;
-
-        var tr = $('<tr></tr>',{class:"even"}).appendTo(self.tb);
-        var td = $('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
-        td.append($('<label></label>').text("请选择您帐户:"));
-        var label = $('<label></label>',{
-
-        }).text('(*注：只有选择了账户才能选择交易策略)');
-        label.css({ 'color': 'red', 'font-size': '80%' });
-        td.append(label);
-
-        self.console("dictTrade_selectList",dictTrade.dictTrade_selectList);
-        self.console("dictTrade_list_body",dictTrade.dictTrade_list_body);
-
-        for(var i = 0; i < dictTrade.dictTrade_list_body.length; i++ ){
-            var tr = $('<tr></tr>',{class:"even"}).appendTo(self.tb);
-            if( i%2 == 0 ){
-                var tr = $('<tr></tr>',{class:"odd"}).appendTo(self.tb);
-            }
-
-            td = $('<td></td>',{ class:"td"}).appendTo(tr);
-            checkbox = $('<input></input>',{
-                'type':'checkbox'
-                // ,'id':dictTrade.dictTrade_list_body[i]+"_od_ck"
-                ,'name':dictTrade.dictTrade_list_body[i]['TRADEID']
-                ,'value':dictTrade.dictTrade_list_body[i]['ACCOUNTID']
-            }).change(self.handler_ck);
-            td.append(checkbox);
-
-            td.append($('<label></label>').text('帐户：'));
-            td =$('<td></td>',{ class:"td"}).appendTo(tr);
-            td.append($('<label></label>').text(dictTrade.dictTrade_list_body[i]['ACCOUNTID']));
-            td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-            var select = self.append_select_tradetype();
-            td.append( select );
-
-            var input = $('<input></input>',{type:'text'});
-            input.prop("disabled", true );
-            td.append($("<span>&nbsp;&nbsp;</span>"));
-            td.append(input);
-            self.acount_ctls.push({TRADEID:dictTrade.dictTrade_list_body[i]['TRADEID'],
-                ACCOUNTID:dictTrade.dictTrade_list_body[i]['ACCOUNTID'],
-                "select":select,'input':input,'checkbox':checkbox});
-
-        }
-
-
-    }
-
-    ,append_select_tradetype: function(){
-        var self = this;
-        var select = $('<select></select>',{
-            // id:'order_select2'
-        });
-
-        select.prop( "disabled", true );
-
-        select.append(
-            "<option value='-1'>请选择交易策略</option>"
-        );
-
-        for(var i = 0; i < self.select_tradetype.length; i++){
-            select.append(
-                "<option value='"
-                +self.select_tradetype[i]['id']
-                +"'>"
-                +self.select_tradetype[i]['name']+"</option>"
-            );
-        }
-        return select;
-    }
 
 
     ,handler_click:function(){

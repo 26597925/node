@@ -39,7 +39,11 @@ var unit_date = function()
 		}else{
             reg = reg2;
 		}
-        if( !myd.match(reg) ){
+		if(!myd){
+            return false;
+		}
+
+        if( !(String(myd).match(reg)) ){
         	return false;
 		}else{
         	return true;
@@ -63,12 +67,22 @@ var unit_date = function()
 		return date_str;
 	};
 
+    this.string2int = function(val){
+        return parseInt(val) || 0;
+    };
+
+    this.string2num = function(val){
+        return Number(val) || 0 ;
+    };
+
+    this.string2_ = function(val){
+        return String(val) || "" ;
+    };
+
     this.objToNumber = function(_obj){
-        console.log(">>>>>",JSON.stringify(_obj));
+
         var obj = {hh:0,mm:0,ss:0};
         obj = _obj;
-        console.log(">>>>>",JSON.stringify(obj));
-        debugger;
         if(obj!=null){
         	return parseInt(obj['hh'])*60*60+parseInt(obj['mm'])*60+parseInt(obj['ss']);
         }else{

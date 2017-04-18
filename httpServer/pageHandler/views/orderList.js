@@ -14,7 +14,7 @@ oojs$.com.stock.orderList = oojs$.createClass(
     ,nvgPolicyClick:function(){
 
         var tb = $('<table></table>', {
-            class:"display dataTable"
+            'class':"display dataTable"
         }).appendTo($('#orderList_tabs_1'));
         var list_head = [{ID:"COL1",NAME:"策略类型"},{ID:"COL2",NAME:"策略类型"},{ID:"COL3",NAME:"策略类型"}];
         var list_body = {

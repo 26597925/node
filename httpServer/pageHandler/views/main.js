@@ -89,7 +89,7 @@ var oojs$ = {
 		{
 			Object.defineProperty(cls.prototype,i,{
 			get:get_set_obj[i].get,
-			set:get_set_obj[i].set,
+			set:get_set_obj[i].set
 			});
 		}
 		return cls;
@@ -392,7 +392,7 @@ var oojs$ = {
                     continue;
                 }
                 var th = $('<th></th>',{
-                    class:"ui-state-default"
+                    'class':"ui-state-default"
                 }).appendTo(tr).text(list_head[elm]["NAME"]);
             }
 
@@ -400,9 +400,9 @@ var oojs$ = {
             for( var elm = 0; elm < list_body.length; elm++ ){
                 var tr = null;
                 if(elm%2 == 0){
-                    tr = $('<tr></tr>',{class:"even"}).appendTo(tbody);
+                    tr = $('<tr></tr>',{'class':"even"}).appendTo(tbody);
                 }else{
-                    tr = $('<tr></tr>',{class:"odd"}).appendTo(tbody);
+                    tr = $('<tr></tr>',{'class':"odd"}).appendTo(tbody);
                 }
                 var td = null;
                 for(var in_elm = 0; in_elm < list_head.length; in_elm++){
@@ -415,53 +415,8 @@ var oojs$ = {
             }
         }
     }
-    /***
-     * usage
-     * oojs$.appendTB_list(panel,list_head,list_body)
-     * param
-     * panel: div
-     * list_head: [{NAME:"title1"},{NAME:"title2"},{NAME:"button"}]
-     * list_body: [
-     * [{ELEMENT:"text11"},{ELEMENT:"text12"},{ELEMENT:$('<button></button>')}],
-     * [{ELEMENT:"text21"},{ELEMENT:"text22"},{ELEMENT:$('<button></button>')}]
-     * ]
-     *
-     *
-     */
-	// ,appendTB_list : function(panel,list_head,list_body){
-    //
-    //
-     //    panel.empty();
-     //    var tb = $('<table></table>', {
-     //        'class':'display dataTable'
-     //    }).appendTo(panel);
-    //
-     //    var thead = $('<thead></thead>').appendTo(tb);
-     //    var tr = $('<tr></tr>').appendTo(thead);
-     //    for(var elm = 0; elm < list_head.length; elm++){
-     //        // if(!list_body[0].hasOwnProperty( head[i]["ID"] )){
-     //        //     continue;
-     //        // }
-     //        var th = $('<th></th>',
-     //            {class:"ui-state-default"
-     //            }).appendTo(tr).text(list_head[elm]["NAME"]);
-     //    }
-    //
-     //    var tbody = $('<tbody></tbody>').appendTo(tb);
-     //    for( var elm = 0; elm < list_body.length; elm++ ){
-     //        var tr = null;
-     //        if(elm%2 == 0){
-     //            tr = $('<tr></tr>',{class:"even"}).appendTo(tbody);
-     //        }else{
-     //            tr = $('<tr></tr>',{class:"odd"}).appendTo(tbody);
-     //        }
-     //        var td = null;
-	// 		for(var in_elm = 0; in_elm < list_body[elm].length; in_elm++){
-     //            td = $('<td></td>').appendTo(tr);
-     //            td.append(list_body[elm][in_elm]['ELEMENT']);
-	// 		}
-	// 	}
-	// }
+
+
     /***
      * usage
      * oojs$.appendTB_item_D2(tb,list_head,item)
@@ -498,16 +453,16 @@ var oojs$ = {
             }
             if(ROWSPAN == ""){
                 if(i%2==0){
-                    tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+                    tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
                 }else{
-                    tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
+                    tr = $('<tr></tr>',{'class':"odd"}).appendTo(tb);
                 }
                 if(COLSPAN == ""){
                 	//width:100px;
-                    $('<td></td>',{ class:"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]+": ");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
+                    $('<td></td>',{ 'class':"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]+": ");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
                 }else if(COLSPAN == "2"){
-                    $('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
+                    $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
                 }else{
                     throw "the value of COLSPAN not allowed"+COLSPAN;
                 }
@@ -523,13 +478,84 @@ var oojs$ = {
                     tmpClass = "odd";
                 }
 
-                tr = $('<tr></tr>',{class:tmpClass}).appendTo(tb);
-                $('<td></td>',{ rowspan:int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+": ");
+                tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
+                $('<td></td>',{ 'rowspan':int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+": ");
                 $('<td></td>',{ }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT1"]);
                 for(var j = 0; j < int_ROWSPAN-1; j++)
                 {
-                    tr = $('<tr></tr>',{class:tmpClass}).appendTo(tb);
+                    tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
                     $('<td></td>',{  }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT2"]);
+                }
+
+            }
+        }
+    }
+
+    /***
+     * usage
+     * oojs$.appendTB_item_D2x(tb,item_D2)
+     * param
+     * panel: tb
+     *
+     * item_D2: [
+     * { 'COLUMN1':"value1", 'COLUMN2':"value2" },
+     * { 'COLUMN1':"value1", 'COLUMN2':"value2"},
+     * { 'COLUMN1':"left",COLUMN2:'right-up',COLUMN3:'right-down',ROWSPAN:2},
+     * { 'COLUMN1':"only one cell",COLSPAN:2}
+     * ]
+     *
+     *(D2x identify 2 column but not head limit body)
+     */
+    ,appendTB_item_D2x:function(tb,item_D2){
+        var tr = null;
+        var ROWSPAN = "";
+        var COLSPAN = "";
+        var int_ROWSPAN = 0;
+        var tmpClass = "";
+        for(var i = 0; i < item_D2.length; i++){
+            ROWSPAN = "";
+            COLSPAN = "";
+
+            if(item_D2[i].hasOwnProperty("ROWSPAN")){
+                ROWSPAN = String(item_D2[i]["ROWSPAN"]);
+            }else if(item_D2[i].hasOwnProperty("COLSPAN")){
+                COLSPAN = String(item_D2[i]["COLSPAN"]);
+            }
+
+            if(ROWSPAN == ""){
+
+                if(i%2==0){
+                    tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
+                }else{
+                    tr = $('<tr></tr>',{'class':"odd"}).appendTo(tb);
+                }
+
+                if(COLSPAN == ""){
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(item_D2[i]["COLUMN1"] );
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(item_D2[i]["COLUMN2"]);
+                }else if(COLSPAN == "2"){
+                    $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr).append(item_D2[i]["COLUMN1"]);
+                }else{
+                    throw "the value of COLSPAN not allowed"+COLSPAN;
+                }
+            }else{
+                int_ROWSPAN = parseInt(ROWSPAN);
+                if(int_ROWSPAN<2){
+                    throw "the value of ROWSPAN not allowed"+ROWSPAN;
+                }
+
+                if(i%2==0){
+                    tmpClass = "even";
+                }else{
+                    tmpClass = "odd";
+                }
+                tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
+                $('<td></td>',{ 'rowspan':int_ROWSPAN}).appendTo(tr).append(item_D2[i]["COLUMN1"] );
+                $('<td></td>',{ }).appendTo(tr).append(item_D2[i]["ELEMENT2"]);
+                for(var j = 0; j < int_ROWSPAN-1; j++)
+                {
+                    tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
+                    $('<td></td>',{  }).appendTo(tr).append(item_D2[i]["ELEMENT"+(j+3)]);
                 }
 
             }
@@ -591,10 +617,10 @@ var oojs$ = {
 oojs$.ns("com.stock.preload");
 oojs$.com.stock.preload=oojs$.createClass({
     NAME:'preload'
-    ,DIRTIPE:'sell buy'
-    ,GROUP:'?dict_group?'
-    ,POLICY:''
-    ,TRADE:''
+    ,GROUP:''
+    // ,POLICY:[]
+    ,TRADE:[]
+    ,STATUS:{'TRADE':0,'GROUP':0}
     ,getDirtype:function(){
         switch (parseInt(arguments[0])){
             case 0:
@@ -616,10 +642,50 @@ oojs$.com.stock.preload=oojs$.createClass({
         }
     }
 
+    ,checkAllload:function(){
+        var self = this;
+        for(var  elm in self.STATUS){
+            if(self.STATUS[elm] == 1){
+                continue;
+            }else{
+                return;
+            }
+        }
+        if(self.callback){
+            self.callback();
+        }
+    }
+    ,load:function(callback){
+        var self = this;
+        self.callback = callback;
+        oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
+            if(result.success){
+                self.TRADE = [];
+                self.TRADE = result.data;
+                self.STATUS.TRADE = 1;
+                self.checkAllload();
+            }else{
+                oojs$.showError(result.message);
+            }
+        },'TRADE');
+
+        oojs$.httpGet("/select_policyGID",function(result,textStatus,token){
+
+            if(result.success){
+                self.GROUP = [];
+                self.GROUP = result.data;
+                self.STATUS.GROUP = 1;
+                self.checkAllload();
+            }else{
+                oojs$.showError(result.message);
+            }
+        },'GROUP');
+
+    }
+
 });
 
 var preload = new oojs$.com.stock.preload();
-
 
 
 <%- jsState %>
@@ -635,7 +701,11 @@ $(document).ready(function(){
     $("#accordion").accordion({
         active: 2
     });
-	oojs$.dispatch("ready");
+
+    preload.load(function(){
+        oojs$.dispatch("ready");
+    });
+
 
 <%- jsRegist %>
 

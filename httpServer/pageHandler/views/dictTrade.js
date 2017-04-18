@@ -41,20 +41,21 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             ID:"CTRL",
             NAME:"操作"
         }
-    ],//增加修改基准数据
-	select_trade: []//券商关联表
+    ]//增加修改基准数据
+        // ,
+	// select_trade: []//券商关联表
 	,dictTrade_list_body: []//券商列表数据
 	// ,dictTrade_record:null
 	// ,dictTrade_selectElement: null
 	,init:function(){
 		$( "#dictTrade_tabs" ).tabs();
-		this.load_dictTrade();
+        this.load_userAccount();
         this.appendTB_add();
         $("#dictTrade").click(this.nvgTradeClick);
 	}
 
 	,nvgTradeClick:function(){
-        dictTrade.load_dictTrade();
+        dictTrade.load_userAccount();
 	}
 
     ,handler_trd_del:function(){
@@ -107,10 +108,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	}
 
 	, getRecord_dt_selectList : function(TRADEID){
-		if(this.select_trade.length>0){
-			for(var i =0; i< this.select_trade.length; i++){
-				if( this.select_trade[i]["ID"]==TRADEID ){
-					return this.select_trade[i]["NAME"];
+		if(preload.TRADE.length>0){
+			for(var i =0; i< preload.TRADE.length; i++){
+				if( preload.TRADE[i]["ID"]==TRADEID ){
+					return preload.TRADE[i]["NAME"];
 				}
 			}
 		}
@@ -139,62 +140,62 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
             tr = $('<tr></tr>').appendTo(tb);
             // if(i%2==0){
-            //     tr = $('<tr></tr>',{class:"even"}).appendTo(tb);
+            //     tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
             // }else{
-            //     tr = $('<tr></tr>',{class:"odd"}).appendTo(tb);
+            //     tr = $('<tr></tr>',{'class':"odd"}).appendTo(tb);
             // }
 
             switch (head[i]["ID"]){
                 case "TRADEID":
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "ACCOUNTID":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "PASSWORD":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "MAXBUY":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "BUYCOUNT":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "BUYAMOUNT":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "PERCENT":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "SPLITCOUNT":
 
 
-                    $('<td></td>',{ class:"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ class:"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 // default:
-                // 	$('<td></td>',{ class:"td"}).appendTo(tr);
-                // 	$('<td></td>',{ class:"td"}).appendTo(tr);
+                // 	$('<td></td>',{ 'class':"td"}).appendTo(tr);
+                // 	$('<td></td>',{ 'class':"td"}).appendTo(tr);
                 // 	break;;
             }
         }
@@ -308,11 +309,11 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 		select_trade.append("<option value='-1'>请选择券商</option>");
 
-        for(var sId = 0; sId < this.select_trade.length; sId++)
+        for(var sId = 0; sId < preload.TRADE.length; sId++)
         {
 
             select_trade.append("<option value='"
-                +this.select_trade[sId]["ID"]+"'>"+this.select_trade[sId]["NAME"]+"</option>");
+                +preload.TRADE[sId]["ID"]+"'>"+preload.TRADE[sId]["NAME"]+"</option>");
         }
 
         if(optID!=null){
@@ -466,27 +467,27 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         });
 
 	}
-    , load_dictTrade : function(){
-
-        var self = this;
-        if(this.select_trade.length==0){
-
-            oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
-
-                if(result.success){
-                    self.select_trade = [];
-                    self.select_trade = result.data;
-                    self.load_userAccount();
-                }else{
-                    oojs$.showError(result.message);
-                }
-
-            });
-
-        }else{
-            self.load_userAccount();
-        }
-    }
+    // , load_dictTrade : function(){
+    //
+    //     var self = this;
+    //     if(this.select_trade.length==0){
+    //
+    //         oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
+    //
+    //             if(result.success){
+    //                 self.select_trade = [];
+    //                 self.select_trade = result.data;
+    //                 self.load_userAccount();
+    //             }else{
+    //                 oojs$.showError(result.message);
+    //             }
+    //
+    //         });
+    //
+    //     }else{
+    //         self.load_userAccount();
+    //     }
+    // }
 });
 
 var dictTrade = new oojs$.com.stock.dictTrade();

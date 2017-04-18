@@ -208,6 +208,7 @@ oojs$.com.stock.policy = oojs$.createClass(
         );
 
         var input = $('<input></input>',{}).text("");
+        $('<label style="color: red; font-size: 80%;">请输入股票编码</label>').appendTo(div2);
         div2.append(input);
 
         $('<input></input>',{type:"button",id:"stock_changeAdd_btn",name:"",value:"新增"}).appendTo(div2).click(
@@ -271,12 +272,20 @@ oojs$.com.stock.policy = oojs$.createClass(
         }
 
         data = String(data).trim();
+        if(data.indexOf(inputval)>=0){
+            oojs$.showError(inputval+"已经存在");
+            return;
+        }
         if( inputval.length > 1){
+
             if(data.length>1){
                 data += ","+inputval
             }else{
                 data +=  inputval
             }
+        }else{
+            oojs$.showError("数据有误请核查");
+            return;
         }
 
         if(token == 1){
@@ -328,7 +337,9 @@ oojs$.com.stock.policy = oojs$.createClass(
         }
     }
 
-    ,drawIterm :function(item){
+    ,drawItem :function(tb ,item){
+        var self = this;
+
         var list_head = self.list_benchmark_head;
 
         var STARTTIME = $('<div></div>');
@@ -356,161 +367,62 @@ oojs$.com.stock.policy = oojs$.createClass(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
             item["STOCKSET"],
-            type);
+            item['type']);
 
         var CTRL = $('<div></div>');
-        for(var elm in self.item_Unsubscribe){
-            self.item_Unsubscribe[elm] = null;
-            delete self.item_Unsubscribe[elm];
-        }
-        self.item_Unsubscribe = null;
-        self.item_Unsubscribe = {};
+
+        var drawitem_data = null;
+        drawitem_data = {};
+
 
         for(var elm in item){
-            self.item_Unsubscribe[elm] = {ELEMENT:item[elm]};
+            drawitem_data[elm] = {ELEMENT:item[elm]};
         }
 
-        self.item_Unsubscribe["PGROUPID"] ={ELEMENT:self.find_item_policyGID(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
-        self.item_Unsubscribe["DIRTYPE"] ={ELEMENT:self.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
+        drawitem_data["PGROUPID"] ={ELEMENT:self.find_item_policyGID(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
+        drawitem_data["DIRTYPE"] ={ELEMENT:self.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
 
-        self.item_Unsubscribe["STARTTIME"] ={ELEMENT:STARTTIME};
-        self.item_Unsubscribe["ENDTIME"] = {ELEMENT:ENDTIME};
-        self.item_Unsubscribe["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
-        self.item_Unsubscribe["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
-        self.item_Unsubscribe["CTRL"] = {ELEMENT:CTRL,COLSPAN:2};
-        self.item_Unsubscribe['type'] = 1;
+        drawitem_data["STARTTIME"] ={ELEMENT:STARTTIME};
+        drawitem_data["ENDTIME"] = {ELEMENT:ENDTIME};
+        drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
+        drawitem_data["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
+        drawitem_data["CTRL"] = {ELEMENT:CTRL,COLSPAN:2};
 
-        $('<input></input>',{'type':"button",name:type,value:"提交"}).appendTo(CTRL).click(
-            self.item_Unsubscribe,
+
+        $('<input></input>',{'type':"button",value:"提交"}).appendTo(CTRL).click(
+            drawitem_data,
             self.policy_item_update
         );
 
-
-        $('<input></input>',{'type':"button",name:type,value:"取消"}).appendTo(CTRL).click(
-            self.item_Unsubscribe,
+        $('<input></input>',{'type':"button",value:"取消"}).appendTo(CTRL).click(
+            drawitem_data,
             self.policy_item_reback
         );
-        oojs$.appendTB_item_D2(tb,list_head,self.item_Unsubscribe);
+
+        oojs$.appendTB_item_D2(tb,list_head,drawitem_data);
     }
+
     ,appendTB_changeSubscribe: function(){
         var self = this;
 
         var item = arguments[0];
         var type = item['type'];
-        console.log("item:",item);
+        console.log("item:",JSON.stringify(item));
 
         var tb = $('<table></table>', {
-            class:"display dataTable"
+            'class':"display dataTable"
         });
 
         if(type == 1){
             $('#policy_tabs_1').empty();
             tb.appendTo($('#policy_tabs_1'));
+            // item['type'] = 1;
         }else if(type==2){
             $('#policy_tabs_2').empty();
             tb.appendTo($('#policy_tabs_2'));
+            // item['type'] = 2;
         }
-
-        var list_head = self.list_benchmark_head;
-
-        var STARTTIME = $('<div></div>');
-        oojs$.generateHMDOption(STARTTIME);
-        var kids = STARTTIME.find( "select" );
-        var hh = parseInt(item["STARTTIME"]["hh"]);
-        var mm = parseInt(item["STARTTIME"]["mm"]);
-        var ss = parseInt(item["STARTTIME"]["ss"]);
-        $(kids[0]).val(hh<=9?"0"+hh:hh);
-        $(kids[1]).val(mm<=9?"0"+mm:mm);
-        $(kids[2]).val(ss<=9?"0"+ss:ss);
-
-        var ENDTIME = $('<div></div>');
-        oojs$.generateHMDOption(ENDTIME);
-        var kids = ENDTIME.find( "select" );
-        var hh = parseInt(item["ENDTIME"]["hh"]);
-        var mm = parseInt(item["ENDTIME"]["mm"]);
-        var ss = parseInt(item["ENDTIME"]["ss"]);
-        $(kids[0]).val(hh<=9?"0"+hh:hh);
-        $(kids[1]).val(mm<=9?"0"+mm:mm);
-        $(kids[2]).val(ss<=9?"0"+ss:ss);
-
-        var STOCKSET = {ELEMENT1:$('<div></div>'),ELEMENT2:$('<div></div>'),ROWSPAN:2};
-
-        self.appendCK_stockset(
-            STOCKSET['ELEMENT1'],
-            STOCKSET['ELEMENT2'],
-            item["STOCKSET"],
-            type);
-
-        var CTRL = $('<div></div>');
-
-
-        if(type == 1){
-            for(var elm in self.item_Unsubscribe){
-                self.item_Unsubscribe[elm] = null;
-                delete self.item_Unsubscribe[elm];
-            }
-            self.item_Unsubscribe = null;
-            self.item_Unsubscribe = {};
-            for(var elm in item){
-                self.item_Unsubscribe[elm] = {ELEMENT:item[elm]};
-            }
-
-            self.item_Unsubscribe["PGROUPID"] ={ELEMENT:self.find_item_policyGID(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
-            self.item_Unsubscribe["DIRTYPE"] ={ELEMENT:self.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
-
-            self.item_Unsubscribe["STARTTIME"] ={ELEMENT:STARTTIME};
-            self.item_Unsubscribe["ENDTIME"] = {ELEMENT:ENDTIME};
-            self.item_Unsubscribe["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
-            self.item_Unsubscribe["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
-            self.item_Unsubscribe["CTRL"] = {ELEMENT:CTRL,COLSPAN:2};
-            self.item_Unsubscribe['type'] = 1;
-
-            $('<input></input>',{'type':"button",name:type,value:"提交"}).appendTo(CTRL).click(
-                self.item_Unsubscribe,
-                self.policy_item_update
-            );
-
-
-            $('<input></input>',{'type':"button",name:type,value:"取消"}).appendTo(CTRL).click(
-                self.item_Unsubscribe,
-                self.policy_item_reback
-            );
-            oojs$.appendTB_item_D2(tb,list_head,self.item_Unsubscribe);
-        }else if(type==2){
-            for(var elm in self.item_Subscribe){
-                self.item_Subscribe[elm] = null;
-                delete self.item_Subscribe[elm];
-            }
-            self.item_Subscribe = null;
-            self.item_Subscribe = {};
-            for(var elm in item){
-                self.item_Subscribe[elm] =   {ELEMENT:item[elm]};;
-            }
-
-            self.item_Subscribe["PGROUPID"] ={ELEMENT:self.find_item_policyGID(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
-            self.item_Subscribe["DIRTYPE"] ={ELEMENT:self.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
-
-            self.item_Subscribe["STARTTIME"] ={ELEMENT:STARTTIME};
-            self.item_Subscribe["ENDTIME"] = {ELEMENT:ENDTIME};
-            self.item_Subscribe["STOCKSET"] = STOCKSET;// {ELEMENT:STOCKSET};
-            self.item_Subscribe["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
-            self.item_Subscribe["CTRL"] = {ELEMENT:CTRL,COLSPAN:2};
-            self.item_Subscribe['type'] = 2;
-
-            $('<input></input>',{'type':"button",name:type,value:"提交"}).appendTo(CTRL).click(
-                self.item_Subscribe,
-                self.policy_item_update
-            );
-
-
-            $('<input></input>',{'type':"button",name:type,value:"取消"}).appendTo(CTRL).click(
-                self.item_Subscribe,
-                self.policy_item_reback
-            );
-
-            oojs$.appendTB_item_D2(tb,list_head,self.item_Subscribe);
-        }
-
+        policy.drawItem(tb,item);
 
     }
 
@@ -619,6 +531,11 @@ oojs$.com.stock.policy = oojs$.createClass(
                 
             }
 
+        }
+        if(token['ELEMENT'] == 1){
+            sendData['STOCKSET'] = policy.item_stockset1
+        }else if(token['ELEMENT'] == 2){
+            sendData['STOCKSET'] = policy.item_stockset2
         }
         console.log("update_subscrible",JSON.stringify(sendData));
         policy.update_subscrible(sendData, sendData['type']);
