@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>radio demo</title>
+
+
+
+</head>
+<body>
+
+<ul id="list"></ul>
+<script type="text/javascript">
+    if(window.opener && !window.opener.closed){
+        var ar= window.opener.getArray();
+        console.log(JSON.stringify(ar));
+        var items="";
+        for(var i=0;i<ar.length;i++){
+            items +="<li>" + ar[i] + "</li>";
+        }
+        $("ul#list").html(items);
+    }
+</script>
+</body>
+</html>
+
+
+
+
+

@@ -9,6 +9,12 @@ FROM information_schema.columns
 WHERE table_schema = 'database_name'
 AND table_name = 'table_name' ;
 
+$('.checkbox').click(function() {
+  if ($(this).is(':checked')) {
+    // Do stuff
+  }
+});
+
 
 <p>
 label

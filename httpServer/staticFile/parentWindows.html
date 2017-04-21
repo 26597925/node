@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>radio demo</title>
+    <style>
+
+    </style>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <span id="popup"> Click to Open Popup </span>
+
+    <script type="text/javascript">
+        var ar=new Array("Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6",
+            "Item 7", "Item 8", "Item 9", "Item 10");
+        function getArray(){
+            return ar;
+        }
+        $(document).ready(function(){
+            $("span#popup").click(function(){
+                var p=window.open("PopupWindows.html");
+            });
+        });
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
+
+
+
+
+
