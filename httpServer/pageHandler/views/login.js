@@ -2,7 +2,7 @@
 <script language="javascript" type="text/javascript" src="/public/js/jquery.crypt.js"></script>
 <script language="javascript" type="text/javascript" src="/public/js/jquery.jqplot.min.js"></script>
 <script type="text/javascript">
-  $(document).ready(function(){
+$(document).ready(function(){
 
     var showTopInfo = function(){
         // if(document.cookie){
@@ -23,6 +23,7 @@
         $("#topinfo").html("<a id='topinfousr' href='/logup#'>注册</a>")
     };
     showTopInfo();
+
     $("#login").click(function(){
         $("#message").text("");
         var user = $("#username").val();
@@ -54,6 +55,10 @@
         });
     });
 
+    $("#findpsw").click(function(){
+        window.location.href = "/findpassword";
+    });
+
     $("#reset").click(function(){
         $("#username").val("");
         $("#password").val("");
@@ -63,5 +68,5 @@
     $("#findpsw").click(function(){
         window.location.href="/users/guidereset";
     });
-  });
+});
 </script>

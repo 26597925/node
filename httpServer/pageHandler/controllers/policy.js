@@ -11,12 +11,12 @@ exports.select_subscrible = function(){
     var self = this;
     var result = {'success':true,'data':''};
 
-    var ID = sessions.get_uID(self.req);
-    var sql = "SELECT  `GROUPID`  FROM `tb_user_basic` where `USERID`="+ID;
+    var uID = sessions.get_uID(self.req);
+    var sql = "SELECT  `GROUPID`  FROM `tb_user_basic` where `USERID`="+uID;
 
     db.query(sql,function(){
         if(arguments.length==1){
-            select_combinePolicy(arguments[0][0],ID,self);
+            select_combinePolicy(arguments[0][0],uID,self);
         }else if(arguments.length==0){
             result = {'success':true,'data':[]};
             self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -48,7 +48,7 @@ var select_combinePolicy = function(){
         +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `PRICES`, `ADDTIME`, `MODTIME`, `FLAG`,"
         +" `SUBSCRBLE`, `PERCENT` "
         +"from  tb_policy_usage where (`USERID`="+uID
-        +")  and `FLAG`=1 or ( `USERID`=0 and ISTEST=0 and `FLAG`=1)  ";
+        +"  and `FLAG`=1 ) or ( `USERID`=0 and ISTEST=0 and `FLAG`=1)  ";
 
     var result1,result2;
 
@@ -56,14 +56,14 @@ var select_combinePolicy = function(){
         if(arguments.length==1){
 
             console.log(path.basename(__filename).replace('.js',''),"select_combinePolicy",arguments[0]);
-            //????????
+
             var groupList = [];
             for(var i=0; i < arguments[0].length; i++){
                 groupList = groupList.concat(arguments[0][i]["USETYPE"].split(","));
             }
 
             if(groupList.indexOf(groupID.toString())>=0){
-                console.log(path.basename(__filename).replace('.js',''),"groupList.indexOf(groupID)>=0");
+
                 result1= arguments[0];
                 db.query(sql2,function(){
                     if(arguments.length==1){
@@ -114,7 +114,8 @@ var combinePolicyResult=function(){
         {
             MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
         }
-        obj[ result2[i]['USERID']+"_"+result2[i]['POLICYID'] ] =
+        // obj[ result2[i]['USERID']+"_"+result2[i]['POLICYID'] ] =
+        obj[result2[i]['POLICYID'] ] =
         {
             USERID:result2[i]['USERID'],
             PGROUPID:result2[i]['PGROUPID'],
@@ -140,7 +141,9 @@ var combinePolicyResult=function(){
 
     for(var i = 0; i < result1.length; i++){
 
-        if(obj.hasOwnProperty(result1[i]['USERID']+"_"+result1[i]['POLICYID'])){
+        // if(obj.hasOwnProperty(result1[i]['USERID']+"_"+result1[i]['POLICYID'])){
+        //result1[i]['USERID']+"_"+
+        if(obj.hasOwnProperty(result1[i]['POLICYID'])){
             continue;
         }else{
             MODTIME = result1[i]['MODTIME'];
@@ -222,25 +225,16 @@ exports.select_alreadySubscrible = function(){
 exports.update_subscrible = function(){
     var self = this;
     var result = {'success':true,'data':''};
-
+    var uID = sessions.get_uID(self.req);
     if(self.req.post){
         console.log(path.basename(__filename).replace('.js',''),'update_subscrible ',self.req.post);
-        // { USERID: '20000',
-        //     PNAME: '打板买入',
-        //     POLICYID: '13',
-        //     POLICYPARAM: '1500',
-        //     STARTTIME: '0000-00-00',
-        //     ENDTIME: '0000-00-00',
-        //     STOCKSET: 'null',
-        //     ISTEST: '0',
-        //     PERCENT: '0.3'
-        //     }
 
-        console.log(path.basename(__filename).replace('.js',''),"update",self.req.post);
         var sql = '';
         var db_type = 'insert';
         sql = "SELECT `USERID`, `POLICYID` FROM  tb_policy_usage where USERID="+
-            self.req.post['USERID']+" and POLICYID="+self.req.post["POLICYID"];
+            // self.req.post['USERID']
+            uID
+            +" and POLICYID="+self.req.post["POLICYID"];
         db.query(sql,function(){
             if(arguments.length==1){
                 db_type = 'update';
@@ -272,7 +266,8 @@ exports.update_subscrible = function(){
                     "'%s', %s, %s, " +
                     "%s)";
                 sql = util.format(sql,
-                    self.req.post['USERID'],self.req.post['PNAME'],self.req.post['PGROUPID']
+                    // self.req.post['USERID']
+                    uID,self.req.post['PNAME'],self.req.post['PGROUPID']
                     ,self.req.post['POLICYID'],self.req.post['POLICYPARAM'], self.req.post['DIRTYPE']
                     ,STARTTIME,ENDTIME,self.req.post['STOCKSET']
                     ,self.req.post['ISTEST'],self.req.post['STATUS'],self.req.post['PRICES']
@@ -308,7 +303,8 @@ exports.update_subscrible = function(){
                     self.req.post['PERCENT'],
                     unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss"),
                     self.req.post['POLICYID'],
-                    self.req.post['USERID']);
+                    uID);
+                    // self.req.post['USERID']);
 
                 db.query(sql,function(){
                     if(arguments.length==1){

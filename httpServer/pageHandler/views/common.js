@@ -1122,7 +1122,7 @@ oojs$.com.stock.preload=oojs$.createClass({
                 return self.PGROUP[i];
             }
         }
-        oojs$.showError("PGROUP:不在数据域内");
+        oojs$.showError("Trade:不在数据域内");
         return -1;
     }
     ,getTradeItem:function(){
@@ -1212,26 +1212,13 @@ var preload = new oojs$.com.stock.preload();
 
 <%- jsState %>
 $(document).ready(function(){
-
     var showTopInfo = function(){
-        $("#topinfo").html("<a id='topinfousr' href='/#'>退出</a>")
+        $("#topinfo").html("<a id='close' href='#'>退出</a>");
+        $('#close').click(function(){
+            window.close();
+        });
     };
     showTopInfo();
-
-	hideAllPanel();
-	
-    $("#accordion").accordion({
-        active: 2
-    });
-
-    preload.load(function(){
-        oojs$.dispatch("ready");
-    });
-
-
-<%- jsRegist %>
-
-//oojs$.heartTime();
+    oojs$.dispatch("ready");
 });
-
 </script>

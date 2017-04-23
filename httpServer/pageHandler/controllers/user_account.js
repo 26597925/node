@@ -17,7 +17,7 @@ exports.select_userAccount = function(){
         " `tb_user_account`.`TRADEID`," +
         " `tb_capital_conf`.`ACCOUNTID`," +
         " `CANAME`," +
-        // " `PASSWORD`," +
+        " `PASSWORD`," +
         " `MAXBUY`," +
         " `BUYCOUNT`," +
         " `BUYAMOUNT`," +

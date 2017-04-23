@@ -6,7 +6,7 @@ var web_DB_config = function()
     //"115.182.51.49","root","OGNkNGUyZmM3ZWE","winners",3306
 
    
-	this.databasesName = "winners";
+	this.databasesName = "winners_test";
     this.selectTB = false;
     this.connection = null;
     this.pool = null;
@@ -15,10 +15,10 @@ var web_DB_config = function()
     this.dbcfg =
     {
         connectionLimit:                20,
-        host:                           "127.0.0.1",//"115.182.51.49",
-        port:                           8889,//3307,
+        host:                           "123.56.243.117",//"115.182.51.49",
+        port:                           3306,//3307,
         user:                           "root",
-        password:                       "root",//"OGNkNGUyZmM3ZWE",
+        password:                       "OGNkNGUyZmM3ZWE",//"root",
         database:                       this.databasesName,
         insecureAuth:                   true,
         connectTimeout:                 2*60*1000
@@ -35,7 +35,7 @@ var web_DB_config = function()
         //     console.log('The solution is: ', results[0].solution);
         // });
         // return this.connection;
-    }
+    };
 
     this.mysql_end =function(){
         if(this.connection){
@@ -44,7 +44,7 @@ var web_DB_config = function()
             });
             // connection.destroy();
         }
-    }
+    };
 
     //========================================>
     this.mysql_pool_getConnection = function(callback){
@@ -71,14 +71,14 @@ var web_DB_config = function()
                 // console.log(path.basename(__filename),'Connection %d released', connection.threadId);
             });
         }
-    }
+    };
 
     
     this.mysql_pool_getConnection();
 
     this.query = function(sql,callback){
         console.log(path.basename(__filename),"query-sql",sql);
-        var rows = []
+        var rows = [];
         this.pool.getConnection(function(err, connection){
             // connected! (unless `err` is set) 
             if(!err){
@@ -92,7 +92,7 @@ var web_DB_config = function()
                         // callback = null;
                     }
                     
-                    console.log("error");
+                    console.log(path.basename(__filename),"error");
                 })
                 .on('fields', function(fields) {
                     // the field packets for the rows to follow 
@@ -134,20 +134,20 @@ var web_DB_config = function()
                     // processRow(row, function() {
                     //   mycon.resume();
                     // });
-                    
+
                     rows.push(row);
                     
                 })
                 .on('end', function() {
                 // all rows have been received
-                    console.log("mysql end ->result",rows);
+
+                    console.log(path.basename(__filename),'query-end',rows);
                     if(rows.length == 0){
                         if(callback){
                             callback();
                             callback = null;
                         }
                     }else{
-                        console.log(path.basename(__filename),'query-end',rows)
                         if(callback){
                             callback(rows);
                             callback = null;
@@ -165,7 +165,7 @@ var web_DB_config = function()
                 }
             }
         });
-    }
+    };
 
     this.transaction = function(sql1, sql2, callback){
         var self = this;

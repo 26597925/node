@@ -14,9 +14,9 @@
 	,
 	{"交易管理":
 		[
-			{"id":"preOrder","href":"#","name":"当日预埋单 ","htmlDoc":"preOrder.html","jsState":"preOrder.js"},
+			{"id":"order_today","href":"#","name":"当日预埋单 ","htmlDoc":"order_today.html","jsState":"order_today.js"},
 
-			{"id":"orderList","href":"#","name":"周期预埋单 ","htmlDoc":"orderList.html","jsState":"orderList.js"}
+			{"id":"order_period","href":"#","name":"周期预埋单 ","htmlDoc":"order_period.html","jsState":"order_period.js"}
 		]
 	}
 ]

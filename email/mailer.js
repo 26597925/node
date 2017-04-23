@@ -8,15 +8,15 @@ let transporter = nodemailer.createTransport({
 	secure: true,
 	port:465,
 	auth: {
-	    user: "your count", // 账号
-	    pass: 'your password' // 密码
+	    user: "mazhou_654452588@qq.com", // 账号
+	    pass: 'dpgkvikhzwlvbdic' // 密码
 	}
 });
 
 // setup email data with unicode symbols
 let mailOptions = {
-    from: 'mail addr', // sender address
-    to: 'mail addr', // list of receivers
+    from: '"mazhou 👻" <mazhou_654452588@qq.com>', // sender address
+    to: 'mazhou@letv.com,mazhou_654452588@qq.com', // list of receivers
     subject: 'Hello ✔', // Subject line
     text: 'Hello world ?', // plain text body
     html: '<b>Hello world ?</b>'+

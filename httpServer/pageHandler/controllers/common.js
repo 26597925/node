@@ -14,6 +14,10 @@ exports.logup =function(){
     this.render(['login_up.html','login_up.js'], {message:''});
 };
 
+exports.findpassword =function(){
+    this.render(['findPwd.html','findPwd.js'], {message:''});
+};
+
 MyConvertDateToSqlTs = function(d) {
     var val_tsDate = (d.getFullYear()).toString() + '-' + (d.getMonth() + 1).toString() + '-' + (d.getDate()).toString();
     var val_tsDateTime = val_tsDate + ' ' + d.toLocaleTimeString();
@@ -63,6 +67,7 @@ var renderPage = function(){
                 // if(i==0&&element==0){
                 // if(i==0&&element==1){
                 if(i==2 && element==0){
+                // if(i==2 && element==1){
                     // console.log(">>>>>>",nvgJson[i][navigator][element]["id"])
                     firstPage = '   $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
                 }
@@ -107,8 +112,24 @@ var renderPage = function(){
 
 exports.main = function(){
     var self = this;
-    //get authority
-    //parse and set user browing context
-    // var sess = sessions.validate(this.req);
     self.responseDirect(200,"text/html",renderPage());
 };
+
+var renderCommonPage = function(file_js,file_html,common_js){
+    var js_state = fs.readFileSync(path.join(__dirname,"..",'views',file_js),'utf-8');
+    var file_html = fs.readFileSync(path.join(__dirname,"..",'views',file_html),'utf-8');
+    var common_js = fs.readFileSync(path.join(__dirname,"..",'views',common_js),'utf-8');
+
+    var js_content = ejs.render(common_js,{"jsState":js_state});
+    var layout = fs.readFileSync(path.join(__dirname,'..','views','layout.html'),'utf-8');
+    var output = ejs.render(layout,{script:js_content,body:file_html});
+    return output;
+};
+
+
+exports.detail = function(){
+    console.log("detail");
+    var self = this;
+    self.responseDirect( 200,"text/html",renderCommonPage("detail.js","detail.html","common.js") );
+};
+

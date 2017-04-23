@@ -49,13 +49,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	// ,dictTrade_selectElement: null
 	,init:function(){
 		$( "#dictTrade_tabs" ).tabs();
-        this.load_userAccount();
         this.appendTB_add();
-        $("#dictTrade").click(this.nvgTradeClick);
+        $("#dictTrade").click(this.dictTrade_tab1_click);
 	}
 
-	,nvgTradeClick:function(){
-        dictTrade.load_userAccount();
+	,dictTrade_tab1_click:function(){
+	    var self = dictTrade;
+        dictTrade.load_userAccount(function(){
+            self.appendTB_list();
+        });
 	}
 
     ,handler_trd_del:function(){
@@ -126,7 +128,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	    var self = this;
 	    oojs$.httpPost_json("/delete_userAccount",sendData,function(result,textStatus,token){
             if(result.success){
-                self.load_userAccount();
+
+                dictTrade.dictTrade_tab1_click();
+
             }
 		});
 
@@ -285,7 +289,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
         oojs$.httpPost_json(url,sendData,function(result,textStatus,token){
             if(result.success){
-                self.load_userAccount();
+
+                dictTrade.dictTrade_tab1_click();
             }else{
                 console.log("sub_userAccount result:",result.message);
                 oojs$.showError(result.message);
@@ -448,7 +453,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	}
 
-	,load_userAccount : function(){
+	,load_userAccount : function(callback,token){
 		var self = this;
 
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
@@ -456,38 +461,23 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			if(result.success){
 				console.log(result.data);
 				self.dictTrade_list_body = [];
-				for(var i=0; i<result.data.length; i++){
-					self.dictTrade_list_body.push(result.data[i]);
-				}
+                self.dictTrade_list_body = result.data;
+				// for(var i=0; i<result.data.length; i++){
+				// 	self.dictTrade_list_body.push(result.data[i]);
+				// }
+
 			}else{
                 oojs$.showError(result.message);
 			}
-			self.appendTB_list();
+			if(callback){
+                callback(token);
+            }
+
 
         });
 
 	}
-    // , load_dictTrade : function(){
-    //
-    //     var self = this;
-    //     if(this.select_trade.length==0){
-    //
-    //         oojs$.httpGet("/select_dictTrade",function(result,textStatus,token){
-    //
-    //             if(result.success){
-    //                 self.select_trade = [];
-    //                 self.select_trade = result.data;
-    //                 self.load_userAccount();
-    //             }else{
-    //                 oojs$.showError(result.message);
-    //             }
-    //
-    //         });
-    //
-    //     }else{
-    //         self.load_userAccount();
-    //     }
-    // }
+
 });
 
 var dictTrade = new oojs$.com.stock.dictTrade();

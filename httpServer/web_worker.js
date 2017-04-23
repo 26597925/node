@@ -18,6 +18,7 @@ exports.runPageServer = function( port )
 	port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
+		// console.log(path.basename(__filename),"url:", req.url);
 		var _bufData = '';
 		req.on('data', function(chunkData)
 		{
@@ -26,6 +27,7 @@ exports.runPageServer = function( port )
 		.on('end', function()
 		{
             var reqData="";
+
 			if( "POST" == req.method.toUpperCase() )
 			{
 				if(req.headers.accept.indexOf('application/json')!=-1)

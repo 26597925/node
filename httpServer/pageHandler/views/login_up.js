@@ -83,10 +83,12 @@ $(document).ready(function(){
             async:false,
             dataType:"json",
             data:JSON.stringify(sendData),
-            success:function(data,textStatus){
-                $("#message").text(data.message);
-                if(data.success){
+            success:function(result,textStatus){
+                $("#message").text(result.message);
+                if(result.success){
                     window.location.href = "/main";
+                }else if(!result.success && result.data == "find password"){
+
                 }
             },
             beforeSend: function(xhr){

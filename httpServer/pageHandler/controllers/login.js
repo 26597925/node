@@ -7,7 +7,6 @@ const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
 
-
 var add_newUser = function(context){
     var self = context;
     var result = {'success':true,'message':'登录成功'};
@@ -38,15 +37,17 @@ var add_newUser = function(context){
                     var sql2 = "select USERID from tb_user_basic where `PHONENUMBER` = '"+self.req.post["PHONENUMBER"]+"' and `PASSWORD` = '"+self.req.post["PASSWORD"]+"'";
                     db.query(sql2,function(){
                         if(arguments.length==1){
-                            debugger
                             updateUserLoginTime(arguments["USERID"],self,"USERID");
                          }else{
-                            result = {'success':false,'message':'数据存在问题，请联系管理员'};
+                            result = {'success':false,'message':'数据存在问题，请联系管理员 code:2'};
                             self.responseDirect(200,"text/json",JSON.stringify(result));
                         }
                     });
+                }else if(arguments.length==0){
+                    result = {'success':false,'data':"find password",'message':'数据存在问题，请联系管理员 code:0'};
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
                 }else{
-                    result = {'success':false,'message':'数据存在问题，请联系管理员'};
+                    result = {'success':false,'message':'数据存在问题，请联系管理员 code:1'};
                     self.responseDirect(200,"text/json",JSON.stringify(result));
                 }
             })
@@ -67,7 +68,8 @@ exports.logup_submit = function(){
             if(arguments.length==0){
                 add_newUser(self);
             }else if(arguments.length==1){
-                result = {'success':false,'message':'该用户名已经注册过'};
+                // add_newUser(self);
+                result = {'success':true,'message':'该用户名已经注册过'};
                 self.responseDirect(200,"text/json",JSON.stringify(result));
             }else{
                 result = {'success':false,'message':'数据查询有问题，请联系管理员'};

@@ -18,6 +18,15 @@ route.map({
 });
 
 
+
+route.map({
+    method:'get',
+    url:/^\/findpassword\/?$/i,
+    controller:'common',
+    action:'findpassword'
+});
+
+
 route.map({
     method:'get',
     url:/^\/logup\/?$/i,
@@ -25,6 +34,12 @@ route.map({
     action:'logup'
 });
 
+route.map({
+    method:'post',
+    url:/^\/submit_find\/?$/i,
+    controller:'findPWD',
+    action:'submit_find'
+});
 
 route.map({
     method:'post',
@@ -47,6 +62,14 @@ route.map({
     action:'heartTime'
 });
 //=============================
+route.map({
+    method:'get',
+    url:/^\/detail.html\/?$/i,
+    controller:'common',
+    action:'detail'
+});
+
+
 route.map({
     method:'get',
     url:/^\/main\/?$/i,

@@ -79,12 +79,12 @@ oojs$.com.stock.policy = oojs$.createClass(
         }
     }
     ,find_item_policyGID: function(id){
-        for( var i = 0; i < this.policyGID.length; i++ ){
-            if(String(this.policyGID[i]["ID"]) == String(id)){
-                return this.policyGID[i];
+        for( var i = 0; i < preload.PGROUP.length; i++ ){
+            if(String(preload.PGROUP[i]["ID"]) == String(id)){
+                return preload.PGROUP[i];
             }
         }
-        oojs$.showError("order databases no this field:"+id);
+        oojs$.showError("policy databases no this field:"+id);
         return null;
     }
     ,search_policyList_Item:function(USERID,POLICYID,list){
@@ -99,18 +99,22 @@ oojs$.com.stock.policy = oojs$.createClass(
     }
     ,init:function(){
         $( "#policy_tabs" ).tabs();
-        $("#policy").click(this.nvgPolicyClick);
-        $("#policy_tabs_a1").click(this.nvgPolicyClick);
-        $("#policy_tabs_a2").click(this.tab2PolicyClick);
-        this.load_policyGID();
+        $("#policy").click(this.policy_tab1_click);
+        $("#policy_tabs_a1").click(this.policy_tab1_click);
+        $("#policy_tabs_a2").click(this.policy_tab2_click);
+
     }
-    ,nvgPolicyClick:function(){
-        policy.load_unsubscribe();
+    ,policy_tab1_click:function(){
+        policy.load_unsubscribe(function () {
+            policy.appendTB_subscribe(1);
+        });
     }
-    ,tab2PolicyClick:function(){
-        policy.load_subscribe();
+    ,policy_tab2_click:function(){
+        policy.load_subscribe(function () {
+            policy.appendTB_subscribe(2);
+        });
     }
-    ,load_unsubscribe:function(){
+    ,load_unsubscribe:function(callback){
         var self = this;
 
         oojs$.httpGet("/select_subscrible",function(result,textStatus,token){
@@ -118,7 +122,10 @@ oojs$.com.stock.policy = oojs$.createClass(
 
                 self.policy_unsubscribe = [];
                 self.policy_unsubscribe = result.data;
-                self.appendTB_subscribe(1);
+                if(callback){
+                    callback();
+                }
+
             }else{
                 oojs$.showError(result.message);
             }
@@ -337,6 +344,78 @@ oojs$.com.stock.policy = oojs$.createClass(
         }
     }
 
+
+    ,get_preOrder_head: function()
+    {
+        var self = this;
+        var list_head = [];
+        for(var i = 0; i < self.list_benchmark_head.length; i++){
+            list_head[i] = {};
+
+            if( self.list_benchmark_head[i]['ID']   == "DIRTYPE"
+                || self.list_benchmark_head[i]['ID']   == "PGROUPID"
+                || self.list_benchmark_head[i]['ID']   == "PNAME"
+                || self.list_benchmark_head[i]['ID']   == "CTRL"
+                || self.list_benchmark_head[i]['ID']   == "PERCENT"
+            ){
+                continue;
+            }
+            list_head[i]['ID'] = self.list_benchmark_head[i]["ID"];
+            list_head[i]['NAME'] = self.list_benchmark_head[i]["NAME"];
+
+        }
+        return list_head;
+    }
+
+    ,get_preOrder_Item: function( item){
+
+        var self = this;
+        var STARTTIME = $('<div></div>');
+        oojs$.generateHMDOption(STARTTIME);
+        var kids = STARTTIME.find( "select" );
+        var hh = parseInt(item["STARTTIME"]["hh"]);
+        var mm = parseInt(item["STARTTIME"]["mm"]);
+        var ss = parseInt(item["STARTTIME"]["ss"]);
+        $(kids[0]).val(hh<=9?"0"+hh:hh);
+        $(kids[1]).val(mm<=9?"0"+mm:mm);
+        $(kids[2]).val(ss<=9?"0"+ss:ss);
+
+        var ENDTIME = $('<div></div>');
+        oojs$.generateHMDOption(ENDTIME);
+        var kids = ENDTIME.find( "select" );
+        var hh = parseInt(item["ENDTIME"]["hh"]);
+        var mm = parseInt(item["ENDTIME"]["mm"]);
+        var ss = parseInt(item["ENDTIME"]["ss"]);
+        $(kids[0]).val(hh<=9?"0"+hh:hh);
+        $(kids[1]).val(mm<=9?"0"+mm:mm);
+        $(kids[2]).val(ss<=9?"0"+ss:ss);
+
+        var STOCKSET = {ELEMENT1:$('<div></div>'),ELEMENT2:$('<div></div>'),ROWSPAN:2};
+        self.appendCK_stockset(
+            STOCKSET['ELEMENT1'],
+            STOCKSET['ELEMENT2'],
+            item["STOCKSET"],
+            item['type']);
+
+
+
+        var drawitem_data = null;
+        drawitem_data = {};
+
+
+        for(var elm in item){
+            drawitem_data[elm] = {ELEMENT:item[elm]};
+        }
+
+        drawitem_data["STARTTIME"] ={ELEMENT:STARTTIME};
+        drawitem_data["ENDTIME"] = {ELEMENT:ENDTIME};
+        drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
+        drawitem_data["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
+
+
+        return drawitem_data;
+    }
+
     ,drawItem :function(tb ,item){
         var self = this;
 
@@ -426,26 +505,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 
     }
 
-
-
-
-    ,load_policyGID:function(){
-        var  self = this;
-
-        oojs$.httpGet("/select_policyGID",function(result,textStatus,token){
-
-            if(result.success){
-                self.policyGID = [];
-                self.policyGID = result.data;
-            }else{
-                oojs$.showError(result.message);
-            }
-
-        });
-
-    }
-
-    ,load_subscribe:function(){
+    ,load_subscribe:function(callback){
         var self = this;
 
         oojs$.httpGet("/select_alreadySubscrible",function(result,textStatus,token){
@@ -453,7 +513,9 @@ oojs$.com.stock.policy = oojs$.createClass(
                 console.log("load_subscribe",result.data);
                 self.policy_subscribe = [];
                 self.policy_subscribe = result.data;
-                self.appendTB_subscribe(2)
+                if(callback){
+                    callback();
+                }
             }else{
                 oojs$.showError(result.message);
             }
@@ -462,9 +524,9 @@ oojs$.com.stock.policy = oojs$.createClass(
     }
     ,policy_item_reback:function(event){
         if(event.data.type == 1){
-            policy.load_unsubscribe();
+            policy.policy_tab1_click();
         }else if(event.data.type == 2){
-            policy.load_subscribe();
+            policy.policy_tab2_click();
         }
     }
 
@@ -533,7 +595,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 
         }
         if(token['ELEMENT'] == 1){
-            sendData['STOCKSET'] = policy.item_stockset1
+            sendData['STOCKSET'] = policy.item_stockset1;
         }else if(token['ELEMENT'] == 2){
             sendData['STOCKSET'] = policy.item_stockset2
         }
@@ -548,9 +610,9 @@ oojs$.com.stock.policy = oojs$.createClass(
             if(result.success){
                 console.log( "subscrible success!",type );
                 if( type == 1){
-                    policy.load_unsubscribe();
+                    policy.policy_tab1_click();
                 }else if( type == 2){
-                    policy.load_subscribe();
+                    policy.policy_tab2_click();
                 }
             }else{
                 oojs$.showError(result.message);
