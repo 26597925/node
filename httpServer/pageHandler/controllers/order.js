@@ -87,7 +87,7 @@ exports.insert_preorder = function(){
         ", `ACCOUNTID`" +//4
         ", `TRADEID`" +//5
         ", `POLICYID`" +//6
-        ", `PNAME`,"+//6_1
+        ", `PNAME` "+//6_1
         ", `POLICYPARAM`" +//7
         ", `DIRTYPE`" +//8
         ", `STOCKSET`" +//9
@@ -114,8 +114,8 @@ exports.insert_preorder = function(){
         ",'%s'" + //4 ACCOUNTID
         ",%s" + //5 TRADEID
         ",%s" +//6 POLICYID
-        ",%s" +//6_1 PNAME
-        ",%s" +//7 POLICYPARAM
+        ",'%s'" +//6_1 PNAME
+        ",'%s'" +//7 POLICYPARAM
         ",%s" + // 8 DIRTYPE
         ",'%s'" +//9 STOCKSET
         // ",%s" + //10 DEALSTOCK

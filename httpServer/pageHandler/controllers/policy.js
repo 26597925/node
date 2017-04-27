@@ -200,7 +200,7 @@ exports.select_alreadySubscrible = function(){
         +" `ENDTIME`, `STOCKSET`, `ISTEST`, `STATUS`, `FLAG`,"
         +" `SUBSCRBLE`, `PERCENT` "
         +"from  tb_policy_usage where ((`USERID`="+uID
-        +" and `FLAG`=1) or (`USERID`=0 and ISTEST=0 and `FLAG`=1) ) and SUBSCRBLE=1";
+        +" and `FLAG`=1) or (`USERID`=0 and ISTEST=0 and `FLAG`=1) ) and SUBSCRBLE=1 order by MODTIME desc";
 
     db.query(sql,function(){
         if(arguments.length==1){

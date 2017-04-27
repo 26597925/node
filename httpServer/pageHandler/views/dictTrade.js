@@ -483,30 +483,21 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	}
 
-	,load_userAccount : function(callback,token){
+	,load_userAccount: function(callback,token){
 		var self = this;
-
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
-
 			if(result.success){
 				self.dictTrade_list_body = [];
+                console.log("trade\n","load_userAccount\n",JSON.stringify(result.data));
                 self.dictTrade_list_body = result.data;
-				// for(var i=0; i<result.data.length; i++){
-				// 	self.dictTrade_list_body.push(result.data[i]);
-				// }
-
 			}else{
                 oojs$.showError(result.message);
 			}
 			if(callback){
                 callback(token);
             }
-
-
         });
-
 	}
-
 });
 
 var dictTrade = new oojs$.com.stock.dictTrade();

@@ -74,9 +74,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
         order_today.load_order_today();
     }
 
-    ,order_today_tab2_clk:function(){
+    ,order_today_tab2_clk:function(event){
+
         dictTrade.load_userAccount(function(){
             policy.load_subscribe(function () {
+                console.log("order\n","load subscrible\n");
+
                 order_today.appendTB_new_order_today();
                 order_today.select_title = null;
                 order_today.select_title = {};
@@ -84,6 +87,18 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
                 }
                 order_today.appendTB_order_today_slct();
+                if(policy.policy_subscribe.length>0){
+                    $(order_today.order_select1).val(parseInt(policy.policy_subscribe[0]['DIRTYPE']));
+                    order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
+                    
+                    $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
+                    order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
+                    console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
+                    $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] );
+                    
+                    
+                }
+                
             })
         });
         preload.getStock();
@@ -189,7 +204,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,appendTB_modify_order:function(){
         var self = this;
         var drawitem_data = arguments[0];
-        
+        console.log('appendTB_modify_order\n',JSON.stringify(drawitem_data));
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
         start_component.init(STARTTIME,oojs$.toHMSOBJ(drawitem_data['STARTTIME']['ELEMENT']));
@@ -267,138 +282,103 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,appendTB_new_order_today:function(){
         var self = this;
         var container =$('#order_today_tabs_2');
-
+        // container.empty();
+        var tb = null;
         if(self.preOerder_ctrl_div==null){
-            var tb = $('<table></table>', {
-                'class':"display dataTable"
-            });
             self.preOerder_ctrl_div = $('<div id="preOerder_ctrl_div"></div>');
             self.preOerder_ctrl_div.appendTo(container);
-
-            self.preOerder_ctrl_div.append(tb);
-            var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
-            var td =$('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
-            //1----------------------------
-            td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-            td.append($('<label></label>').text("交易类型:"));
-
-            self.order_select1 = $('<select></select>',{
-                id:'order_select1'
+            tb = $('<table></table>', {
+                'class':"display dataTable"
             });
-            self.order_select1.append(
-                "<option  value='-1'>请选择交易类型</option>"
-            );
-            // self.option_append(self.order_select1, self.select_title, policy.getDirtype);
-            self.order_select1.change(self.handler_dirtype);
-            td.append( self.order_select1 );
-            //2----------------------------
-            td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-            td.append($('<label></label>').text("策略类型:"));
-
-            self.order_select2 = $('<select></select>',{
-                id:'order_select2'
-            });
-            self.order_select2.append(
-                "<option  value='-1'>请选择策略类型</option>"
-            );
-
-            self.order_select2.prop("disabled", true);
-            self.order_select2.change(self.handler_group);
-
-            td.append( self.order_select2 );
-
-            //3----------------------------
-            td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-            td.append($('<label></label>').text("策略名称:"));
-
-            self.order_select3 = $('<select></select>',{
-                id:'order_select3'
-            });
-
-            self.order_select3.append(
-                "<option value='-1'>请选择策略名称</option>"
-            );
-
-            self.order_select3.change(self.handler_policy);
-            self.order_select3.prop("disabled", true);
-            td.append( self.order_select3 );
-
         }
 
-        var drawitem_data = null;
-        drawitem_data = {};
+        tb.empty();
+        console.log('appendTB_new_order_today\n',JSON.stringify(policy.policy_subscribe[0]));
+        
+        self.appendTB_control(tb);
 
-        var STARTTIME = $('<div></div>');
-        oojs$.generateHMDOption(STARTTIME);
-        var kids = STARTTIME.find( "select" );
-        var hh = parseInt(0);
-        var mm = parseInt(0);
-        var ss = parseInt(0);
-        $(kids[0]).val(hh<=9?"0"+hh:hh);
-        $(kids[1]).val(mm<=9?"0"+mm:mm);
-        $(kids[2]).val(ss<=9?"0"+ss:ss);
-        $(kids[0]).prop("disabled",true);
-        $(kids[1]).prop("disabled",true);
-        $(kids[2]).prop("disabled",true);
-
-        var ENDTIME = $('<div></div>');
-        oojs$.generateHMDOption(ENDTIME);
-        var kids = ENDTIME.find( "select" );
-        var hh = parseInt(0);
-        var mm = parseInt(0);
-        var ss = parseInt(0);
-        $(kids[0]).val(hh<=9?"0"+hh:hh);
-        $(kids[1]).val(mm<=9?"0"+mm:mm);
-        $(kids[2]).val(ss<=9?"0"+ss:ss);
-        $(kids[0]).prop("disabled",true);
-        $(kids[1]).prop("disabled",true);
-        $(kids[2]).prop("disabled",true);
-
-
-        drawitem_data["STARTTIME"] ={ELEMENT:STARTTIME};
-        drawitem_data["ENDTIME"] = {ELEMENT:ENDTIME};
-        drawitem_data["STOCKSET"] = {ELEMENT:''};//STOCKSET;//{ELEMENT:STOCKSET};
-        drawitem_data["DIRTYPE"] = {ELEMENT:'0'};
-
-
-        var itemD2_count = [{
-            'USERID': -1,
-            'TRADEID': -1,
-            'ACCOUNTID': "1234567890",
-            'CANAME': "",
-            'PASSWORD': "",
-            'MAXBUY': 0,
-            'BUYCOUNT': 0,
-            'BUYAMOUNT': 0,
-            'PERCENT': 0,
-            'SPLITCOUNT': 0
-        }];
-
-        self.appendTB_neworder_body(policy.list_benchmark_head,drawitem_data,itemD2_count);
+        if(policy.policy_subscribe.length>0){
+            var event = {};
+            event.data = {};
+            event.data['USERID'] = policy.policy_subscribe[0]['USERID'];
+            event.data['POLICYID'] = policy.policy_subscribe[0]['POLICYID'];
+            self.handler_policy(event);
+        }
     }
 
-
-    ,appendTB_neworder_body:function(policy_head, policy_item, account_itemD2){
+    ,appendTB_control:function(tb){
         var self = this;
+        self.preOerder_ctrl_div.append(tb);
+        var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
+        var td =$('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
+        //1----------------------------
+        td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        td.append($('<label></label>').text("交易类型:"));
 
-        if(self.order_today_body_div == null){
-            self.order_today_body_div = $('<div id="order_today_body_div"></div>');
-            self.order_today_body_div.appendTo($('#order_today_tabs_2'));
-        }
+        self.order_select1 = $('<select></select>',{
+            id:'order_select1'
+        });
+        self.order_select1.append(
+            "<option  value='-1'>请选择交易类型</option>"
+        );
+        // self.option_append(self.order_select1, self.select_title, policy.getDirtype);
+        self.order_select1.change(self.handler_dirtype);
+        td.append( self.order_select1 );
+        //2----------------------------
+        td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        td.append($('<label></label>').text("策略类型:"));
 
-        self.order_today_body_div.empty();
+        self.order_select2 = $('<select></select>',{
+            id:'order_select2'
+        });
+        self.order_select2.append(
+            "<option  value='-1'>请选择策略类型</option>"
+        );
 
-        var tb = $('<table></table>', {
-            'class':"display dataTable"
-        }).appendTo(self.order_today_body_div);
+        self.order_select2.prop("disabled", true);
+        self.order_select2.change(self.handler_group);
 
-        var dirtype = policy_item['DIRTYPE']['ELEMENT'];
-        delete policy_item['DIRTYPE'];
-        oojs$.appendTB_item_D2(tb,policy_head,policy_item);
-        self.appendTB_accountHint(tb);
-        self.appendTB_account_body(tb, account_itemD2, dirtype);
+        td.append( self.order_select2 );
 
+        //3----------------------------
+        td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        td.append($('<label></label>').text("策略名称:"));
+
+        self.order_select3 = $('<select></select>',{
+            id:'order_select3'
+        });
+
+        self.order_select3.append(
+            "<option value='-1'>请选择策略名称</option>"
+        );
+
+        self.order_select3.change(null,self.handler_policy);
+        self.order_select3.prop("disabled", true);
+        td.append( self.order_select3 );
+        
     }
+
+    // ,appendTB_neworder_body:function(policy_head, policy_item, account_itemD2){
+    //     var self = this;
+
+    //     if(self.order_today_body_div == null){
+    //         self.order_today_body_div = $('<div id="order_today_body_div"></div>');
+    //         self.order_today_body_div.appendTo($('#order_today_tabs_2'));
+    //     }
+
+    //     self.order_today_body_div.empty();
+
+    //     var tb = $('<table></table>', {
+    //         'class':"display dataTable"
+    //     }).appendTo(self.order_today_body_div);
+
+    //     var dirtype = policy_item['DIRTYPE']['ELEMENT'];
+    //     delete policy_item['DIRTYPE'];
+    //     oojs$.appendTB_item_D2(tb,policy_head,policy_item);
+    //     self.appendTB_accountHint(tb);
+    //     self.appendTB_account_body(tb, account_itemD2, dirtype);
+
+    // }
 
     ,appendTB_accountHint:function(tb){
         var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
@@ -506,6 +486,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         oojs$.httpPost_json("/select_preorder",sendData,function(result,textStatus,token){
             if(result.success){
 
+                
                 self.order_today_list = [];
                 self.order_today_list = result.data;
                 self.appendTB_order_today();
@@ -653,7 +634,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
     }
 
-    ,handler_dirtype: function(){
+    ,handler_dirtype: function(event){
         var self = order_today;
         self.order_select2.empty();
         self.order_select3.empty();
@@ -662,7 +643,15 @@ oojs$.com.stock.order_today = oojs$.createClass(
         self.order_select2.append(
             "<option  value='-1'>请选择策略类型</option>"
         );
-        self.option_append(self.order_select2,self.select_title[this.value],function(pp){
+
+        var value = -1
+        if(event.data != null){
+            value = event.data.value;
+        }else{
+            value = this.value;
+        }
+        
+        self.option_append(self.order_select2,self.select_title[value],function(pp){
             return policy.find_item_policyGID(pp)["NAME"];
         });
 
@@ -671,16 +660,21 @@ oojs$.com.stock.order_today = oojs$.createClass(
         );
     }
 
-    ,handler_group: function(){
+    ,handler_group: function(event){
         var self = order_today;
         self.order_select3.empty();
         self.order_select3.prop("disabled", false);
         self.order_select3.append(
             "<option value='-1'>请选择策略名称</option>"
         );
+        // var value = -1
+        // if(event.data != null){
+        //     value = event.data.value;
+        // }else{
+        //     value = self.order_select2.val();
+        // }
         var tempArr = self.select_title[ self.order_select1.val()][self.order_select2.val()];
-
-
+        
         for( var i = 0; i < tempArr.length; i++ ){
             self.order_select3.append(
                 "<option value='"
@@ -690,24 +684,25 @@ oojs$.com.stock.order_today = oojs$.createClass(
         }
 
     }
-    // ,preOder_policy:null
-    ,handler_policy: function(){
-        var self = order_today;
+    ,handler_policy: function(event){
         // console.log(">>>>>>>>>>",
         // self.order_select1.val(),
         // self.order_select2.val(),
         // this.value,$(this).find("option:selected").text() );
-
+        var USERID = '';
+        var POLICYID = '';
         var self = order_today;
-        var obj = $(this).find("option:selected");
-        var name = obj.text();
-        var key_value = obj.val().split("_");
-        var USERID = key_value[0];
-        var POLICYID = key_value[1];
-
+        if(event.data == null){
+            var obj = $(this).find("option:selected");
+            var name = obj.text();
+            var key_value = obj.val().split("_");
+            USERID = key_value[0];
+            POLICYID = key_value[1];
+        }else{
+            USERID = event.data['USERID'];
+            POLICYID = event.data['POLICYID'];
+        }
         //------------------------
-
-        
 
         var item = policy.search_policyList_Item(USERID,POLICYID,policy.policy_subscribe);
         var drawitem_data = {};
@@ -766,14 +761,10 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     ,item_account['PERCENT']
                     ,true
                 );
-                
             }
             console.log("trade_list",JSON.stringify(trade_list));
-            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list)
+            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
         })
-       
-        
-
     }
     ,appendTB_neworder_flush:function(policy_head,policy_data,account_list){
         var self = this;
