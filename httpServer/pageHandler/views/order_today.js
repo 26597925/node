@@ -12,7 +12,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             NAME:"交易类型"
         }
         ,{
-            ID:'POLICYID',
+            ID:'PNAME',
             NAME:"策略名称"
         }
         // ,{
@@ -61,11 +61,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,order_select3:null
     ,select_title:null//顶部下拉框数据结构
     ,init:function(){
-        $("#order_today_tabs").tabs();
+        $( "#order_today_tabs" ).tabs();
+        $( "#order_today_tabs" ).tabs({ selected: 0 });
+        // $("#order_today_tabs").tabs('select', 2);
         $("#order_today").click(this.order_today_tab1_clk);
         $("#order_today_tabs_a1").click(this.order_today_tab1_clk);
         $("#order_today_tabs_a2").click(this.order_today_tab2_clk);
-
         order_today.order_today_tab1_clk();
     }
 
@@ -83,9 +84,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
                 }
                 order_today.appendTB_order_today_slct();
-
             })
         });
+        preload.getStock();
     }
 
     ,option_append: function(select,obj,filter){
@@ -108,33 +109,164 @@ oojs$.com.stock.order_today = oojs$.createClass(
         return this.detail;
     }
     ,order_today_btn_detail:function(event){
-        //详情
-//{'data':list_body[elm],'scope':self},
+        //订单详情
         var self = event.data.scope;
         self.detail = event.data.data;
         console.log(JSON.stringify(event.data));
-        var p=window.open("detail.html");
+        var p=window.open("detailOrder.html");
     }
-    ,order_today_btn_chg:function(){
+    ,order_today_btn_chg:function(event){
         //修改
         var self = event.data.scope;
         self.detail = event.data.data;
-
+        self.appendTB_modify_order(self.detail);
     }
-    ,order_today_btn_switch:function(){
+    ,order_today_btn_switch:function(event){
         //启动／禁用
-    }
-    ,order_today_btn_herf:function(event){
-        //详情
-        console.log(JSON.stringify(event.data.item))
-         event.preventDefault();
-    }
+        var self = event.data.scope;
+        var sendData = event.data.data;
+        // self.appendTB_modify_order(self.detail);
+        console.log("switch",JSON.stringify(sendData))
+        sendData['DIRTYPE']["ELEMENT"] =  sendData['DIRTYPE']['ORIGIN'];
+        sendData['STARTTIME']["ELEMENT"] = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
+        sendData['ENDTIME']["ELEMENT"] = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
 
+        for(var elm in sendData){
+            sendData[elm] = sendData[elm]["ELEMENT"];
+        }
+        if(String(sendData['FLAG_USER']) == "0"){
+           sendData['FLAG_USER'] = "1";
+        }
+        if(String(sendData['FLAG_USER']) == "1"){
+            sendData['FLAG_USER'] = "0"
+        }
+        sendData['ADDTIME']=null;
+        sendData['MODTIME']=null;
+        sendData['ONETHIRD']=null;
+        sendData['CTRL']=null;
+        delete sendData['ADDTIME'];
+        delete sendData['MODTIME'];
+        delete sendData['ONETHIRD'];
+        delete sendData['CTRL'];
+        console.log("switch",JSON.stringify(sendData))
+        oojs$.httpPost_json("/update_ordertoday",[sendData],function(result,textStatus,token){
+                if(result.success){
+                    // if( type == 1){
+                    //     policy.policy_tab1_click();
+                    // }else if( type == 2){
+                    //     policy.policy_tab2_click();
+                    // }
+                    $( "#order_today_tabs" ).tabs({ selected: 0 });
+                    order_today.order_today_tab1_clk();
+                }else{
+                    oojs$.showError(result.message);
+                }
+            });
+    }
+    ,
+    stockDetail:null
+    ,
+    get_stockDetail:function(){
+        var self = this;
+        return self.stockDetail;
+    }
+    ,
+    stock:null
+    ,
+    order_today_btn_herf:function(event){
+        //股票详情
+        console.log(JSON.stringify(event.data.item))
+        var self = event.data.scope;
+        self.stockDetail = event.data.item;
+        self.stock = event.data.stock;
+        event.preventDefault();
+        var p=window.open("detailStock.html");
+    }
+    ,order_today_btn_modifyreback:function(event){
+        //返回
+        order_today.load_order_today();
+    }
+    ,appendTB_modify_order:function(){
+        var self = this;
+        var drawitem_data = arguments[0];
+        
+        var STARTTIME = $('<div></div>');
+        var start_component = new  oojs$.com.stock.component.hh_mm_ss();
+        start_component.init(STARTTIME,oojs$.toHMSOBJ(drawitem_data['STARTTIME']['ELEMENT']));
+
+        var ENDTIME = $('<div></div>');
+        var end_component = new  oojs$.com.stock.component.hh_mm_ss();
+        end_component.init(ENDTIME,oojs$.toHMSOBJ(drawitem_data["ENDTIME"]['ELEMENT']));
+
+
+        var stockset = new oojs$.com.stock.component.stockset();
+        var STOCKSET = {
+            'ELEMENT':null
+            ,'ELEMENT1':$('<div></div>')
+            ,'ELEMENT2':$('<div></div>')
+            ,'ROWSPAN':2
+            ,'COMPONENT':stockset};
+        stockset.appendCK_stockset(
+            STOCKSET['ELEMENT1'],
+            STOCKSET['ELEMENT2'],
+            drawitem_data["STOCKSET"]['ELEMENT']);
+
+        drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
+        drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
+        drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
+
+        var policyHead = policy.get_preOrder_head();
+        var accountOBJ = {};
+        accountOBJ["ELEMENT"] = drawitem_data['ACCOUNTID']['ELEMENT'];
+        accountOBJ["COLUMN1"] = $('<div></div>');
+        accountOBJ["COLUMN2"] = $('<div></div>');
+        accountOBJ["COMPONENT"] = new oojs$.com.stock.component.acountset();
+        accountOBJ["COMPONENT"].init(
+            accountOBJ["COLUMN1"]
+            ,accountOBJ["COLUMN2"]
+            ,drawitem_data['ACCOUNTID']['ELEMENT']
+            ,null
+            ,null
+            ,drawitem_data['BUYCOUNT']["ELEMENT"]
+            ,drawitem_data['BUYAMOUNT']["ELEMENT"]
+            ,drawitem_data['PERCENT']["ELEMENT"]
+            ,true
+        );
+
+        self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+    }
+    ,appendTB_modifyorder_flush:function(policy_head,policy_data,account_list){
+        var self = this;
+
+        var order_today_body_div =  $('#order_today_tabs_1').empty()
+
+        var tb = $('<table></table>', {
+            'class':"display dataTable"
+        }).appendTo(order_today_body_div);
+
+        oojs$.appendTB_item_D2(tb,policy_head,policy_data);
+        self.appendTB_accountHint(tb);
+        // self.appendTB_account_body(tb, account_itemD2, dirtype);
+
+        oojs$.appendTB_item_D2x(tb,account_list);
+
+
+        var tr = $('<tr></tr>',{}).appendTo(tb);
+        var td = $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr)
+        $('<input></input>',{'type':"button",value:"提交"}).appendTo(td).click(
+            {"policy_data":policy_data,"account_list":account_list,"type":"modify"}
+            ,self.order_today_new_submit
+            // 
+        );
+
+        $('<input></input>',{'type':"button",value:"取消"}).appendTo(td).click(
+            self.order_today_btn_modifyreback
+        );
+
+    }
     ,appendTB_new_order_today:function(){
         var self = this;
-        self.console("appendTB_order_today_slct");
         var container =$('#order_today_tabs_2');
-
 
         if(self.preOerder_ctrl_div==null){
             var tb = $('<table></table>', {
@@ -297,22 +429,35 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var btnName = '';
         var href = null;
         var hrefs = null;
+        var div = null;
+        var stocks = [];
         for(var elm = 0; elm < list.length; elm++){
             list_body[elm] = {};
             for(var  inner in  list[elm]){
                 list_body[elm][inner] = {ELEMENT: list[elm][inner]};
             }
             // getFrom
-            list_body[elm]['STOCKSET'] = {'ELEMENT':String( oojs$.valideString(list[elm]['STOCKSET']) ) };
-            list_body[elm]['DIRTYPE']= {'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE'])};
+            list_body[elm]['STOCKSET'] = {
+                'ELEMENT':String( oojs$.valideString(list[elm]['STOCKSET'])),
+                'ORIGIN':list[elm]['STOCKSET'] 
+            };
+            list_body[elm]['DIRTYPE']= {
+                'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE']),
+                'ORIGIN':list[elm]['DIRTYPE']};
 
-            if(String(list[elm]['DEALSTOCK'])&& String(list[elm]['DEALSTOCK']).length>5 ){
-
-                href = $('<a href="#"></a>').text(list[elm]['DEALSTOCK']).click(
-                    {'item':list_body[elm]},
-                    self.order_today_btn_herf
-                );
-                list_body[elm]['DEALSTOCK'] ={'ELEMENT': href,'COMPONENT':list[elm]['DEALSTOCK']};
+            if(""+list[elm]['DEALSTOCK']&& (""+list[elm]['DEALSTOCK']).length>5 ){
+                stocks = (list[elm]['DEALSTOCK']).split(",");
+                div = $('<div></div>');
+                for(var jj=0;jj<stocks.length;jj++){
+                    href = $('<a href="#"></a>').text(stocks[jj]).click(
+                        {'item':list_body[elm],'stock':stocks[jj],'scope':self},
+                        self.order_today_btn_herf
+                    );
+                    div.append(href)
+                    div.append($('<br />'));
+                }
+                
+                list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
             }
             //<a id="sign_up" class="sign_new">Sign up</a>
             
@@ -340,7 +485,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             );
 
             btnName = "X";
-            if(parseInt(list_body[elm]['FLAG']['ELEMENT']) == 1){
+            if(parseInt(list_body[elm]['FLAG_USER']['ELEMENT']) == 1){
                 btnName = '✓'
             }
 
@@ -355,7 +500,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
     }
 
     ,load_order_today:function(){
-        
         var self = this;
         var sendData = {};
 
@@ -509,31 +653,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
     }
 
-//------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-    ,account_body: []
-    ,alreadySubscribe_body:[]
-    ,tb_div1:null
-    ,tb_div2:null
-    ,acount_ctls:null
-
-
-    ,console:function(){
-        var logs = ["order_today"];
-        console.log(JSON.stringify(logs.concat(arguments)));
-    }
-
-    ,find_item_acount_ctls: function(TRADEID,ACCOUNTID){
-        for( var i = 0; i < this.acount_ctls.length; i++ ){
-            if(String(this.acount_ctls[i]["TRADEID"]) == String(TRADEID)
-                && String(this.acount_ctls[i]["ACCOUNTID"]) == String(ACCOUNTID)){
-                return this.acount_ctls[i];
-            }
-        }
-
-    }
-
     ,handler_dirtype: function(){
         var self = order_today;
         self.order_select2.empty();
@@ -571,7 +690,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         }
 
     }
-    ,preOder_policy:null
+    // ,preOder_policy:null
     ,handler_policy: function(){
         var self = order_today;
         // console.log(">>>>>>>>>>",
@@ -622,23 +741,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         var policyHead = policy.get_preOrder_head();
 
-
-        //var policyDrawItem = policy.get_order_today_Item(item);
-        //console.log(JSON.stringify(policyDrawItem));
-
-        // var itemD2_count = [{
-        //     'USERID': -1,
-        //     'TRADEID': -1,
-        //     'ACCOUNTID': "1234567890",
-        //     'CANAME': "",
-        //     'PASSWORD': "",
-        //     'MAXBUY': 0,
-        //     'BUYCOUNT': 0,
-        //     'BUYAMOUNT': 0,
-        //     'PERCENT': 0,
-        //     'SPLITCOUNT': 0
-        // }];
-
         dictTrade.load_userAccount(function(){
             var trade_list = [];
             var index = 0;
@@ -666,6 +768,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 );
                 
             }
+            console.log("trade_list",JSON.stringify(trade_list));
             self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list)
         })
        
@@ -711,22 +814,28 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,order_today_new_submit:function(event){
         var policy_data = event.data['policy_data'];
         var account_list = event.data['account_list'];
+        var type = "add"
+        if(event.data.hasOwnProperty("type")){
+            type = event.data['type']
+        }
+        console.log("policy_data",JSON.stringify(policy_data));
+        if(type == 'modify'){
+            policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
+        }
         for(var elm in policy_data){
-
-            if(policy_data[elm].hasOwnProperty("COMPONENT")
+            if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){
                 policy_data[elm] = policy_data[elm]['COMPONENT'].val();
-            }else if(policy_data[elm].hasOwnProperty('ELEMENT')){
+            }else if(policy_data[elm] && policy_data[elm].hasOwnProperty('ELEMENT')){
                 policy_data[elm] = policy_data[elm]['ELEMENT'];
             }
-            
         }
         console.log("policy_data",JSON.stringify(policy_data));
 
         var account_result = []
         for(var i =0; i< account_list.length;i++){
             
-            if(account_list[i]["COMPONENT"].val()['CHECKED']){
+            if(account_list[i]["COMPONENT"] && account_list[i]["COMPONENT"].val()['CHECKED']){
                 account_result[i] = {};
 
                 for(var elm in account_list[i]["ELEMENT"]){
@@ -742,10 +851,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
         
         
         var sentStruct = {
-            'PGROUPID':null
+            'ROWID':null
+            ,'PGROUPID':null
             ,'ACCOUNTID':null
             ,'TRADEID':null
             ,'POLICYID':null
+            ,'PNAME':null
             ,'POLICYPARAM':null
             ,'DIRTYPE':null
             ,'STOCKSET':null
@@ -755,6 +866,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,'BUYCOUNT':null
             ,'BUYAMOUNT':null
             ,'PERCENT':null
+            ,'FLAG_USER':null
         }
 
         var sendData = [];
@@ -768,24 +880,39 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     sendData[i][elm] = policy_data[elm];
                 }
                 if(account_result[i].hasOwnProperty(elm)){
+                    if(type == "modify" && elm == 'DIRTYPE'){
+                        continue;
+                    }
                     sendData[i][elm] = account_result[i][elm];
                 }
             }
         }
 
         console.log("sendData",JSON.stringify(sendData));
-        oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
-            if(result.success){
-                // if( type == 1){
-                //     policy.policy_tab1_click();
-                // }else if( type == 2){
-                //     policy.policy_tab2_click();
-                // }
-            }else{
-                oojs$.showError(result.message);
-            }
-        });
-
+        if(type == "add"){
+            oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
+                if(result.success){
+                    $( "#order_today_tabs" ).tabs({ selected: 0 });
+                    order_today.order_today_tab1_clk();
+                }else{
+                    oojs$.showError(result.message);
+                }
+            });
+        }else if(type == "modify"){
+            oojs$.httpPost_json("/update_ordertoday",sendData,function(result,textStatus,token){
+                if(result.success){
+                    // if( type == 1){
+                    //     policy.policy_tab1_click();
+                    // }else if( type == 2){
+                    //     policy.policy_tab2_click();
+                    // }
+                    $( "#order_today_tabs" ).tabs({ selected: 0 });
+                    order_today.order_today_tab1_clk();
+                }else{
+                    oojs$.showError(result.message);
+                }
+            });
+        }
     }
 
 });

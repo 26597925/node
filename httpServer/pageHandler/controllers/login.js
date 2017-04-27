@@ -32,7 +32,7 @@ var add_newUser = function(context){
                 +self.req.post["ZIPCODE"]+"', '"
                 +unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+"')";
             db.query(sql,function(){
-                console.log("insert",JSON.stringify(arguments));
+
                 if(arguments.length==1){
                     var sql2 = "select USERID from tb_user_basic where `PHONENUMBER` = '"+self.req.post["PHONENUMBER"]+"' and `PASSWORD` = '"+self.req.post["PASSWORD"]+"'";
                     db.query(sql2,function(){
@@ -62,23 +62,30 @@ exports.logup_submit = function(){
     var self = this;
     var result = {'success':true,'message':'登录成功'};
     if(self.req.post){
-        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='"+this.req.post["UENAME"]+"' and `PASSWORD`='"+this.req.post["PASSWORD"]+"'";
+        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='%s'";
+            // " and `PASSWORD`='%s'";
+        sql = util.format(sql,this.req.post["UENAME"]);//,this;
         db.query(sql,function(){
             
             if(arguments.length==0){
                 add_newUser(self);
             }else if(arguments.length==1){
-                // add_newUser(self);
-                result = {'success':true,'message':'该用户名已经注册过'};
-                self.responseDirect(200,"text/json",JSON.stringify(result));
+                if(arguments[0]["PASSWORD"] == self.req.post["PASSWORD"]  ){
+                    result = {'success':true,'message':'登录成功'};
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }else{
+                    result = {'success':false,'data':"find password",'message':'该用户注册过logup code:0'};
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }
+
             }else{
-                result = {'success':false,'message':'数据查询有问题，请联系管理员'};
+                result = {'success':false,'message':'数据查询有问题，请联系管理员 code:0001'};
                 self.responseDirect(200,"text/json",JSON.stringify(result));
             }
         })
         
     }else{
-        result = {'success':false,'message':'数据非法0'};
+        result = {'success':false,'message':'数据非法 code:0000'};
         self.responseDirect(200,"text/json",JSON.stringify(result));
     }
 };
@@ -87,27 +94,37 @@ exports.logup_submit = function(){
 
 exports.exit = function(){
     var self = this;
-    var sess = sessions.validate(self.req);
-    if(sess){
-        sess.destory();
+    var ip =  getIp(this.req);
+    var uID = sessions.get_uID(self.req);
+    var result = {'success':true,'data':''};
+    sessions.destory(self.req,self.res);
+    insert_exit_log_login(uID,ip);
+    self.responseDirect(200,"text/json",JSON.stringify(result));
+};
+
+var getIp = function(req){
+    debugger;
+    var ip = '';
+    if(req.hasOwnProperty("headers")
+        && req.headers.hasOwnProperty('x-forwarded-for')){
+        ip = req.headers['x-forwarded-for']
+    }else{
+        if(req.hasOwnProperty('connection') && req.connection.hasOwnProperty('remoteAddress')){
+            ip = req.connection.remoteAddress;
+        }else if(req.hasOwnProperty('socket') && req.socket.hasOwnProperty('remoteAddress')){
+            ip = req.socket.remoteAddress;
+        }else if(req.hasOwnProperty('connection') && req.connection.hasOwnProperty('socket')
+            && req.connection.socket.hasOwnProperty('remoteAddress')){
+            ip = req.connection.socket.remoteAddress;
+        }
     }
-    self.responseDirect(200,'text/json','');
+    return ip;
 };
 
 exports.login = function(args){
-    var ip = '';
-    if(this.req.hasOwnProperty("headers")
-        && this.req.headers.hasOwnProperty('x-forwarded-for')){
-        ip = this.req.headers['x-forwarded-for']
-    }else{
-        ip = this.req.connection.remoteAddress ||
-            this.req.socket.remoteAddress ||
-            this.req.connection.socket.remoteAddress||"";
-    }
-
-
 
 	var self = this;
+    var ip =  getIp(this.req);
     var usr = args["usr"] || null;
     var psw = args["psw"] || null;
     // SELECT `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, 
@@ -142,6 +159,18 @@ var insert_tb_log_login = function(USERID,IPADDRESS){
         // "'%s', " +
         "'%s')";
     sql = util.format(sql, USERID, IPADDRESS);
+    db.query(sql);
+};
+var insert_exit_log_login = function(USERID,IPADDRESS){
+    var sql = "INSERT INTO `tb_log_login` (" +
+        " `USERID`," +
+        " `LOGOUT`," +
+        " `IPADDRESS`" +
+        ") VALUES ( " +
+        "'%s', " +
+        "'%s', " +
+        "'%s')";
+    sql = util.format(sql, USERID, unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss"),IPADDRESS);
     db.query(sql);
 };
 

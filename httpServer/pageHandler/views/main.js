@@ -215,6 +215,9 @@ var oojs$ = {
             return false;
         }
     }
+    /***
+    * oojs$.toHMSOBJ(time)
+    */
     ,toHMSOBJ: function(){
         var shortTime = arguments[0];
         var obj = {hh:0,mm:0,ss:0};
@@ -231,6 +234,9 @@ var oojs$ = {
 
         return obj;
     }
+    /***
+    * oojs$.toHMS(time)
+    */
     ,toHMS: function(){
         var shortTime = arguments[0];
         var obj = {hh:0,mm:0,ss:0};
@@ -249,7 +255,7 @@ var oojs$ = {
     }
     /**
     * usage
-    * generateHMDOption(div)
+    * oojs$.generateHMDOption(div)
     * 
     */
     ,generateHMDOption: function(){
@@ -813,7 +819,6 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
         div2.empty();
         self.DIRTYPE = DIRTYPE;
         self.ACCOUNTID = ACCOUNTID;
-        self.DIRTYPE = DIRTYPE;
         self.BORROW = BORROW;
         self.BUYCOUNT = BUYCOUNT;
         self.BUYAMOUNT = BUYAMOUNT;
@@ -837,6 +842,7 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
         //column2
         var label_value = $('<label></label>').text(ACCOUNTID);
         div2.append(label_value);
+
         self.NEWDIRTYPE = 0;
 
         if(DIRTYPE == 0){//买入
@@ -863,23 +869,7 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
                 div2.append(self.SELECT_DIRTYPE);
             }
 
-            if( self.SELECT == null ){//one_third
-                self.SELECT = self.append_select_tradetype();
-                self.SELECT.change(
-                    {'scope':self},
-                    self.select_change
-                );
-            }
             
-            div2.append(self.SELECT);
-            self.INPUT = $('<input></input>',{type:'text'});
-            if(!CHECKED){
-                self.INPUT.prop("disabled", true );
-            }
-
-            div2.append(self.INPUT);
-            self.LABEL_UNIT = $('<label></label>');
-            div2.append(self.LABEL_UNIT);
         }else if(DIRTYPE == 1){//卖出
             if(BORROW == 0){
                 self.NEWDIRTYPE = 1;
@@ -900,6 +890,15 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
                 div2.append(self.SELECT_DIRTYPE);
             }
 
+            
+        }else if(DIRTYPE == 9){//撤单
+            self.NEWDIRTYPE = 9
+            label_value = $('<label></label>').text("撤单");
+            div2.append(label_value);
+            
+        }
+
+        if(DIRTYPE == null||DIRTYPE != 9){
             if( self.SELECT == null ){//one_third
                 self.SELECT = self.append_select_tradetype(CHECKED);
                  self.SELECT.change(
@@ -917,13 +916,7 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
             div2.append(self.INPUT);
             self.LABEL_UNIT = $('<label></label>');
             div2.append(self.LABEL_UNIT);
-        }else if(DIRTYPE == 9){//撤单
-            self.NEWDIRTYPE = 9
-            label_value = $('<label></label>').text("撤单");
-            div2.append(label_value);
-            
         }
-        
     }
     ,append_select_tradetype: function(CHECKED){
         var self = this;
@@ -1098,6 +1091,14 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         );
 
         var input = $('<input></input>',{}).text("");
+        var stocks = preload.getStock();
+
+        if(stocks!=null){
+            $(input).autocomplete({
+              source: stocks
+            });
+        }
+
         $('<label style="color: #000000; font-size: 80%;">请输入股票编码</label>').appendTo(div2);
         div2.append(input);
         $('<input></input>',{type:"button",value:"新增"}).appendTo(div2).click(
@@ -1107,7 +1108,35 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
     }
 })
 
+oojs$.ns("com.stock.regular");
+oojs$.com.stock.regular=oojs$.createClass({
+    NAME:'grep'
+    ,reg1:/^[0-9]*$/ //验证数字
+    ,reg2:/^\d{n}$/ //验证n位的数字：
+    ,reg3:/^\d{n,}$/ //验证至少n位数字
+    ,reg4:/^\d{m,n}$/ //验证m-n位的数字
 
+    ,reg5:/^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/ //正浮点数
+    ,reg6:/^(?:[a-z\d]+[_\-\+\.]?)*[a-z\d]+@(?:([a-z\d]+\-?)*[a-z\d]+\.)+([a-z]{2,})+$/ //验证Email地址
+    ,reg7:/^[a-zA-Z]\w{5,17}$/ //以字母开头，长度在6-18之间，只能包含字符、数字和下划线
+    ,reg8:/[^%&',;=?$\x22]+\"/ //否含有 ^%&',;=?$\" 等字符
+    ,reg9:/^(\(\d{3,4}\)|\d{3,4}-)?\d{7,8}$/ //验证电话号码正确格式为：XXXX-XXXXXXX，XXXXXXXXXXXX，
+    ,reg10:/^(-?\d+)(\.\d+)?$/ //验证数字
+    ,checkNum:function(value){
+        var self = this;
+        return (self.reg1.test(value))
+    }
+    ,checkXNum:function(value,bit){
+        var self = this;
+        var reg2 = new RegExp("^\\d{"+bit+"}");
+        return (reg2.test(value))
+    }
+    ,checkFloat:function(value){
+        var self = this;
+        return self.reg5.test(value);
+    }
+});
+var regular = new oojs$.com.stock.regular();
 oojs$.ns("com.stock.preload");
 oojs$.com.stock.preload=oojs$.createClass({
     NAME:'preload'
@@ -1115,6 +1144,38 @@ oojs$.com.stock.preload=oojs$.createClass({
     // ,POLICY:[]
     ,TRADE:[]
     ,STATUS:{'TRADE':0,'PGROUP':0}
+    ,STOCKS:null
+    ,isLoadStock:false
+    ,getStock:function(){
+        var self = this;
+        if(self.STOCKS == null && !self.isLoadStock ){
+            self.isLoadStock = true
+            oojs$.httpGet("/stocks",function(result,textStatus,token){
+                if(result.success){
+                    self.STOCKS = [];
+                    
+                    var obj = JSON.parse(result.data);
+                    for(var i = 0; i < obj.length; i++){
+                        // {
+                        //     label: "aardvark_哈对方考虑",
+                        //     value: "aardvark"
+                        // }
+                        self.STOCKS.push({
+                            'label':obj[i]['code']+" "+obj[i]['name']
+                            ,'value':obj[i]['code']
+                        });
+                    }
+                    return self.STOCKS;
+                    self.isLoadStock = false;
+                }else{
+                    // oojs$.showError(result.message);
+                    self.isLoadStock = false;
+                }
+            })
+        }else{
+            return self.STOCKS;
+        }
+    }
     ,getPGroupItem:function(){
         var self = this;
         for( var i = 0; i < self.PGROUP.length; i++ ){
@@ -1209,21 +1270,30 @@ oojs$.com.stock.preload=oojs$.createClass({
 
 var preload = new oojs$.com.stock.preload();
 
-
 <%- jsState %>
 $(document).ready(function(){
-
-    var showTopInfo = function(){
-        $("#topinfo").html("<a id='topinfousr' href='/#'>退出</a>")
-    };
-    showTopInfo();
-
-	hideAllPanel();
-	
     $("#accordion").accordion({
         active: 2
     });
-
+    var showTopInfo = function(){
+        $("#topinfo").append(
+            $('<a  href="#"">退出</a>').click(function(event){
+                event.preventDefault();
+                oojs$.httpGet("/exit",function(result,textStatus,token){
+                    if(result.success){
+                        window.location.href = "/";
+                    }else{
+                        oojs$.showError(result.message);
+                    }
+                });
+                
+            })
+        )
+        //$.get('http://jsonip.com/', function(r){ alert(r.ip); });
+    };
+    showTopInfo();
+	hideAllPanel();
+	//console.log('regular\n',regular.checkXNum(("00345"),5))
     preload.load(function(){
         oojs$.dispatch("ready");
     });

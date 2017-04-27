@@ -14,14 +14,12 @@ exports.select_preorder = function(){
 
     var result = {'success':true,'data':''};
     var sql  = 'SELECT' +
-        ' `ROWID`,'+
         ' `ORDERID`,'+
         ' `USERID`,'+
         ' `PGROUPID`,'+
         ' `ACCOUNTID`,'+
         ' `TRADEID`,'+
         ' `POLICYID`,'+
-        ' `PNAME`,'+
         ' `POLICYPARAM`,'+
         ' `DIRTYPE`,'+
         ' `STOCKSET`,'+
@@ -33,17 +31,14 @@ exports.select_preorder = function(){
         ' `BUYAMOUNT`,'+
         ' `PERCENT`,'+
         ' `STATUS`,'+
-        ' `FLAG_SYSTEM`,'+
-        ' `FLAG_USER`,'+
+        ' `FLAG`,'+
         ' `ADDTIME`,'+
         ' `MODTIME`,'+
         ' `FROMID` '+
         ' FROM ' +
         '`tb_order_id`' +
         ' WHERE' +
-        ' `USERID`=%s' +
-        ' AND ' +
-        ' `FLAG_SYSTEM` = 1';
+        ' `USERID`=%s';
 
     sql = util.format(sql,uID);
     db.query(sql,function(){
@@ -67,13 +62,16 @@ exports.select_preorder = function(){
 
 };
 
-// exports.select_userPolicyGID = function(){
-//     this.alias = path.basename(__filename);
-//     this.callback = callback_userPolicyGID;
-//     console.log( path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
-//     policy.select_alreadySubscrible.apply(this,arguments[0],"test123_567");
-//
-// };
+
+
+exports.select_alreadySubscrible = function(){
+    this.alias = path.basename(__filename);
+    this.callback = callback_userPolicyGID;
+    console.log( path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
+    policy.select_alreadySubscrible.apply(this,arguments[0],"test123_567");
+
+};
+
 
 exports.insert_preorder = function(){
     var  self = this;
@@ -87,7 +85,6 @@ exports.insert_preorder = function(){
         ", `ACCOUNTID`" +//4
         ", `TRADEID`" +//5
         ", `POLICYID`" +//6
-        ", `PNAME`,"+//6_1
         ", `POLICYPARAM`" +//7
         ", `DIRTYPE`" +//8
         ", `STOCKSET`" +//9
@@ -99,8 +96,7 @@ exports.insert_preorder = function(){
         ", `BUYAMOUNT`" +//15
         ", `PERCENT`" +//16
         // ", `STATUS`" +//17
-        // ", `FLAG_SYSTEM`" +//18
-        // ", `FLAG_USER`" +//18_1
+        // ", `FLAG`" +//18
         // ", `ADDTIME`" +//19
         ", `MODTIME`" +//20
         ", `FROMID`" +//21
@@ -114,7 +110,6 @@ exports.insert_preorder = function(){
         ",'%s'" + //4 ACCOUNTID
         ",%s" + //5 TRADEID
         ",%s" +//6 POLICYID
-        ",%s" +//6_1 PNAME
         ",%s" +//7 POLICYPARAM
         ",%s" + // 8 DIRTYPE
         ",'%s'" +//9 STOCKSET
@@ -139,7 +134,7 @@ exports.insert_preorder = function(){
 
     var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
     var reportServer = [];
-
+    debugger;
     for( var i = 0; i < self.req.post.length; i++ ){
         if(i!=0){
             sqldata += ",";
@@ -160,7 +155,6 @@ exports.insert_preorder = function(){
             ,self.req.post[i]['ACCOUNTID']//4 ACCOUNTID
             ,self.req.post[i]['TRADEID']//5 TRADEID
             ,self.req.post[i]['POLICYID']//6 POLICYID
-            ,self.req.post[i]['PNAME']//6_1 PNAME
             ,self.req.post[i]['POLICYPARAM']//7 POLICYPARAM
             ,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
             ,self.req.post[i]['STOCKSET']//9 STOCKSET
@@ -173,13 +167,23 @@ exports.insert_preorder = function(){
             // ,self.req.post[i]['FLAG']// 18 FLAG
             ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
         );
-
+        // ;
+        // util.format( JSON.stringify(reportServerStruct),
+        //     ORDERID
+        //     ,new Date().getTime()
+        //     ,self.req.post[i]['POLICYID']
+        //     ,self.req.post[i]['DIRTYPE']
+        //     ,0
+        //     ,self.req.post[i]['STOCKSET']
+        //     ,0
+        //     ,self.req.post[i]['ISTEST']
         reportServer.push(
             {
                 "orderid":String(ORDERID)
-                ,"operation":"1"//operation=删除0记录,插入新数据1,修改记录2
+                ,"operation":"1"//新增和修改都是1，删除和禁用是0
+
                 ,"accountid":String(self.req.post[i]['ACCOUNTID'])
-                ,"tradeid":String(self.req.post[i]['TRADEID'])
+                ,"tradeid":String(self.req.post[i]['ACCOUNTID'])
                 ,"userid":String(uID)
                 ,"policyid":String(self.req.post[i]['POLICYID'])
                 ,"policyparam":String(self.req.post[i]['POLICYPARAM'])
@@ -192,7 +196,7 @@ exports.insert_preorder = function(){
                 ,"percent":String(PERCENT)
                 ,"stockset":String(self.req.post[i]['STOCKSET'])
                 ,"fromid":String(2)
-                ,"flaguser":String(1)
+                ,"flaguser":String(0)
                 ,"flagsystem":String(1)
             }
         );
@@ -209,6 +213,10 @@ exports.insert_preorder = function(){
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     });
+};
+
+var callback_userPolicyGID = function(){
+
 };
 
 var http_post=function(){
@@ -246,94 +254,3 @@ var http_post=function(){
     req.end();
 };
 
-exports.update_ordertoday = function(){
-    //时间  param参数 自选股集合 数量/金额/比例 可以修改
-
-    var  self = this;
-    var uID = sessions.get_uID(self.req);
-    var result = {'success':true,'data':''};
-
-    if(self.req.post){
-
-
-        var sql = "UPDATE `tb_order_id` set" +
-            // USERID
-            //PNAME
-            // "  `PGROUPID`=%s ," +
-            // " `ACCOUNTID`=%s ," +
-            // " `TRADEID`=%s ," +
-            // " `POLICYID`=%s ," +
-            " `POLICYPARAM`='%s' ," +
-            // " `DIRTYPE`=%s ," +
-            " `STOCKSET`='%s' ," +
-            " `STARTTIME`=%s ," +
-            " `ENDTIME`=%s ," +
-            // " `ISTEST`=%s ," +
-            " `BUYCOUNT`=%s ," +
-            " `BUYAMOUNT`=%s ," +
-            " `PERCENT`=%s ," +
-            //STATUS
-            //FLAG_SYSTEM
-            " `FLAG_USER`='%s' , " +
-            //ADDTIME
-            " `MODTIME`='%s' " +
-            // "," +
-            // " `FROMID`=%s " +
-            " WHERE " +
-            "`ROWID`='%s'";
-        // ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
-        var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
-        STARTTIME = unit_date.objToNumber(self.req.post[0]['STARTTIME']);
-        ENDTIME = unit_date.objToNumber(self.req.post[0]['ENDTIME']);
-        BUYCOUNT = unit_date.string2int(self.req.post[0]['BUYCOUNT']);
-        BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
-        PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
-
-        sql  = util.format(sql
-            ,unit_date.string2_(self.req.post[0]['POLICYPARAM'])
-            ,unit_date.string2_(self.req.post[0]['STOCKSET'])
-            ,STARTTIME
-            ,ENDTIME
-            ,BUYCOUNT
-            ,BUYAMOUNT
-            ,PERCENT
-            ,self.req.post[0]['FLAG_USER']
-            ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
-            ,self.req.post[0]['ROWID']
-        );
-        var reportServer = [];
-        reportServer.push(
-            {
-                "orderid":self.req.post[0]['ORDERID']
-                ,"operation":"2"//operation=删除0记录,插入新数据1,修改记录2
-                ,"accountid":String(self.req.post[0]['ACCOUNTID'])
-                ,"tradeid":String(self.req.post[0]['TRADEID'])
-                ,"userid":String(uID)
-                ,"policyid":String(self.req.post[0]['POLICYID'])
-                ,"policyparam":String(self.req.post[0]['POLICYPARAM'])
-                ,"dirtype":String(self.req.post[0]['DIRTYPE'])
-                ,"istest":String(self.req.post[0]['ISTEST'])
-                ,"starttime":String(STARTTIME)
-                ,"endtime":String(ENDTIME)
-                ,"buycount":String(BUYCOUNT)
-                ,"buyamount":String(BUYAMOUNT)
-                ,"percent":String(PERCENT)
-                ,"stockset":String(self.req.post[0]['STOCKSET'])
-                ,"fromid":String(2)
-                ,"flaguser":String(self.req.post[0]['FLAG_USER'])
-                ,"flagsystem":String(1)
-            }
-        );
-
-        http_post(reportServer);
-        db.query(sql, function(){
-            if(arguments.length==1){
-                self.responseDirect(200,"text/json",JSON.stringify(result));
-            }else{
-                result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
-                self.responseDirect(200,"text/json",JSON.stringify(result));
-            }
-        });
-    }
-
-};

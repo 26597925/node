@@ -235,20 +235,31 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     }
                     break;
                 case "MAXBUY":
-                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
-                	if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
+                    var div = body[head[i]["ID"]];
+                    var input = div.find( "input" );
+                    var select = div.find( "select" );
+                    console.log('MAXBUY\n',input.val(),select.val());
+                    if( 
+                        !(/^\+?[0-9][0-9]*$/.test( parseInt(input.val()) ) ) 
+                    ){
                         oojs$.showError("请输入正确的总额度数字");
-					}
+                    }
+                    sendData[head[i]["ID"]] = parseInt(input.val());
+                    if(select.val() == 0){
+                        sendData[head[i]["ID"]] = parseInt(sendData[head[i]["ID"]])*10000;
+                    }
+                    
+                	
                     break;
                 case "BUYCOUNT":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
-                    if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
+                    if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
                         oojs$.showError("请输入正确的最大股数数字");
                     }
                     break;
                 case "BUYAMOUNT":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
-                    if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
+                    if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
                         oojs$.showError("请输入正确的单次最大额度数字");
                     }
                     break;
@@ -274,11 +285,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
         }
 
-        for(var i in body){
-            body[i] = null;
-            delete body[i];
-		}
-        body = null;
+        
 
 		var url = "";
 		if(type == "add"){
@@ -289,7 +296,11 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
         oojs$.httpPost_json(url,sendData,function(result,textStatus,token){
             if(result.success){
-
+            for(var i in body){
+                body[i] = null;
+                delete body[i];
+            }
+            body = null;
                 dictTrade.dictTrade_tab1_click();
             }else{
                 console.log("sub_userAccount result:",result.message);
@@ -355,13 +366,24 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             ,"PERCENT":$('<input type="text" value="'+record["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
             ,"SPLITCOUNT":$('<input type="text" value="'+record["SPLITCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
         };
-
+        var value = parseInt(record["MAXBUY"]);
+        var input = $('<input type="text" value="'+record["MAXBUY"]+'" ></input>');
+        var select = $('<select><select>');
+        select.append($('<option  value="0">万元</option>'));
+        select.append($('<option  value="1">元</option>'));
+        select.val(1);
+        var label = $('<label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>');
+        var div = $('<div></div>');
+        div.append(input);
+        div.append(select);
+        div.append(label);
+        body['MAXBUY']=div;//$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
         self.appendTB_trade_body ( tb, head, body );
         tr = $('<tr></tr>').appendTo(tb);
         var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
         $('<input></input>',{type:"button", name:"",value:"提交"}).appendTo(td).click(
             body,
-            this.handler_trd_sub
+            self.handler_trd_mdy
         );;
         $('<input></input>',{type:"button", name:"",value:"返回"}).appendTo(td).click(
             body,
@@ -387,13 +409,22 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         	"TRADEID":self.create_dictTrade_Select("TRADEID_add")
 			,"ACCOUNTID":$('<input type="text" value="" ></input>')
 			,"PASSWORD":$('<input type="text" value=""></input>')
-			,"MAXBUY":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+			,"MAXBUY":$('<input type="text" value="214748" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
             ,"BUYCOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
 			,"BUYAMOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
 			,"PERCENT":$('<input type="text" value="0.5" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
 			,"SPLITCOUNT":$('<input type="text" value="1" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
         };
-
+        var input = $('<input type="text" value="214748" >');
+        var select = $('<select><select>');
+        select.append($('<option  value="0">万元</option>'));
+        select.append($('<option  value="1">元</option>'));
+        var label = $('<label style="color: red; font-size: 80%;">(*注：最大值214748万元)</label>');
+        var div = $('<div></div>');
+        div.append(input);
+        div.append(select);
+        div.append(label);
+        body['MAXBUY']=div;
         self.appendTB_trade_body ( tb, head, body );
 
 		tr = $('<tr></tr>').appendTo(tb);
@@ -447,8 +478,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 				');" >'
 			)};
 		}
-
-
+        
         oojs$.appendTB_list(panel,list_head,list_body);
 
 	}
@@ -459,7 +489,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
 
 			if(result.success){
-				console.log(result.data);
 				self.dictTrade_list_body = [];
                 self.dictTrade_list_body = result.data;
 				// for(var i=0; i<result.data.length; i++){

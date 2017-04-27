@@ -69,7 +69,7 @@ var handlerRequest = function(req, res){
       staticFileServer (req, res);
     }
 };
-
+var stocks = {'date':new Date(),'data':null};
 var count = 0;
 var cumulation = function(){
 	if(count>=10000){
@@ -78,14 +78,25 @@ var cumulation = function(){
 	return count++;
 };
 
+var setStocks = function(data){
+    stocks.date = new Date();
+    stocks.data = data;
+};
+
+var getStocks = function(data){
+    return stocks
+};
+
+
 var controllerContext = function(req, res){
-	this.alias = "root"
+	this.alias = "root";
     this.req = req;
     this.res = res;
+    this.setStocks = setStocks;
+    this.getStocks = getStocks;
 	this.cumulation = cumulation;
     this.handler404 = handler404;
     this.handler500 = handler500;
-
 };
 
 

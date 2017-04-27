@@ -76,6 +76,12 @@ var unit_date = function()
     };
 
     this.string2_ = function(val){
+    	if(String(val).toUpperCase() == "NULL"){
+            val = "";
+		}
+		if(String(val).toLowerCase() == 'undefined'){
+            val = "";
+		}
         return String(val) || "" ;
     };
 

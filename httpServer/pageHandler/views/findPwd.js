@@ -12,7 +12,7 @@ $(document).ready(function(){
 
         $("#message").text("");
         var UENAME = $.trim($("#UENAME").val());
-        var MAIL = $.trim($("#MAIL").val());
+        var EMAIL = $.trim($("#EMAIL").val());
         if(UENAME.length <= 0){
             $("#message").text("请输入用户名");
             return;
@@ -20,7 +20,7 @@ $(document).ready(function(){
 
         var sendData = {
             'UENAME':UENAME
-            ,'MAIL':MAIL
+            ,'EMAIL':EMAIL
         };
 
         $.ajax({

@@ -1,0 +1,1 @@
+UPDATE `tb_order_id` set  `PGROUPID`=%s , `ACCOUNTID`=%s , `TRADEID`=%s , `POLICYID`=%s , `POLICYPARAM`=%s , `DIRTYPE`=%s , `STOCKSET`=%s , `STARTTIME`=%s , `ENDTIME`=%s , `ISTEST`=%s , `BUYCOUNT`=%s , `BUYAMOUNT`=%s , `PERCENT`=%s , `MODTIME`=%s , `FROMID`=%s   where `USERID`='20000'

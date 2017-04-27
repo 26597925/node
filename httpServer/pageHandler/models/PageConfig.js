@@ -64,9 +64,16 @@ route.map({
 //=============================
 route.map({
     method:'get',
-    url:/^\/detail.html\/?$/i,
+    url:/^\/detailOrder.html\/?$/i,
     controller:'common',
-    action:'detail'
+    action:'detailOrder'
+});
+
+route.map({
+    method:'get',
+    url:/^\/detailStock.html\/?$/i,
+    controller:'common',
+    action:'detailStock'
 });
 
 
@@ -160,10 +167,10 @@ route.map({
 });
 
 route.map({
-    method:'get',
-    url:/^\/select_userPolicyGID\/?$/i,
+    method:'post',
+    url:/^\/update_ordertoday\/?$/i,
     controller:'order',
-    action:'select_userPolicyGID'
+    action:'update_ordertoday'
 });
 
 route.map({
@@ -173,6 +180,32 @@ route.map({
     action:'select_preorder'
 });
 
+
+//================================
+
+route.map({
+    method:'post',
+    url:/^\/select_tradeDetail\/?$/i,
+    controller:'detail',
+    action:'select_tradeDetail'
+});
+
+//================================
+
+route.map({
+    method:'get',
+    url:/^\/stocks\/?$/i,
+    controller:'proxy',
+    action:'stocks'
+});
+
+
+route.map({
+    method:'post',
+    url:/^\/capital\/?$/i,
+    controller:'proxy',
+    action:'capital'
+});
 
 //================================
 route.map({

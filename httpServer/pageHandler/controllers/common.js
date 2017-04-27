@@ -127,9 +127,15 @@ var renderCommonPage = function(file_js,file_html,common_js){
 };
 
 
-exports.detail = function(){
-    console.log("detail");
+exports.detailOrder = function(){
+    // console.log("detailOrder");
     var self = this;
-    self.responseDirect( 200,"text/html",renderCommonPage("detail.js","detail.html","common.js") );
+    self.responseDirect( 200,"text/html",renderCommonPage("detailOrder.js","detailOrder.html","common.js") );
+};
+
+exports.detailStock = function(){
+    // console.log("detailStock");
+    var self = this;
+    self.responseDirect( 200,"text/html",renderCommonPage("detailStock.js","detailStock.html","common.js") );
 };
 

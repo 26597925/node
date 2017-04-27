@@ -50,30 +50,44 @@ oojs$.com.stock.order_period = oojs$.createClass(
     ]
     ,test:function(){
       $( function() {
-            var availableTags = [
-              "ActionScript",
-              "AppleScript",
-              "Asp",
-              "BASIC",
-              "C",
-              "C++",
-              "Clojure",
-              "COBOL",
-              "ColdFusion",
-              "Erlang",
-              "Fortran",
-              "Groovy",
-              "Haskell",
-              "Java",
-              "JavaScript",
-              "Lisp",
-              "Perl",
-              "PHP",
-              "Python",
-              "Ruby",
-              "Scala",
-              "Scheme"
-            ];
+        var availableTags = [
+          {
+            label: "aardvark_哈对方考虑",
+            value: "aardvark"
+          },
+          {
+            label: "<b>apple</b>",
+            value: "apple"
+          },
+          {
+            label: "<i>atom</i>",
+            value: "atom"
+          }
+        ];
+            // var availableTags = [
+            //   "ActionScript",
+            //   "AppleScript",
+            //   "Asp",
+            //   "BASIC",
+            //   "C",
+            //   "C++",
+            //   "Clojure",
+            //   "COBOL",
+            //   "ColdFusion",
+            //   "Erlang",
+            //   "Fortran",
+            //   "Groovy",
+            //   "Haskell",
+            //   "Java",
+            //   "JavaScript",
+            //   "Lisp",
+            //   "Perl",
+            //   "PHP",
+            //   "Python",
+            //   "Ruby",
+            //   "Scala",
+            //   "Scheme"
+            // ];
             $( "#tags" ).autocomplete({
               source: availableTags
             });
@@ -105,14 +119,16 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
     }
     ,init:function(){
-        $("#order_period_tabs").tabs();
-        $("#order_period").click(this.order_period_tab1_clk);
-        $("#order_period_tabs_a1").click(this.order_period_tab1_clk);
-        $("#order_period_tabs_a2").click(this.order_period_tab2_clk);
-         order_period.order_period_tab1_clk();
+      var self = this;
+        // $("#order_period_tabs").tabs();
+        // $("#order_period").click(this.order_period_tab1_clk);
+        // $("#order_period_tabs_a1").click(this.order_period_tab1_clk);
+        // $("#order_period_tabs_a2").click(this.order_period_tab2_clk);
+        //  order_period.order_period_tab1_clk();
+        self.test();
     }
     ,order_period_tab1_clk:function(){
-        order_today.load_order_today();
+        // order_today.load_order_today();
     }
     
 

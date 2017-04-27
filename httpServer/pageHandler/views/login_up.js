@@ -18,6 +18,7 @@ $(document).ready(function(){
         var PHONENUMBER = $.trim($("#PHONENUMBER").val());
         var ADDRESS = $.trim($("#ADDRESS").val());
         var ZIPCODE = $.trim($("#ZIPCODE").val());
+        var EMAIL = $.trim($("#EMAIL").val());
 
         if(!(/^1(3|4|5|7|8)\d{9}$/.test(PHONENUMBER))){ 
             $("#message").text("手机号码有误，请重填");  
@@ -48,7 +49,7 @@ $(document).ready(function(){
         }
 
         if(PHONENUMBER.length <= 0){
-            $("#message").text("请输入电话号码");
+            $("#message").text("请输入手机号码");
             return;
         }
 
@@ -62,19 +63,25 @@ $(document).ready(function(){
             return;
         }
 
-        var re= /^[1-9][0-9]{5}$/
+        var re= /^[1-9][0-9]{5}$/;
         if(re.test(ZIPCODE)){
             $("#message").text("您输入的邮编不正确");
             return;
         }
 
+        var reg = /^(?:[a-z\d]+[_\-\+\.]?)*[a-z\d]+@(?:([a-z\d]+\-?)*[a-z\d]+\.)+([a-z]{2,})+$/;
+        if(reg.test(EMAIL)){
+            $("#message").text("您输入的邮箱不正确");
+            return;
+        }
         var sendData = {
-            UENAME:UENAME
-            ,PASSWORD:PASSWORD
-            ,UCNAME:UCNAME
-            ,PHONENUMBER:PHONENUMBER
-            ,ADDRESS:ADDRESS
-            ,ZIPCODE:ZIPCODE
+            'UENAME':UENAME
+            ,'PASSWORD':PASSWORD
+            ,'UCNAME':UCNAME
+            ,'PHONENUMBER':PHONENUMBER
+            ,'ADDRESS':ADDRESS
+            ,'ZIPCODE':ZIPCODE
+            ,'EMAIL':EMAIL
         };
 
         $.ajax({
@@ -88,7 +95,14 @@ $(document).ready(function(){
                 if(result.success){
                     window.location.href = "/main";
                 }else if(!result.success && result.data == "find password"){
-
+                    $("#message").empty();
+                    $("#message").append($("<label>该用户已经注册过</label>"));
+                    var href = $('<a href="#">找回密码</a>');
+                    href.click(function(event){
+                        window.location.href =  "/findpassword";
+                        event.preventDefault();
+                    });
+                    $('#message').append(href);
                 }
             },
             beforeSend: function(xhr){
@@ -105,6 +119,7 @@ $(document).ready(function(){
         $("#PHONENUMBER").val("");
         $("#ADDRESS").val("");
         $("#ZIPCODE").val("");
+        $("#EMAIL").val("");
         $("#message").text("");
     });
 });

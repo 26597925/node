@@ -66,7 +66,7 @@ $(document).ready(function(){
     });
 
     $("#findpsw").click(function(){
-        window.location.href="/users/guidereset";
+        window.location.href="/findpassword";
     });
 });
 </script>

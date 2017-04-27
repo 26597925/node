@@ -80,6 +80,10 @@ exports.invertTimestamp = function(sID){
 
 };
 
+exports.destory = function(req,res){
+    req.headers.cookie = '';
+};
+
 exports.get_uID = function(req){
 	
 	var cookies = this.parseCookies(req.headers.cookie);

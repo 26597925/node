@@ -9,6 +9,8 @@
 	<li>http://jqueryui.com/accordion/</li>
 	<li><a href="https://github.com/DoubleSpout/ccap">https://github.com/DoubleSpout/ccap</a></li>
 	<li><a href="https://github.com/mysqljs/mysql">https://github.com/mysqljs/mysql</a></li>
+	<li>http://api.jqueryui.com/autocomplete/</li>
+	<li>https://msdn.microsoft.com/en-us/library/ms533723(VS.85).aspx</li>
 </ul>
 </p>
 <p>

@@ -9,7 +9,7 @@ exports.select_userAccount = function(){
 	
 	var self = this;
 
-	var ID = sessions.get_uID(self.req);
+	var uID = sessions.get_uID(self.req);
     // ID=10000;//test
 	var result = {'success':true,'data':''};
     var sql = "select" +
@@ -32,7 +32,7 @@ exports.select_userAccount = function(){
         " and " +
         " `tb_capital_conf`.`USERID`='%s'" +
         " and `VISIBLE` = '1'";
-    sql = util.format(sql,ID);
+    sql = util.format(sql,uID);
 
     db.query(sql,function(){
         console.log(path.basename(__filename).replace('.js',''),"select_userAccount", arguments);
@@ -190,7 +190,7 @@ exports.add_userAccount = function(){
                         if(hresult['status'] == 200){
                             insert_userAccount(self,hresult);
                         }else if(hresult['status'] == 403){
-                            result = {'success':false,'message':result['detail']};
+                            result = {'success':false,'message':hresult['detail']};
                             self.responseDirect(200,"text/json",JSON.stringify(result));
                         }else{
                             result = {'success':false,'message':'未知状态!'};
@@ -218,6 +218,7 @@ exports.add_userAccount = function(){
 
 // insert_userAccount(self,self.req.post,result)
 var insert_userAccount = function(context,account_result){
+    var self = context;
     var post = context.req.post;
     var ID = sessions.get_uID(context.req);
     var result = {'success':true,'data':''};

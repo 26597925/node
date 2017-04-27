@@ -28,7 +28,7 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             NAME:"交易类型"
         }
         ,{
-            ID:'POLICYID',
+            ID:'PNAME',
             NAME:"策略名称"
         }
         ,{
@@ -76,22 +76,30 @@ oojs$.com.stock.order_detail = oojs$.createClass(
         //     'NAME':"操作"
         // }
     ]
+    ,detail_item:null
+   
     ,init:function(){
         var self = this;
         console.log("window.opener:",window.opener.order_today);
-        var detail_item= window.opener.order_today.get_detail();
-        var preload = window.opener.preload;
-        // console.log("detail",JSON.stringify(detail_item));
-        self.appendTB_item(detail_item,preload)
+        if(self.detail_item == null){
+            self.detail_item= window.opener.order_today.get_detail();
+            //self.preload = window.opener.preload;
+            preload.PGROUP = window.opener.preload.PGROUP;
+            preload.TRADE = window.opener.preload.TRADE;
+        }
+        self.appendTB_item();
     }
-    ,appendTB_item:function(detail_item,preload){
+    ,appendTB_item:function(){
         var self = this;
+        var detail_item = self.detail_item ;
+        
         var tb = $('<table></table>', {
             'class':"display dataTable"
         }).appendTo( $('#detail_panel') );
         detail_item['PGROUPID']['ELEMENT'] = preload.getPGroupItem(detail_item['PGROUPID']['ELEMENT'])['NAME'];
         detail_item['STARTTIME']['ELEMENT'] = oojs$.toHMS(detail_item['STARTTIME']['ELEMENT']);
         detail_item['ENDTIME']['ELEMENT'] = oojs$.toHMS(detail_item['ENDTIME']['ELEMENT']);
+        detail_item['DEALSTOCK']['ELEMENT'] = detail_item['DEALSTOCK']['ORIGIN'];
         oojs$.appendTB_item_D2(tb,self.list_benchmark_head,detail_item);
     }
 
