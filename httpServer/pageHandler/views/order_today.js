@@ -94,11 +94,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
                     order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
                     console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
-                    $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] );
-                    
-                    
+                    $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
                 }
-                
             })
         });
         preload.getStock();
@@ -205,6 +202,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var self = this;
         var drawitem_data = arguments[0];
         console.log('appendTB_modify_order\n',JSON.stringify(drawitem_data));
+        drawitem_data['PGROUPID']['ORIGIN'] = drawitem_data['PGROUPID']['ELEMENT'];
+        drawitem_data['PGROUPID']['ELEMENT'] = preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
         start_component.init(STARTTIME,oojs$.toHMSOBJ(drawitem_data['STARTTIME']['ELEMENT']));
@@ -221,7 +220,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,'ELEMENT2':$('<div></div>')
             ,'ROWSPAN':2
             ,'COMPONENT':stockset};
-        stockset.appendCK_stockset(
+        stockset.init(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
             drawitem_data["STOCKSET"]['ELEMENT']);
@@ -287,12 +286,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
         if(self.preOerder_ctrl_div==null){
             self.preOerder_ctrl_div = $('<div id="preOerder_ctrl_div"></div>');
             self.preOerder_ctrl_div.appendTo(container);
-            tb = $('<table></table>', {
-                'class':"display dataTable"
-            });
+            
         }
-
-        tb.empty();
+        tb = $('<table></table>', {
+            'class':"display dataTable"
+        });
+        
         console.log('appendTB_new_order_today\n',JSON.stringify(policy.policy_subscribe[0]));
         
         self.appendTB_control(tb);
@@ -358,28 +357,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
         
     }
 
-    // ,appendTB_neworder_body:function(policy_head, policy_item, account_itemD2){
-    //     var self = this;
-
-    //     if(self.order_today_body_div == null){
-    //         self.order_today_body_div = $('<div id="order_today_body_div"></div>');
-    //         self.order_today_body_div.appendTo($('#order_today_tabs_2'));
-    //     }
-
-    //     self.order_today_body_div.empty();
-
-    //     var tb = $('<table></table>', {
-    //         'class':"display dataTable"
-    //     }).appendTo(self.order_today_body_div);
-
-    //     var dirtype = policy_item['DIRTYPE']['ELEMENT'];
-    //     delete policy_item['DIRTYPE'];
-    //     oojs$.appendTB_item_D2(tb,policy_head,policy_item);
-    //     self.appendTB_accountHint(tb);
-    //     self.appendTB_account_body(tb, account_itemD2, dirtype);
-
-    // }
-
     ,appendTB_accountHint:function(tb){
         var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
         var td = $('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
@@ -390,8 +367,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
         label.css({ 'color': 'red', 'font-size': '80%' });
         td.append(label);
     }
-
-
 
     ,appendTB_order_today:function(){
         var self = this;
@@ -485,8 +460,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         oojs$.httpPost_json("/select_preorder",sendData,function(result,textStatus,token){
             if(result.success){
-
-                
                 self.order_today_list = [];
                 self.order_today_list = result.data;
                 self.appendTB_order_today();
@@ -517,93 +490,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
             );
         }
         return select;
-    }
-
-    ,appendTB_account_body:function( tb, item, dirtype){
-        var self = this;
-        var item_D2 = [];
-        var div_col1 = null;
-        var div_col2 = null;
-        var checkbox = null;
-        var label_name = null;
-        var label_value = null;
-        var select_trade = null;
-        var select_dirtype = null;
-        var input = null;
-
-        for(var i = 0; i < item.length; i++ ){
-            item_D2[i] = {};
-            item_D2[i].ACCOUNTID = item[i]['ACCOUNTID'];
-
-            div_col1 = $('<div></div>');
-            div_col2 = $('<div></div>');
-            //column1
-            checkbox = $('<input></input>',{
-                'type':'checkbox'
-            }).change(
-                // {}
-                // self.handler_ck
-            );
-            checkbox.prop("disabled", true );
-            div_col1.append(checkbox);
-            label_name = $('<label></label>').text('帐户：');
-            div_col1.append(label_name);
-            //column2
-            label_value = $('<label></label>').text(item[i]['ACCOUNTID']);
-            div_col2.append(label_value);
-
-            var borrow = 1;
-            var newdirtype = 0;
-            if(dirtype == 0){//买入
-                if(borrow == 0){
-                    newdirtype = 0;
-                }else if(borrow == 1){
-                    //委托种类
-                    select_dirtype = $('<select></select>');
-                    select_dirtype.append(
-                        "<option value='0'>普通</option>"
-                    );
-                    select_dirtype.append(
-                        "<option value='2'>融资买入</option>"
-                    );
-                    select_dirtype.prop("disabled", true );
-                    div_col2.append(select_dirtype);
-                }
-            }else if(dirtype == 1){//卖出
-                if(borrow == 0){
-                    newdirtype = 1;
-                }else if(borrow == 1){
-                    //委托种类
-                    select_dirtype = $('<select></select>');
-                    select_dirtype.append(
-                        "<option value='1'>普通</option>"
-                    );
-                    select_dirtype.append(
-                        "<option value='5'>卖券还款</option>"
-                    );
-                    select_dirtype.prop("disabled", true );
-                    div_col2.append(select_dirtype);
-                }
-            }else if(dirtype == 9){//撤单
-                //??
-            }
-
-
-            select_trade = self.append_select_tradetype();
-            select_trade.change(
-                // {}
-                // self.handler_ck
-            );
-            div_col2.append(select_trade);
-            input = $('<input></input>',{type:'text'});
-            input.prop("disabled", true );
-            div_col2.append(input);
-
-            item_D2[i]["COLUMN1"] = div_col1;
-            item_D2[i]["COLUMN2"] = div_col2;
-        }
-
-        oojs$.appendTB_item_D2x(tb,item_D2);
     }
 
     //顶部下拉框数据结构
@@ -725,7 +611,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,'ELEMENT2':$('<div></div>')
             ,'ROWSPAN':2
             ,'COMPONENT':stockset};
-        stockset.appendCK_stockset(
+        stockset.init(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
             item["STOCKSET"]);
@@ -821,8 +707,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 policy_data[elm] = policy_data[elm]['ELEMENT'];
             }
         }
-        console.log("policy_data",JSON.stringify(policy_data));
-
+        console.log("policy_data\n",JSON.stringify(policy_data));
+        console.log("account_list\n",JSON.stringify(account_list));
         var account_result = []
         for(var i =0; i< account_list.length;i++){
             
@@ -834,9 +720,19 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 }
 
                 for( var elm in  account_list[i]["COMPONENT"].val() ){
-                    account_result[i][elm] = account_list[i]["COMPONENT"][elm];
+                    if(elm == "INPUT" && $.trim(account_list[i]["COMPONENT"][elm].val())==""){
+                        oojs$.showError("请选择交易策略并输入信息");
+                        return;
+                    }else{
+                        account_result[i][elm] = account_list[i]["COMPONENT"][elm];
+                    }
                 }
             }
+        }
+
+        if(account_result.length ==0){
+            oojs$.showError("请添加账户");
+            return;
         }
         console.log('account_list',JSON.stringify(account_result));
         
@@ -879,7 +775,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
             }
         }
 
+        
         console.log("sendData",JSON.stringify(sendData));
+        
         if(type == "add"){
             oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
                 if(result.success){
@@ -892,11 +790,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         }else if(type == "modify"){
             oojs$.httpPost_json("/update_ordertoday",sendData,function(result,textStatus,token){
                 if(result.success){
-                    // if( type == 1){
-                    //     policy.policy_tab1_click();
-                    // }else if( type == 2){
-                    //     policy.policy_tab2_click();
-                    // }
+                    
                     $( "#order_today_tabs" ).tabs({ selected: 0 });
                     order_today.order_today_tab1_clk();
                 }else{

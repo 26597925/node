@@ -180,7 +180,14 @@ var updateUserLoginTime = function(USERID,context){
     if(context){self = context;}
     var req = self.req;
     var res = self.res;
-    var SID = sessions.createSID();
+    var SID;
+    if( self.hasOwnProperty("alias") && self.alias == "heart" )
+    {
+        SID = sessions.updateSID(self.SID);
+    }else{
+        SID = sessions.createSID();
+    }
+
     sessions.setCookie(req,res,SID,USERID);
     var sql2 = "UPDATE `tb_user_basic` SET `LASTLOGIN` = '"+SID+"' WHERE `tb_user_basic`.`USERID` = "+USERID+" ";
 

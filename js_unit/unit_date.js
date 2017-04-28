@@ -49,7 +49,16 @@ var unit_date = function()
         	return true;
 		}
 	};
+	this.getID = function makeid(digit)
+	{
+		var text = "";
+		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+		for( var i=0; i < digit; i++ )
+			text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+		return text;
+	};
 	this.sortTime = function(date_str){
 		var _date = new Date("1970-1-1 0:0:0");
 		var _date2;

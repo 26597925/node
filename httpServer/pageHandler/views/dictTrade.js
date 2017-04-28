@@ -392,7 +392,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	}
 
-	, appendTB_add : function( TRADEID, ACCOUNTID ){
+	,appendTB_add : function( TRADEID, ACCOUNTID ){
 		var self = this;
         $("#dictTrade_tabs_2").empty();
 

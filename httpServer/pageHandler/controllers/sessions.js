@@ -5,13 +5,29 @@ const config = require(path.join(__dirname,"..","..","..","config.js"));
 
 exports.createSID = function () {
     var now = new Date();
+
     var yMd = unit_date.Format(now,"yyyyMMdd")
         ,HH = unit_date.Format(now,"HH")
         ,mm = unit_date.Format(now,"mm")
         ,ss = unit_date.Format(now,"ss");
 
-    var sID = util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)), (Math.round(Math.random()*1000)) );
+    var sID = util.format("%s_%s_%s"
+		, yMd
+		, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss))
+		, (unit_date.getID(10)) );
     return sID;
+};
+
+exports.updateSID = function(sID){
+	//20170428_42053_587;
+	var ids = sID.split("_");
+	var lastID = ids[ids.length-1];
+    var now = new Date();
+    var yMd = unit_date.Format(now,"yyyyMMdd")
+        ,HH = unit_date.Format(now,"HH")
+        ,mm = unit_date.Format(now,"mm")
+        ,ss = unit_date.Format(now,"ss");
+    return util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)),lastID);
 };
 
 exports.parseCookies = function(cookies){
@@ -49,6 +65,21 @@ exports.setCookie = function(req,res,sID,uID){
 	delete cookies["sID"];
 	delete cookies["uID"];
 	cookies = null;
+};
+
+exports.setCookieTime = function(req,res,sID,uID){
+    var cookies = this.parseCookies(req.headers.cookie);
+
+    cookies["sID"] = sID;
+    cookies["uID"] = uID;
+    // res.setHeader("Set-Cookie",["sID=" + sID,"user=" + usr,"authorized=true","Secure"]);
+    res.setHeader("Set-Cookie",invertParseCookies(cookies));
+
+    cookies["sID"] = null;
+    cookies["uID"] = null;
+    delete cookies["sID"];
+    delete cookies["uID"];
+    cookies = null;
 };
 
 exports.invertDate = function(sID){

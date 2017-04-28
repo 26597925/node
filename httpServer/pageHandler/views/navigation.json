@@ -2,21 +2,25 @@
 	{"帐号管理":
 		[
 			{"id":"dictTrade","href":"#","name":"用户券商管理 ","htmlDoc":"dictTrade.html","jsState":"dictTrade.js"}
-
 		]
 	}
 	,{"策略管理":
 		[
-
 			{"id":"policy","href":"#","name":"策略管理 ","htmlDoc":"policy.html","jsState":"policy.js"}
 		]
 	}
 	,
 	{"交易管理":
 		[
-			{"id":"order_today","href":"#","name":"当日预埋单 ","htmlDoc":"order_today.html","jsState":"order_today.js"},
-
+			{"id":"order_today","href":"#","name":"当日预埋单 ","htmlDoc":"order_today.html","jsState":"order_today.js"}
+			,
 			{"id":"order_period","href":"#","name":"周期预埋单 ","htmlDoc":"order_period.html","jsState":"order_period.js"}
 		]
+	}
+,
+	{"个人管理":
+	[
+		{"id":"order_today","href":"#","name":"登录账号 ","htmlDoc":"","jsState":""}
+	]
 	}
 ]

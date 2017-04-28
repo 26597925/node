@@ -324,10 +324,21 @@ var oojs$ = {
 		 * */
         $("#dialogtext").text(text);
         $( "#dialog" ).dialog({
-            resizable: false,
-            height: "auto",
-            width: 400,
-            modal: true,
+            closeOnEscape: false
+            ,
+            
+            resizable: false
+            ,
+            height: "auto"
+            ,
+            width: 400
+            ,
+            modal: true
+            ,
+            open: function(event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            }
+            ,
             buttons: {
                 "确定": function() {
 
@@ -354,7 +365,16 @@ var oojs$ = {
          * */
         $("#dialogtext").text(text);
         $("#dialog").dialog({
-            buttons: {"Ok":function(){$(this).dialog("close");if(callback){callback()};}},
+            closeOnEscape: false
+            ,
+            open: function(event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            }
+            ,
+            buttons: {
+                "Ok":function(){$(this).dialog("close");if(callback){callback()};}
+            }
+            ,
             modal:true
         });
     }
@@ -609,32 +629,38 @@ var oojs$ = {
 	,heartID:null
 
 	,heartTime:function(){
-		if(this.heartID==null){
-			this.heartID = setInterval(function(){
+        var self = this;
+		if(self.heartID==null){
+			self.heartID = setInterval(function(){
+                //self.closeHeartTime();
 				$.ajax({
 					type:"get",
 					url:"/heartTime",
 					async:false,
 					dataType:"json",
 					success:function(result,textStatus){
-
 						if(result.success){
 							console.log( "success!" );
+                            //self.heartTime();
 						}else{
-							oojs$.showError(result.message)
+                            self.closeHeartTime();
+							oojs$.showError(result.message,function(){
+                                window.location.href = "/";
+                            });
 						}
 					},
 					beforeSend: function(xhr){
 						xhr.withCredentials = true;
 					}
 				});
-			},30000);
+			},30*1000);
 		}
 	}
 
     ,closeHeartTime:function(){
-		clearInterval( this.heartID);
-        this.heartID = null;
+        var self = this;
+		clearInterval( self.heartID);
+        self.heartID = null;
     }
     ,valideString:function(val){
         val = String(val);
@@ -667,7 +693,6 @@ var oojs$ = {
 oojs$.ns("com.stock.component.acountset");
 oojs$.com.stock.component.acountset =oojs$.createClass({
     NAME:"account"
-
     ,ck_change:function(event){
         var self = event.data['scope'];
         if ($(this).is(':checked')) {
@@ -774,6 +799,7 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
             ,'BUYCOUNT':self.BUYCOUNT
             ,'BUYAMOUNT':self.BUYAMOUNT
             ,'PERCENT':self.PERCENT
+            ,'INPUT':self.INPUT
         };
     }
     ,destroy:function(){
@@ -1004,10 +1030,25 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         var inputval = event.data['input'].val();
         var self = event.data['scope'];
         event.data['input'].val('');
-        inputval = inputval.trim();
+        inputval = $.trim(inputval);
         if(inputval.length < 3){
             oojs$.showError("输入的数据有误");
             return;
+        }
+        
+        if(preload.STOCKS.length>0){
+            var instock = false;
+            for(var i = 0; i < preload.STOCKS.length; i++){
+                if(preload.STOCKS[i]['value'] == ""+inputval){
+                    instock = true;
+                    break;
+                }
+                
+            }
+            if(!instock){
+                oojs$.showError("输入的股票数据有误");
+                return;
+            }
         }
         var data = self.data ;
         console.log("addCKBtnFun>>>>",data);
@@ -1069,7 +1110,7 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         }
     }
 
-    ,appendCK_stockset:function(div1,div2,data){
+    ,init:function(div1,div2,data){
         var self = this;
         if(data == "null"){
             data = "";
@@ -1301,7 +1342,7 @@ $(document).ready(function(){
 
 <%- jsRegist %>
 
-//oojs$.heartTime();
+    oojs$.heartTime();
 });
 
 </script>

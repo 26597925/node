@@ -95,7 +95,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
 
         var stockset = new oojs$.com.stock.component.stockset();
-        stockset.appendCK_stockset($('#t1'),$('#t2'),'123,456');
+        stockset.init($('#t1'),$('#t2'),'123,456');
 
 
 

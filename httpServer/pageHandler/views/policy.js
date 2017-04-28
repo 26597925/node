@@ -71,13 +71,7 @@ oojs$.com.stock.policy = oojs$.createClass(
         var obj = arguments[0];
         return obj["hh"]+":"+obj["mm"]+":"+obj["ss"];
     }
-    ,valideStock:function(){
-        if(arguments[0].match(/^[a-zA-Z0-9]{6}$/)){
-            return true;
-        }else{
-            return false;
-        }
-    }
+    
     ,find_item_policyGID: function(id){
         for( var i = 0; i < preload.PGROUP.length; i++ ){
             if(String(preload.PGROUP[i]["ID"]) == String(id)){
@@ -169,7 +163,6 @@ oojs$.com.stock.policy = oojs$.createClass(
             $('<input></input>',{type:"button",value:"策略修改"}).appendTo(div).click(
                 list[elm],
                 policy.policy_btn_chg
-
             );
             if(type == 1){
                 $('<input></input>',{type:"button",value:"订阅"}).appendTo(div).click(
@@ -188,43 +181,6 @@ oojs$.com.stock.policy = oojs$.createClass(
 
         oojs$.appendTB_list(panel,list_head,list_body);
     }
-
-
-
-    // ,appendCK_stockset:function(div1,div2,data,token){
-    //     if(data == "null"){
-    //         data = "";
-    //     }
-    //     data = String(data).trim();
-    //     div1.empty();
-    //     div2.empty();
-    //     console.log("stockset data",data);
-    //     if(token == 1){
-    //         policy.item_stockset1 = data;
-    //     }else if(token == 2){
-    //         policy.item_stockset2 = data;
-    //     }
-
-    //     var div_ck = $('<div></div>');
-    //     div1.append(div_ck);
-
-    //     policy.rangeChk(div_ck,token);
-
-    //     $('<input></input>',{type:"button",value:"删除"}).appendTo(div1).click(
-    //         {"div1":div1,"div2":div2,"div_ck":div_ck,data:data,token:token},
-    //         policy.delCKBtnFun
-    //     );
-
-    //     var input = $('<input></input>',{}).text("");
-    //     $('<label style="color: red; font-size: 80%;">请输入股票编码</label>').appendTo(div2);
-    //     div2.append(input);
-
-    //     $('<input></input>',{type:"button",id:"stock_changeAdd_btn",name:"",value:"新增"}).appendTo(div2).click(
-    //         {"div1":div1,"div2":div2,"div_ck":div_ck,"input":input,'data':data,token:token},
-    //         policy.addCKBtnFun
-    //     );
-    // }
-
     ,policy_btn_chg: function(event){
         var item = event.data;
         policy.appendTB_changeSubscribe(item);
@@ -352,10 +308,11 @@ oojs$.com.stock.policy = oojs$.createClass(
         for(var i = 0; i < self.list_benchmark_head.length; i++){
             list_head[i] = {};
 
-            if( self.list_benchmark_head[i]['ID']   == "DIRTYPE"
-                || self.list_benchmark_head[i]['ID']   == "PGROUPID"
-                || self.list_benchmark_head[i]['ID']   == "PNAME"
-                || self.list_benchmark_head[i]['ID']   == "CTRL"
+            if( //self.list_benchmark_head[i]['ID']   == "DIRTYPE"
+                //|| self.list_benchmark_head[i]['ID']   == "PGROUPID"
+                //|| self.list_benchmark_head[i]['ID']   == "PNAME"
+                //|| 
+                self.list_benchmark_head[i]['ID']   == "CTRL"
                 || self.list_benchmark_head[i]['ID']   == "PERCENT"
             ){
                 continue;
@@ -392,12 +349,6 @@ oojs$.com.stock.policy = oojs$.createClass(
         $(kids[1]).val(mm<=9?"0"+mm:mm);
         $(kids[2]).val(ss<=9?"0"+ss:ss);
 
-        // var STOCKSET = {ELEMENT1:$('<div></div>'),ELEMENT2:$('<div></div>'),ROWSPAN:2};
-        // self.appendCK_stockset(
-        //     STOCKSET['ELEMENT1'],
-        //     STOCKSET['ELEMENT2'],
-        //     item["STOCKSET"],
-        //     item['type']);
         var stockset = new oojs$.com.stock.component.stockset();
         var STOCKSET = {
             'ELEMENT':null
@@ -405,7 +356,7 @@ oojs$.com.stock.policy = oojs$.createClass(
             ,'ELEMENT2':$('<div></div>')
             ,'ROWSPAN':2
             ,'COMPONENT':stockset};
-        stockset.appendCK_stockset(
+        stockset.init(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
             item["STOCKSET"]);
@@ -529,11 +480,6 @@ oojs$.com.stock.policy = oojs$.createClass(
                         sendData[elm] = ENDTIME;
                         break;
                     case "STOCKSET":
-                        // if(token == 1){
-                        //     sendData[elm] = policy.item_stockset1;
-                        // }else if(token == 2){
-                        //     sendData[elm] = policy.item_stockset2;
-                        // }
                         sendData[elm] = event.data["STOCKSET"]["COMPONENT"].val();
                         break;
                     case "PERCENT":
@@ -558,12 +504,7 @@ oojs$.com.stock.policy = oojs$.createClass(
             }
 
         }
-        // if(token['ELEMENT'] == 1){
-        //     sendData['STOCKSET'] = policy.item_stockset1;
-        // }else if(token['ELEMENT'] == 2){
-        //     sendData['STOCKSET'] = policy.item_stockset2
-        // }
-
+        
         if(!regular.checkFloat(PERCENT)){
             oojs$.showError("交易比例非法");
             return;
@@ -575,7 +516,6 @@ oojs$.com.stock.policy = oojs$.createClass(
 
         console.log("update_subscrible",JSON.stringify(sendData));
         policy.update_subscrible(sendData, sendData['type']);
-
     }
 
     ,update_subscrible:function(sendData, type){
