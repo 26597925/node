@@ -57,10 +57,18 @@ route.map({
 
 route.map({
     method:'get',
+    url:/^\/getUserInfo\/?$/i,
+    controller:'login',
+    action:'getUserInfo'
+});
+
+route.map({
+    method:'get',
     url:/^\/heartTime\/?$/i,
     controller:'heartTime',
     action:'heartTime'
 });
+
 //=============================
 route.map({
     method:'get',
@@ -162,24 +170,45 @@ route.map({
 route.map({
     method:'post',
     url:/^\/insert_preorder\/?$/i,
-    controller:'order',
+    controller:'order_today',
     action:'insert_preorder'
 });
 
 route.map({
     method:'post',
     url:/^\/update_ordertoday\/?$/i,
-    controller:'order',
+    controller:'order_today',
     action:'update_ordertoday'
 });
 
 route.map({
     method:'post',
     url:/^\/select_preorder\/?$/i,
-    controller:'order',
+    controller:'order_today',
     action:'select_preorder'
 });
+//================================
 
+route.map({
+    method:'post',
+    url:/^\/insert_orderPeriod\/?$/i,
+    controller:'order_period',
+    action:'insert_orderPeriod'
+});
+
+route.map({
+    method:'post',
+    url:/^\/update_orderPeriod\/?$/i,
+    controller:'order_period',
+    action:'update_ordertoday'
+});
+
+route.map({
+    method:'post',
+    url:/^\/select_orderPeriod\/?$/i,
+    controller:'order_period',
+    action:'select_orderPeriod'
+});
 
 //================================
 

@@ -208,3 +208,39 @@ exports.updateLoginTime = function(USERID){
     updateUserLoginTime(USERID,this);
 };
 
+exports.getUserInfo = function(USERID){
+    var self = this;
+    var uID = sessions.get_uID(self.req);
+    var result = {'success':true,'data':''};
+
+    var sql = "SELECT " +
+        // " `GROUPID`" +
+        // "," +
+        " `UENAME`" +
+        ", `UCNAME`" +
+        ", `PHONENUMBER`" +
+        ", `PASSWORD`" +
+        ", `ADDRESS`" +
+        ", `ZIPCODE`" +
+        // ", `TYPEID`" +
+        // ", `STATUS`" +
+        // ", `LASTLOGIN`" +
+        // ", `SESSIONID`" +
+        ", `ONLINE`" +
+        // ", `ADDTIME`" +
+        // ", `MODTIME`" +
+        ", `EMAIL`" +
+        // ", `REMARK`" +
+        // ", `INVOKE`" +
+        " FROM  `tb_user_basic` WHERE USERID='%s'";
+    sql = util.format(sql,uID);//,this;
+    db.query(sql,function () {
+       if(arguments.length  == 1){
+           result.data = arguments[0];
+           self.responseDirect(200,"text/json",JSON.stringify(result));
+       }else{
+           result = {'success':false,'message':'数据库异常'};
+           self.responseDirect(200,"text/json",JSON.stringify(result));
+       }
+    });
+};

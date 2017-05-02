@@ -48,11 +48,11 @@ oojs$.com.stock.order_today = oojs$.createClass(
             'NAME':"操作"
         }
     ]
-    ,select_tradetype:[
-        {id:"BUYCOUNT",name:"交易股数"}
-        ,{id:"BUYAMOUNT",name:"交易金额"}
-        ,{id:"PERCENT",name:"交易比例"}
-    ]//帐户用
+    // ,select_tradetype:[
+    //     {id:"BUYCOUNT",name:"交易股数"}
+    //     ,{id:"BUYAMOUNT",name:"交易金额"}
+    //     ,{id:"PERCENT",name:"交易比例"}
+    // ]//帐户用
     ,order_today_list: []
     ,preOerder_ctrl_div:null
     ,order_today_body_div:null
@@ -469,28 +469,28 @@ oojs$.com.stock.order_today = oojs$.createClass(
         });
     }
 
-    ,append_select_tradetype: function(){
-        var self = this;
-        var select = $('<select></select>',{
-            // id:'order_select2'
-        });
+    // ,append_select_tradetype: function(){
+    //     var self = this;
+    //     var select = $('<select></select>',{
+    //         // id:'order_select2'
+    //     });
 
-        select.prop( "disabled", true );
+    //     select.prop( "disabled", true );
 
-        select.append(
-            "<option value='-1'>请选择交易策略</option>"
-        );
+    //     select.append(
+    //         "<option value='-1'>请选择交易策略</option>"
+    //     );
 
-        for(var i = 0; i < self.select_tradetype.length; i++){
-            select.append(
-                "<option value='"
-                +self.select_tradetype[i]['id']
-                +"'>"
-                +self.select_tradetype[i]['name']+"</option>"
-            );
-        }
-        return select;
-    }
+    //     for(var i = 0; i < self.select_tradetype.length; i++){
+    //         select.append(
+    //             "<option value='"
+    //             +self.select_tradetype[i]['id']
+    //             +"'>"
+    //             +self.select_tradetype[i]['name']+"</option>"
+    //         );
+    //     }
+    //     return select;
+    // }
 
     //顶部下拉框数据结构
         /**

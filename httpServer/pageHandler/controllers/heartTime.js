@@ -46,14 +46,15 @@ exports.heartTime = function(){
                     //     20*1000<(currentTime-cookieTime)
                     //     && (currentTime-cookieTime) <40*1000
                     // ){
-                    //     self.alias = "heart";
-                    //     self.SID = cookies["sID"];
-                    //     login.updateLoginTime.apply(self,[USERID]);
-                    // }else{
-                        result.success = false;
-                        result.message = "你的账号已经在其他地方登录";
-                        self.responseDirect(200,'text/json',JSON.stringify(result));
-                        return;
+                        self.alias = "heart";
+                        self.SID = cookies["sID"];
+                        login.updateLoginTime.apply(self,[USERID]);
+                    //}
+                    // else{
+                    //     result.success = false;
+                    //     result.message = "你的账号已经在其他地方登录";
+                    //     self.responseDirect(200,'text/json',JSON.stringify(result));
+                    //     return;
                     // }
 
                 }else{
