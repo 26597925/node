@@ -1,4 +1,3 @@
-# node
 <ul>
 <li>https://github.com/bminer/node-mysql-queues</li>
 <li>npm install mysql-queues</li>
@@ -17,15 +16,7 @@
 <li>npm install express --save  </li>
 <li>npm install mysql  </li>
 <li>https://www.npmjs.com/package/mysql  </li>
-
-https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html <br />
+ 	https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html <br />
+<li>npm install --save ws </li>
+<span>https://github.com/websockets/ws</span>
 </ul>
-
-<li>
-js
-</li>
-function(){<br />
-	console.log(JSON.stringify(arguments));<br />
-}<br />
-
-ALTER TABLE `tb_user_basic` ADD `userLastLogin` INT NULL DEFAULT NULL COMMENT '用户最后访问时间' AFTER `STATUS`;
