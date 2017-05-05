@@ -42,11 +42,8 @@ var renderPage = function(){
     var jsRegist = "";
     var jsState = "";
     var htmlDoc = "";
-    var firstPage = "";
-    //var hideAllPanel = function ()
-    // {
-    //     $("#historydata").hide();
-    //}
+    // var firstPage = "";
+
     var hideAllPanel = "var hideAllPanel = function (){\n";
     
     for(var i = 0; i< nvgJson.length;i++){
@@ -64,18 +61,11 @@ var renderPage = function(){
                     +'      hideAllPanel();\n'
                     +'      $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
                     +'    });\n';
-                // if(i==0&&element==0){
-                // if(i==0&&element==1){
-                if(i==2 && element==0){
-                // if(i==2 && element==1){
-                    // console.log(">>>>>>",nvgJson[i][navigator][element]["id"])
-                    firstPage = '   $("#'+nvgJson[i][navigator][element]["id"]+'_panel").show();\n'
-                }
+
     
                 if(String(nvgJson[i][navigator][element]["jsState"]).length>1){
                     jsState += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsState"]),'utf-8');
                 }
-                // jsRegist += fs.readFileSync(path.join(__dirname,"..",'views',nvgJson[i][navigator][element]["jsRegist"]),'utf-8');
 
                 hideAllPanel += '   $("#'+(nvgJson[i][navigator][element]["id"]+"_panel")+'").hide();\n';
 
@@ -95,7 +85,6 @@ var renderPage = function(){
     hideAllPanel += '}\n';
     jsState += hideAllPanel+"\n";
     jsRegist += nvgClick+"\n";
-    jsRegist += firstPage+"\n";
 
     var js_templates = fs.readFileSync(path.join(__dirname,"..",'views','main.js'),'utf-8');
     var js_content = ejs.render(js_templates,{"jsState":jsState,"jsRegist":jsRegist});

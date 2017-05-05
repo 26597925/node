@@ -55,6 +55,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
     ,order_select2:null
     ,order_select3:null
     ,select_title:null//顶部下拉框数据结构
+    ,tb:null
     ,init:function(){
         $( "#order_period_tabs" ).tabs();
         $( "#order_period_tabs" ).tabs({ selected: 0 });
@@ -276,20 +277,22 @@ oojs$.com.stock.order_period = oojs$.createClass(
     ,appendTB_new_order_period:function(){
         var self = this;
         var container =$('#order_period_tabs_2');
-        // container.empty();
-        var tb = null;
+        
+        if(self.tb == null){
+            self.tb = $('<table></table>', {
+                'class':"display dataTable"
+            });
+        }else{
+            self.tb.empty()
+        }
         if(self.preOerder_ctrl_div==null){
             self.preOerder_ctrl_div = $('<div id="preOerder_ctrl_div"></div>');
             self.preOerder_ctrl_div.appendTo(container);
-            
         }
-        tb = $('<table></table>', {
-            'class':"display dataTable"
-        });
         
         console.log('appendTB_new_order_period\n',JSON.stringify(policy.policy_subscribe[0]));
         
-        self.appendTB_control(tb);
+        self.appendTB_control(self.tb);
 
         if(policy.policy_subscribe.length>0){
             var event = {};

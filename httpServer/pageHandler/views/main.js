@@ -122,6 +122,67 @@ var oojs$ = {
 		}
 	}
 
+    /*****
+    * <input id="upload-input" type="file" name="uploads_name" multiple="multiple"></br>
+    * <button class="btn btn-lg upload-btn" type="button">Upload File</button>
+    * $('.upload-btn').on('click', function (){
+    *   $('#upload-input').click();
+    *   //$('.progress-bar').text('0%');
+    *   //$('.progress-bar').width('0%');
+    * });
+    * $('#upload-input').on('change', function(){
+    *   var files = $(this).get(0).files;
+    *   oojs$.http_upload( 'uploads_name', files, function(percent){
+    *       console.log(percent);
+    *   })
+    *  })
+    */
+    ,http_upload: function(  name, files, callback, percentback){
+
+        if (files.length > 0){
+            var formData = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                formData.append(name, file, file.name);
+            }   
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(result){
+                    // console.log('upload successful!\n' + result);
+                    if(callback){
+                        callback(result);
+                    }
+                },
+                xhr: function() {
+                    // create an XMLHttpRequest
+                    var xhr = new XMLHttpRequest();
+
+                    // listen to the 'progress' event
+                    xhr.upload.addEventListener('progress', function(evt) {
+
+                        if (evt.lengthComputable) {
+                            // calculate the percentage of upload completed
+                            var percentComplete = evt.loaded / evt.total;
+                            percentComplete = parseInt(percentComplete * 100);
+                            if(percentback){
+                                percentback(percentComplete);
+                            }
+                            // if (percentComplete === 100) {
+                            // }
+                        }
+                    }, false);
+                    return xhr;
+                }
+            });
+        }else{
+            oojs$.showError("没有选择文件");
+        }
+    }
+    
 	,httpPost_json: function( send_url, send_jsonObj, callback, token ){
         $.ajax({
             type:"post",
@@ -682,7 +743,33 @@ var oojs$ = {
             return false;
         }
     }
-
+    ,getPanelID: function(){
+        return $('#accordion').accordion('option','active');
+    }
+    ,showPanel: function(){
+        var active = $('#accordion').accordion('option','active');
+        switch(active){
+            case 0:
+                $('#dictTrade_panel').show()
+                break;
+            case 1:
+                $('#policy_panel').show()
+                break;
+            case 2:
+                $('#order_today_panel').show()
+                break;
+            case 3:
+                $('#market_panel').show()
+                break;
+            case 4:
+                $('#user_panel').show()
+                break;
+            case 5:
+                $('#_panel').show()
+                break;
+        }
+    }
+    //,$(':button').prop('disabled', true);
 };
 
 /**
@@ -944,6 +1031,7 @@ oojs$.com.stock.component.acountset =oojs$.createClass({
             div2.append(self.LABEL_UNIT);
         }
     }
+
     ,append_select_tradetype: function(CHECKED){
         var self = this;
         var select = $('<select></select>',{
@@ -1133,8 +1221,8 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
 
         var input = $('<input></input>',{}).text("");
         var stocks = preload.getStock();
-
         if(stocks!=null){
+
             $(input).autocomplete({
               source: stocks
             });
@@ -1142,10 +1230,50 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
 
         $('<label style="color: #000000; font-size: 80%;">请输入股票编码</label>').appendTo(div2);
         div2.append(input);
-        $('<input></input>',{type:"button",value:"新增"}).appendTo(div2).click(
+        $('<input></input>',{'type':"button",'value':"新增"}).appendTo(div2).click(
             {"div1":div1,"div2":div2,"div_ck":div_ck,"input":input,'data':data,'scope':self},
             self.addCKBtnFun
         );
+
+        var input = $('<input  type="file" name="uploads" multiple="multiple" style="display: none;" />');//
+        var button = $('<input type="button" value="上传文件"></input>');
+        button.click(function (){
+            input.click();
+         });
+        input.change(function(){
+            var files = $(this).get(0).files;
+            $(':input').prop('disabled', true);
+            // $(':a').prop('disabled', true);
+            console.log(files);
+            oojs$.http_upload( 'uploads_name', files,function(result){
+                console.log(JSON.stringify(result));
+                if(self.data.length>0){
+                    for(var i = 0; i < result.data.length; i++){
+                        self.data += ","+result.data[i];
+                    }
+                }else{
+                    for(var i = 0; i < result.data.length; i++){
+                        if(i == 0){
+                            self.data += result.data[0];
+                        }else{
+                            self.data += ","+result.data[i];
+                        }
+                    }
+                }
+                
+                self.rangeChk(div_ck);
+                $(':input').prop('disabled', false);
+                // $(':a').prop('disabled', false);
+                
+            }, function(percent){
+                console.log(percent);
+            })
+        });
+
+        div2.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        div2.append(input);
+        div2.append(button);
+
     }
 })
 
@@ -1311,11 +1439,16 @@ oojs$.com.stock.preload=oojs$.createClass({
 
 var preload = new oojs$.com.stock.preload();
 
+
 <%- jsState %>
+oojs$.addEventListener("ready",function(){
+        oojs$.showPanel();
+    });
 $(document).ready(function(){
     $("#accordion").accordion({
         active: 2
     });
+    
     var showTopInfo = function(){
         $("#topinfo").append(
             $('<a  href="#"">退出</a>').click(function(event){
@@ -1327,22 +1460,21 @@ $(document).ready(function(){
                         oojs$.showError(result.message);
                     }
                 });
-                
             })
         )
-        //$.get('http://jsonip.com/', function(r){ alert(r.ip); });
     };
     showTopInfo();
+
 	hideAllPanel();
-	//console.log('regular\n',regular.checkXNum(("00345"),5))
+	
     preload.load(function(){
         oojs$.dispatch("ready");
     });
-
+    
 
 <%- jsRegist %>
 
-    oojs$.heartTime();
+    // oojs$.heartTime();
 });
 
 </script>

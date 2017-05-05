@@ -160,6 +160,7 @@ var web_DB_config = function()
                 });
             }else{
                 if(callback){
+                    console.log(path.basename(__filename),err.code);
                     callback('error2',err);
                     callback = null;
                 }

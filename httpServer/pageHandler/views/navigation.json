@@ -18,6 +18,12 @@
 		]
 	}
 	,
+	{"交易行情":
+		[
+			{"id":"market","href":"#","name":"行情分析 ","htmlDoc":"market.html","jsState":"market.js"}
+		]
+	}
+	,
 	{"个人管理":
 		[
 			{"id":"user","href":"#","name":"个人中心 ","htmlDoc":"user.html","jsState":"user.js"}

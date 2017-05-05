@@ -1,3 +1,4 @@
+const WebSocket = require('ws');
 var http = require('http');
 var url = require("url");
 var path = require("path");
@@ -16,44 +17,61 @@ var workerList = new Array();
 exports.runPageServer = function( port )
 {
 	port = port || 20080;
+
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
-		// console.log(path.basename(__filename),"url:", req.url);
-		var _bufData = '';
-		req.on('data', function(chunkData)
-		{
-			_bufData += chunkData;
-		})
-		.on('end', function()
-		{
-            var reqData="";
+		if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
 
-			if( "POST" == req.method.toUpperCase() )
-			{
-				if(req.headers.accept.indexOf('application/json')!=-1)
-				{
-					if(_bufData.length>0){
-						try{
-							reqData = JSON.parse(_bufData);
-						}catch (err){
-							console.log("not json format");
+            var controller = require(path.join(__dirname,'pageHandler','controllers','upload.js'));
+            var ct = new controllerContext(req, res);
+            controller['upload'].apply(ct);
+
+		}else
+        {
+            // console.log(path.basename(__filename),"url:", req.url);
+            var _bufData = '';
+            req.on('data', function (chunkData) {
+                _bufData += chunkData;
+            })
+			.on('end', function () {
+				var reqData = "";
+
+				if ("POST" == req.method.toUpperCase()) {
+					if (req.headers.accept.indexOf('application/json') != -1) {
+						if (_bufData.length > 0) {
+							try {
+								reqData = JSON.parse(_bufData);
+							} catch (err) {
+								console.log("not json format");
+							}
+						} else {
+							reqData = {};
 						}
-					}else{
-                        reqData = {};
+					} else {
+						reqData = querystring.parse(_bufData);
 					}
-				}else{
-                    reqData = querystring.parse(_bufData);
 				}
-			}
-			req.post = reqData;
-			handlerRequest(req, res);
-		});
+				req.post = reqData;
+				handlerRequest(req, res);
+			});
+        }
 	}).listen(port);
+    var wss = new WebSocket.Server({ server });
+    wss.on('connection', function (ws) {
+        var id = setInterval(function () {
+            ws.send(JSON.stringify(process.memoryUsage()), function () { /* ignore errors */ });
+        }, 100);
+        console.log('started client interval');
+        ws.on('close', function () {
+            console.log('stopping client interval');
+            clearInterval(id);
+        });
+    });
 };
 
 var handlerRequest = function(req, res){
   
-  var actionInfo = route.getActionInfo(req.url, req.method);
+  	var actionInfo = route.getActionInfo(req.url, req.method);
     if(actionInfo.action){
        
         var controller = require(path.join(__dirname,'pageHandler','controllers',actionInfo.controller));

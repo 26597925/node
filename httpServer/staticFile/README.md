@@ -1,5 +1,7 @@
 # web server
 <pre>
+http://legacy.datatables.net/usage/columns
+https://datatables.net/release-datatables/examples/ajax/null_data_source.html
 
 show create table tableName;
 show create table node_distri_dl_other;

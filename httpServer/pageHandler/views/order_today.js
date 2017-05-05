@@ -48,11 +48,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
             'NAME':"操作"
         }
     ]
-    // ,select_tradetype:[
-    //     {id:"BUYCOUNT",name:"交易股数"}
-    //     ,{id:"BUYAMOUNT",name:"交易金额"}
-    //     ,{id:"PERCENT",name:"交易比例"}
-    // ]//帐户用
     ,order_today_list: []
     ,preOerder_ctrl_div:null
     ,order_today_body_div:null
@@ -60,22 +55,31 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,order_select2:null
     ,order_select3:null
     ,select_title:null//顶部下拉框数据结构
+    ,status:'init'
+    ,tb:null
     ,init:function(){
+        var self = this;
         $( "#order_today_tabs" ).tabs();
         $( "#order_today_tabs" ).tabs({ selected: 0 });
         // $("#order_today_tabs").tabs('select', 2);
         $("#order_today").click(this.order_today_tab1_clk);
         $("#order_today_tabs_a1").click(this.order_today_tab1_clk);
         $("#order_today_tabs_a2").click(this.order_today_tab2_clk);
-        order_today.order_today_tab1_clk();
+        
+        if(oojs$.getPanelID() == 2){
+            order_today.order_today_tab1_clk();
+        }
+        preload.getStock();
     }
 
     ,order_today_tab1_clk:function(){
+        var self = this;
         order_today.load_order_today();
     }
 
     ,order_today_tab2_clk:function(event){
-
+        var self = this;
+        
         dictTrade.load_userAccount(function(){
             policy.load_subscribe(function () {
                 console.log("order\n","load subscrible\n");
@@ -98,7 +102,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 }
             })
         });
-        preload.getStock();
+        
     }
 
     ,option_append: function(select,obj,filter){
@@ -162,18 +166,13 @@ oojs$.com.stock.order_today = oojs$.createClass(
         delete sendData['CTRL'];
         console.log("switch",JSON.stringify(sendData))
         oojs$.httpPost_json("/update_ordertoday",[sendData],function(result,textStatus,token){
-                if(result.success){
-                    // if( type == 1){
-                    //     policy.policy_tab1_click();
-                    // }else if( type == 2){
-                    //     policy.policy_tab2_click();
-                    // }
-                    $( "#order_today_tabs" ).tabs({ selected: 0 });
-                    order_today.order_today_tab1_clk();
-                }else{
-                    oojs$.showError(result.message);
-                }
-            });
+            if(result.success){
+                $( "#order_today_tabs" ).tabs({ selected: 0 });
+                order_today.order_today_tab1_clk();
+            }else{
+                oojs$.showError(result.message);
+            }
+        });
     }
     ,
     stockDetail:null
@@ -281,20 +280,25 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,appendTB_new_order_today:function(){
         var self = this;
         var container =$('#order_today_tabs_2');
-        // container.empty();
-        var tb = null;
+        //container.empty();
+        if(self.tb != null){
+            self.tb.empty();
+        }else{
+            self.tb = $('<table></table>', {
+            'class':"display dataTable"
+        });
+        }
+        
         if(self.preOerder_ctrl_div==null){
             self.preOerder_ctrl_div = $('<div id="preOerder_ctrl_div"></div>');
             self.preOerder_ctrl_div.appendTo(container);
             
         }
-        tb = $('<table></table>', {
-            'class':"display dataTable"
-        });
+        
         
         console.log('appendTB_new_order_today\n',JSON.stringify(policy.policy_subscribe[0]));
         
-        self.appendTB_control(tb);
+        self.appendTB_control(self.tb);
 
         if(policy.policy_subscribe.length>0){
             var event = {};
@@ -462,35 +466,30 @@ oojs$.com.stock.order_today = oojs$.createClass(
             if(result.success){
                 self.order_today_list = [];
                 self.order_today_list = result.data;
-                self.appendTB_order_today();
+                if(self.order_today_list.length == 0){
+
+                    dictTrade.load_userAccount(function(){
+                        console.log(dictTrade.dictTrade_list_body.length)
+                        if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
+                            self.status = "notinit";
+                            console.log('show dicttrade');
+                            $('#accordion').accordion({'active':0});
+                            oojs$.dispatch("ready");
+                        }else if(self.status == "init"){
+                            self.status = "notinit";
+                            console.log('show policy');
+                            $('#accordion').accordion({'active':1});
+                            oojs$.dispatch("ready");
+                        }
+                    })
+                }else{
+                    self.appendTB_order_today();
+                }
             }else{
                 oojs$.showError(result.message);
             }
         });
     }
-
-    // ,append_select_tradetype: function(){
-    //     var self = this;
-    //     var select = $('<select></select>',{
-    //         // id:'order_select2'
-    //     });
-
-    //     select.prop( "disabled", true );
-
-    //     select.append(
-    //         "<option value='-1'>请选择交易策略</option>"
-    //     );
-
-    //     for(var i = 0; i < self.select_tradetype.length; i++){
-    //         select.append(
-    //             "<option value='"
-    //             +self.select_tradetype[i]['id']
-    //             +"'>"
-    //             +self.select_tradetype[i]['name']+"</option>"
-    //         );
-    //     }
-    //     return select;
-    // }
 
     //顶部下拉框数据结构
         /**

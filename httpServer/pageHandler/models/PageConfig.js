@@ -238,9 +238,15 @@ route.map({
 
 //================================
 route.map({
+    method:'post',
+    url:/^\/upload\/?$/i,
+    controller:'upload',
+    action:'upload'
+});
+//================================
+route.map({
     method:'get',
     url:/^\/exit\/?$/i,
     controller:'login',
     action:'exit'
 });
-

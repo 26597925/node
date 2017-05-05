@@ -42,15 +42,18 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             NAME:"操作"
         }
     ]//增加修改基准数据
-        // ,
-	// select_trade: []//券商关联表
 	,dictTrade_list_body: []//券商列表数据
-	// ,dictTrade_record:null
-	// ,dictTrade_selectElement: null
 	,init:function(){
+        var self = this;
 		$( "#dictTrade_tabs" ).tabs();
         this.appendTB_add();
         $("#dictTrade").click(this.dictTrade_tab1_click);
+        if(oojs$.getPanelID() == 0){
+            if(self.dictTrade_list_body.length == 0){
+                $( "#dictTrade_tabs" ).tabs({ 'selected': 1 });
+            }
+        }
+        
 	}
 
 	,dictTrade_tab1_click:function(){
