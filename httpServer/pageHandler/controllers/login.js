@@ -37,7 +37,7 @@ var add_newUser = function(context){
                     var sql2 = "select USERID from tb_user_basic where `PHONENUMBER` = '"+self.req.post["PHONENUMBER"]+"' and `PASSWORD` = '"+self.req.post["PASSWORD"]+"'";
                     db.query(sql2,function(){
                         if(arguments.length==1){
-                            updateUserLoginTime(arguments["USERID"],self,"USERID");
+                            updateUserLoginTime(arguments[0]["USERID"],self);
                          }else{
                             result = {'success':false,'message':'数据存在问题，请联系管理员 code:2'};
                             self.responseDirect(200,"text/json",JSON.stringify(result));
