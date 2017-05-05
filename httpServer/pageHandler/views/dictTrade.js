@@ -305,6 +305,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
             body = null;
                 dictTrade.dictTrade_tab1_click();
+                $( "#dictTrade_tabs" ).tabs({ 'selected': 0 });
             }else{
                 console.log("sub_userAccount result:",result.message);
                 oojs$.showError(result.message);
