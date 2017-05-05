@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>children demo</title>
+    <style>
+        body {
+            font-size: 16px;
+            font-weight: bolder;
+        }
+        /*div {*/
+            /*width: 130px;*/
+            /*height: 82px;*/
+            /*margin: 10px;*/
+            /*float: left;*/
+            /*border: 1px solid blue;*/
+            /*padding: 4px;*/
+        /*}*/
+        #container {
+            width: auto;
+            height: 105px;
+            margin: 0;
+            float: none;
+            border: none;
+        }
+        .hilite {
+            border-color: red;
+        }
+        #results {
+            display: block;
+            color: red;
+        }
+        p, span, em, a, b, button {
+            border: 1px solid transparent;
+        }
+        p {
+            margin: 10px;
+        }
+        span {
+            color: blue;
+        }
+        input {
+            width: 100px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script type="text/javascript">
+
+    var appendCK_stockset=function(div1,div2,data,rangeChk,delBtnFun,addBtnFun,emit){
+        data = String(data).trim();
+        div1.empty();
+        div2.empty();
+        console.log("stockset data",data);
+        var div_ck = $('<div></div>');
+        div1.append(div_ck);
+
+        rangeChk(div_ck,data);
+        $('<input></input>',{type:"button",value:"删除"}).appendTo(div1).click(
+            {"div_ck":div_ck,data:data,'emit':emit},
+            delBtnFun
+        );
+
+        var input = $('<input></input>',{
+        }).text("");
+        div2.append(input);
+
+        $('<input></input>',{type:"button",id:"stock_changeAdd_btn",name:"",value:"新增"}).appendTo(div2).click(
+            {"div_ck":div_ck,"rangeChk":rangeChk,"input":input,'data':data,'emit':emit},
+            addBtnFun
+        );
+
+    };
+
+    var delCKBtnFun = function(event){
+
+        var kids1 = event.data['div_ck'].find( "input" );
+        var tmpdatas = "";
+        var isselect = false;
+        for(var i =0; i < kids1.length; i++){
+            console.log($(kids1[i]).is(':checked'),$(kids1[i]).val());
+            if(!$(kids1[i]).is(':checked')){
+                isselect = true;
+                tmpdatas += $(kids1[i]).val()+",";
+            }
+        }
+        if(isselect){
+            tmpdatas = tmpdatas.substr(0,tmpdatas.length-1);
+        }
+        if(event.data['emit']){
+            event.data['emit'](tmpdatas);
+        }
+        rangeChk(event.data['div_ck'],tmpdatas);
+    };
+
+    var addCKBtnFun = function(event){
+
+        var inputval = event.data['input'].val();
+        inputval = inputval.trim();
+        var data = String(event.data['data']).trim();
+        if( inputval.length > 1){
+            if(data.length>1){
+                data += ","+inputval
+            }else{
+                data +=  inputval
+            }
+        }
+
+        if(event.data['emit']){
+            event.data['emit'](data);
+        }
+        rangeChk(event.data['div_ck'],data);
+
+    };
+
+    var rangeChk = function(div_ck,data){
+        div_ck.empty();
+        var label = null;
+        var checkbox = null;
+        if(data.indexOf(",") == 0){
+            data = data.substr(1);
+        }
+
+        if(data[data.length-1]==","){
+            data = data.substr(0,data.length-1);
+        }
+
+        if( data.length > 0 ){
+            var datas = data.split(",");
+            if(datas.length == 1 &&  datas[0] == ""){
+                //null
+            }else{
+                for(var i = 0; i < datas.length; i++){
+                    checkbox = $('<input></input>',{
+                        'style':'width:10px',
+                        'type':'checkbox',
+                        'value':datas[i]
+                    }).appendTo(div_ck);
+
+                    $('<label></label>').appendTo(div_ck).text(datas[i]);
+                    div_ck.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+                }
+            }
+        }
+    };
+    var receiveData = function(){
+        console.log(arguments[0]);
+        appendCK_stockset($('#div1'),$('#div2'),arguments[0],rangeChk,delBtnFun,addBtnFun,receiveData);
+    };
+    $(document).ready(function(){
+
+        appendCK_stockset($('#div1'),$('#div2'),"12312,312312",rangeChk,delBtnFun,addBtnFun,receiveData);
+
+    });
+
+
+    </script>
+
+</head>
+<body>
+
+<div id="div1">
+</div>
+<div id="div2">
+</div>
+<script>
+
+
+
+</script>
+
+</body>
+</html>
