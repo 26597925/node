@@ -249,30 +249,41 @@ var insert_userAccount = function(context,account_result){
             // ('301719804403', 20000, 0, 0, 0, 0.4, 1, '2017-02-23 01:11:14', '2017-02-23 09:10:06', ''),
 
             var sql2 = "INSERT INTO `tb_capital_conf` (" +
-                "`ACCOUNTID`, `USERID`, `MAXBUY`, " +
-                "`BUYCOUNT`, `BUYAMOUNT`, `PERCENT`, " +
-                "`SPLITCOUNT`, " +
+                " `ACCOUNTID`," +
+                " `USERID`," +
+                " `MAXBUY`, " +
+                " `BUYCOUNT`," +
+                " `BUYAMOUNT`," +
+                " `PERCENT`, " +
+                " `SPLITCOUNT`, " +
                 // "`ADDTIME`, " +
                 "`MODTIME`" +
                 // ", " +
                 // "`REMARK`" +
                 ") VALUES(" +
-                "'%s', %s, %s, " +
-                "%s, %s, %s, " +
-                "%s, " +
-                // "'2017-02-23 01:11:14', " +
-                "'2017-02-23 09:10:06'" +
+                "'%s'," +
+                " %s," +
+                " %s, " +
+                " %s," +
+                " %s," +
+                " %s, " +
+                " %s, " +
+                "'%s'" +
                 // ", " +
                 // "''" +
                 ")";
 
-            sql2 = util.format(sql1,
-                account_result['accountid'], ID, post["MAXBUY"]
-                ,post["BUYAMOUNT"], post["BUYAMOUNT"], post["PERCENT"]
+            sql2 = util.format(sql2,
+                account_result['accountid']
+                ,ID
+                ,post["MAXBUY"]
+                ,post["BUYAMOUNT"]
+                ,post["BUYAMOUNT"]
+                ,post["PERCENT"]
                 ,post["SPLITCOUNT"]
                 ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
             );
-
+            console.log("db.transaction",sql1,sql2);
             try{
                 db.transaction(sql1,sql2,function(){
                     context.responseDirect(200,"text/json",JSON.stringify(result));
