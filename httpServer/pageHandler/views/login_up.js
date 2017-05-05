@@ -64,13 +64,13 @@ $(document).ready(function(){
         }
 
         var re= /^[1-9][0-9]{5}$/;
-        if(re.test(ZIPCODE)){
+        if(!re.test(ZIPCODE)){
             $("#message").text("您输入的邮编不正确");
             return;
         }
 
         var reg = /^(?:[a-z\d]+[_\-\+\.]?)*[a-z\d]+@(?:([a-z\d]+\-?)*[a-z\d]+\.)+([a-z]{2,})+$/;
-        if(reg.test(EMAIL)){
+        if(!reg.test(EMAIL)){
             $("#message").text("您输入的邮箱不正确");
             return;
         }

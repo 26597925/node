@@ -1,4 +1,5 @@
 <ul>
+
 <li>https://github.com/bminer/node-mysql-queues</li>
 <li>npm install mysql-queues</li>
 <li>https://craftpip.github.io/jquery-confirm/</li>
@@ -20,3 +21,10 @@
 <li>npm install --save ws </li>
 <span>https://github.com/websockets/ws</span>
 </ul>
+
+<span>
+yum install -y gcc-c++ make
+curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -
+yum install nodejs
+node -v
+</span>

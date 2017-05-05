@@ -22,6 +22,18 @@ oojs
 
 <p>
 
+SyntaxError: Use of const in strict mode.
+>>>
+node --version v0.10.37
+>>>
+npm cache clean -f
+npm install -g n
+n v7.5.0 //
+n stable
+node --version
+node app.js
+
+
 //nameSpace
 var oojs$ = {
 	ns : function(space) {
