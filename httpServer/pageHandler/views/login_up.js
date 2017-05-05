@@ -9,7 +9,7 @@ $(document).ready(function(){
     showTopInfo();
 
     $("#login").click(function(){
-
+        $("#login").prop('disabled',true);
         $("#message").text("");
         var UENAME = $.trim($("#UENAME").val());
         var PASSWORD = $.trim($("#PASSWORD").val());
@@ -21,57 +21,68 @@ $(document).ready(function(){
         var EMAIL = $.trim($("#EMAIL").val());
 
         if(!(/^1(3|4|5|7|8)\d{9}$/.test(PHONENUMBER))){ 
-            $("#message").text("手机号码有误，请重填");  
+            $("#message").text("手机号码有误，请重填");
+            $("#login").prop('disabled',false);
             return false; 
         } 
         if(UENAME.length <= 0){
             $("#message").text("请输入用户名");
+            $("#login").prop('disabled',false);
             return;         
         }
 
         if(PASSWORD.length <= 0){
             $("#message").text("请输入密码");
+            $("#login").prop('disabled',false);
             return;
         }
 
         if(PASSWORD2.length <= 0){
             $("#message").text("请再次输入密码");
+            $("#login").prop('disabled',false);
             return;
         }
 
         if(PASSWORD!=PASSWORD2){
             $("#message").text("您两次输入的密码不一致");
+            $("#login").prop('disabled',false);
             return;
         }
         if(UCNAME.length <= 0){
             $("#message").text("请输入中文名");
+            $("#login").prop('disabled',false);
             return;
         }
 
         if(PHONENUMBER.length <= 0){
             $("#message").text("请输入手机号码");
+            $("#login").prop('disabled',false);
             return;
         }
 
         if(ADDRESS.length <= 0){
             $("#message").text("请输入地址");
+            $("#login").prop('disabled',false);
             return;
         }
 
         if(ZIPCODE.length <= 0){
             $("#message").text("请输入邮编");
+            $("#login").prop('disabled',false);
             return;
         }
 
         var re= /^[1-9][0-9]{5}$/;
         if(!re.test(ZIPCODE)){
             $("#message").text("您输入的邮编不正确");
+            $("#login").prop('disabled',false);
             return;
         }
 
         var reg = /^(?:[a-z\d]+[_\-\+\.]?)*[a-z\d]+@(?:([a-z\d]+\-?)*[a-z\d]+\.)+([a-z]{2,})+$/;
         if(!reg.test(EMAIL)){
             $("#message").text("您输入的邮箱不正确");
+            $("#login").prop('disabled',false);
             return;
         }
         var sendData = {
@@ -104,6 +115,7 @@ $(document).ready(function(){
                     });
                     $('#message').append(href);
                 }
+                $("#login").prop('disabled',false);
             },
             beforeSend: function(xhr){
                 xhr.withCredentials = true;
