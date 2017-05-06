@@ -96,7 +96,9 @@ oojs$.com.stock.policy = oojs$.createClass(
         $("#policy").click(this.policy_tab1_click);
         $("#policy_tabs_a1").click(this.policy_tab1_click);
         $("#policy_tabs_a2").click(this.policy_tab2_click);
-
+        if(oojs$.getPanelID() == 1){
+            policy.policy_tab1_click();
+        }
     }
     ,policy_tab1_click:function(){
         policy.load_unsubscribe(function () {
