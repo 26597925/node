@@ -83,23 +83,40 @@ oojs$.com.stock.order_today = oojs$.createClass(
         dictTrade.load_userAccount(function(){
             policy.load_subscribe(function () {
                 console.log("order\n","load subscrible\n");
-
-                order_today.appendTB_new_order_today();
-                order_today.select_title = null;
-                order_today.select_title = {};
-                for(var i = 0; i < policy.policy_subscribe.length; i++ ){
-                    order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
+                if(policy.policy_subscribe.length == 0){
+                    console.log('show policy_subscribe!');
+                    dictTrade.load_userAccount(function(){
+                        console.log(dictTrade.dictTrade_list_body.length)
+                        if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
+                            self.status = "notinit";
+                            $('#accordion').accordion({'active':0});
+                            oojs$.dispatch("ready");
+                        }else if(self.status == "init"){
+                            self.status = "notinit";
+                            console.log('show policy');
+                            $('#accordion').accordion({'active':1});
+                            oojs$.dispatch("ready");
+                        }
+                    });
+                }else{
+                    order_today.appendTB_new_order_today();
+                    order_today.select_title = null;
+                    order_today.select_title = {};
+                    for(var i = 0; i < policy.policy_subscribe.length; i++ ){
+                        order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
+                    }
+                    order_today.appendTB_order_today_slct();
+                    if(policy.policy_subscribe.length>0){
+                        $(order_today.order_select1).val(parseInt(policy.policy_subscribe[0]['DIRTYPE']));
+                        order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
+                        
+                        $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
+                        order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
+                        console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
+                        $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
+                    }
                 }
-                order_today.appendTB_order_today_slct();
-                if(policy.policy_subscribe.length>0){
-                    $(order_today.order_select1).val(parseInt(policy.policy_subscribe[0]['DIRTYPE']));
-                    order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
-                    
-                    $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
-                    order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
-                    console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
-                    $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
-                }
+                
             })
         });
         
@@ -467,21 +484,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 self.order_today_list = [];
                 self.order_today_list = result.data;
                 if(self.order_today_list.length == 0){
-
-                    dictTrade.load_userAccount(function(){
-                        console.log(dictTrade.dictTrade_list_body.length)
-                        if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
-                            self.status = "notinit";
-                            console.log('show dicttrade');
-                            $('#accordion').accordion({'active':0});
-                            oojs$.dispatch("ready");
-                        }else if(self.status == "init"){
-                            self.status = "notinit";
-                            console.log('show policy');
-                            $('#accordion').accordion({'active':1});
-                            oojs$.dispatch("ready");
-                        }
-                    })
+                    $('#order_today_tabs').tabs({ 'selected': 1 });
+                    self.order_today_tab2_clk();
                 }else{
                     self.appendTB_order_today();
                 }
