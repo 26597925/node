@@ -846,7 +846,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.PERCENT='';
                     if(self.ACCOUNT!=null){
                         if( self.ACCOUNT.hasOwnProperty('PERCENT') ){
-                            self.PERCENT=self.ACCOUNT['PERCENT'];
+                            self.INPUT.val(self.ACCOUNT['PERCENT']);
                         }
                     }
                 }
@@ -1322,7 +1322,7 @@ oojs$.com.stock.preload=oojs$.createClass({
     ,STATUS:{'TRADE':0,'PGROUP':0}
     ,STOCKS:null
     ,isLoadStock:false
-    ,getStock:function(){
+    ,getStock:function(callback){
         var self = this;
         if(self.STOCKS == null && !self.isLoadStock ){
             self.isLoadStock = true;
@@ -1332,23 +1332,29 @@ oojs$.com.stock.preload=oojs$.createClass({
                     
                     var obj = JSON.parse(result.data);
                     for(var i = 0; i < obj.length; i++){
-                        // {
-                        //     label: "aardvark_哈对方考虑",
-                        //     value: "aardvark"
-                        // }
                         self.STOCKS.push({
                             'label':obj[i]['code']+" "+obj[i]['name']
                             ,'value':obj[i]['code']
                         });
                     }
-                    return self.STOCKS;
                     self.isLoadStock = false;
+
+                    if(callback){
+                        callback(self.STOCKS);
+                    }
+                    return self.STOCKS;
                 }else{
                     // oojs$.showError(result.message);
+                    if(callback){
+                        callback([]);
+                    }
                     self.isLoadStock = false;
                 }
             })
         }else{
+            if(callback){
+                callback(self.STOCKS);
+            }
             return self.STOCKS;
         }
     }

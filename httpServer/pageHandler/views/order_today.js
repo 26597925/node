@@ -66,10 +66,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
         $("#order_today_tabs_a1").click(this.order_today_tab1_clk);
         $("#order_today_tabs_a2").click(this.order_today_tab2_clk);
         
-        if(oojs$.getPanelID() == 2){
-            order_today.order_today_tab1_clk();
-        }
-        preload.getStock();
+        
+        preload.getStock(function(){
+            if(oojs$.getPanelID() == 2){
+                order_today.order_today_tab1_clk();
+            }
+        });
     }
 
     ,order_today_tab1_clk:function(){
