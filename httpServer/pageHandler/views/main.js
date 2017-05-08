@@ -845,7 +845,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.BUYAMOUNT='';
                     self.PERCENT='';
                     if(self.ACCOUNT!=null){
-                        if(self.ACCOUNT.hasOwnProperty('PERCENT'))){
+                        if( self.ACCOUNT.hasOwnProperty('PERCENT') ){
                             self.PERCENT=self.ACCOUNT['PERCENT'];
                         }
                     }
