@@ -773,12 +773,12 @@ var oojs$ = {
 };
 
 /**
-* var acountset = new oojs$.com.stock.component.acountset();
-* acountset.init( div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED);
-* console.log(acountset.val());=>{ACCOUNTID:"123456",BORROW:0,BUYAMOUNT:"",BUYCOUNT:"",CHECKED:true,DIRTYPE:9,PERCENT:""}
+* var accountset = new oojs$.com.stock.component.accountset();
+* accountset.init( div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED);
+* console.log(accountset.val());=>{ACCOUNTID:"123456",BORROW:0,BUYAMOUNT:"",BUYCOUNT:"",CHECKED:true,DIRTYPE:9,PERCENT:""}
 */
-oojs$.ns("com.stock.component.acountset");
-oojs$.com.stock.component.acountset =oojs$.createClass({
+oojs$.ns("com.stock.component.accountset");
+oojs$.com.stock.component.accountset =oojs$.createClass({
     NAME:"account"
     ,ck_change:function(event){
         var self = event.data['scope'];
@@ -1314,11 +1314,13 @@ oojs$.com.stock.preload=oojs$.createClass({
     ,TRADE:[]
     ,STATUS:{'TRADE':0,'PGROUP':0}
     ,STOCKS:null
+    ,CAPITAL:null
     ,isLoadStock:false
+    ,isLoadCapital:false
     ,getStock:function(){
         var self = this;
         if(self.STOCKS == null && !self.isLoadStock ){
-            self.isLoadStock = true
+            self.isLoadStock = true;
             oojs$.httpGet("/stocks",function(result,textStatus,token){
                 if(result.success){
                     self.STOCKS = [];
@@ -1343,6 +1345,25 @@ oojs$.com.stock.preload=oojs$.createClass({
             })
         }else{
             return self.STOCKS;
+        }
+    }
+    ,getCapital:function(){
+        var self = this;
+        if(self.CAPITAL==null && !self.isLoadCapital){
+            self.isLoadCapital = true;
+            oojs$.httpGet("/capital",function(result,textStatus,token){
+                if(result.success){
+                    self.STOCKS = [];
+                    self.CAPITAL= JSON.parse(result.data);
+                    return self.CAPITAL;
+                    self.isLoadCapital = false;
+                }else{
+                    // oojs$.showError(result.message);
+                    self.isLoadCapital = false;
+                }
+            });
+        }else{
+            return self.CAPITAL;
         }
     }
     ,getPGroupItem:function(){

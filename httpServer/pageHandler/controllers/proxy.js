@@ -53,18 +53,33 @@ exports.capital = function(){
     var self = this;
     var uID = sessions.get_uID(self.req);
     var result = {'success':true,'data':''};
-
-
-    proxy_capital(function(_result){
-        self.setStocks(_result);
-        result.data = _result;
+    if(self.req.post){
+        if( self.req.post.hasOwnProperty("accountid")){
+            proxy_capital(self.req.post["accountid"],function(){
+                if(arguments.length ==1){
+                    result.data = arguments[0];
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }else{
+                    result.message = "请求失败 code：001 proxy";
+                    result.success = false;
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }
+            });
+        }else{
+            result.message = "请求失败 code：002 proxy";
+            result.success = false;
+            self.responseDirect(200,"text/json",JSON.stringify(result));
+        }
+    }else{
+        result.message = "请求失败 code：003 proxy";
+        result.success = false;
         self.responseDirect(200,"text/json",JSON.stringify(result));
-    });
+    }
 
 };
 
 //http://111.206.209.27:8080/account/detail?accountid=309219512983资金提示
-var proxy_capital = function(scope,accountid){
+var proxy_capital = function(accountid,callback){
     var url = 'http://111.206.209.27:8080/account/detail?accountid='+accountid;
     //{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000",
     // "account_muse": "1986.90", //可用
