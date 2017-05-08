@@ -79,47 +79,38 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
     ,order_today_tab2_clk:function(event){
         var self = this;
-        
         dictTrade.load_userAccount(function(){
-            policy.load_subscribe(function () {
-                console.log("order\n","load subscrible\n");
-                if(policy.policy_subscribe.length == 0){
-                    console.log('show policy_subscribe!');
-                    dictTrade.load_userAccount(function(){
-                        console.log(dictTrade.dictTrade_list_body.length)
-                        if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
-                            self.status = "notinit";
-                            $('#accordion').accordion({'active':0});
-                            oojs$.dispatch("ready");
-                        }else if(self.status == "init"){
-                            self.status = "notinit";
-                            console.log('show policy');
-                            $('#accordion').accordion({'active':1});
-                            oojs$.dispatch("ready");
+            if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init") 
+                self.status = "notinit";
+                $('#accordion').accordion({'active':0});
+                oojs$.dispatch("ready");
+            }else if(dictTrade.dictTrade_list_body.length > 0  && self.status == "init"){
+                policy.load_subscribe(function () {
+                    console.log("order\n","load subscrible\n");
+                    self.status = "notinit";
+                    if(policy.policy_subscribe.length == 0){
+                        $('#accordion').accordion({'active':1});
+                        oojs$.dispatch("ready");
+                    }else{
+                        order_today.appendTB_new_order_today();
+                        order_today.select_title = null;
+                        order_today.select_title = {};
+                        for(var i = 0; i < policy.policy_subscribe.length; i++ ){
+                            order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
                         }
-                    });
-                }else{
-                    order_today.appendTB_new_order_today();
-                    order_today.select_title = null;
-                    order_today.select_title = {};
-                    for(var i = 0; i < policy.policy_subscribe.length; i++ ){
-                        order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
+                        order_today.appendTB_order_today_slct();
+                        if(policy.policy_subscribe.length>0){
+                            $(order_today.order_select1).val(parseInt(policy.policy_subscribe[0]['DIRTYPE']));
+                            order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
+                            $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
+                            order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
+                            console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
+                            $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
+                        }
                     }
-                    order_today.appendTB_order_today_slct();
-                    if(policy.policy_subscribe.length>0){
-                        $(order_today.order_select1).val(parseInt(policy.policy_subscribe[0]['DIRTYPE']));
-                        order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
-                        
-                        $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
-                        order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
-                        console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
-                        $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
-                    }
-                }
-                
-            })
+                })
+            }  
         });
-        
     }
 
     ,option_append: function(select,obj,filter){
@@ -250,7 +241,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         accountOBJ["ELEMENT"] = drawitem_data['ACCOUNTID']['ELEMENT'];
         accountOBJ["COLUMN1"] = $('<div></div>');
         accountOBJ["COLUMN2"] = $('<div></div>');
-        accountOBJ["COMPONENT"] = new oojs$.com.stock.component.acountset();
+        accountOBJ["COMPONENT"] = new oojs$.com.stock.component.accountset();
         accountOBJ["COMPONENT"].init(
             accountOBJ["COLUMN1"]
             ,accountOBJ["COLUMN2"]
@@ -307,7 +298,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         }
         
         if(self.preOerder_ctrl_div==null){
-            self.preOerder_ctrl_div = $('<div id="preOerder_ctrl_div"></div>');
+            self.preOerder_ctrl_div = $('<div></div>');
             self.preOerder_ctrl_div.appendTo(container);
             
         }
@@ -483,7 +474,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             if(result.success){
                 self.order_today_list = [];
                 self.order_today_list = result.data;
-                if(self.order_today_list.length == 0){
+                if(self.order_today_list.length == 0 && self.status == 'init' ){
                     $('#order_today_tabs').tabs({ 'selected': 1 });
                     self.order_today_tab2_clk();
                 }else{
@@ -629,6 +620,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             var trade_list = [];
             var index = 0;
             var item_account = null;
+            console.log("同时请求账号中的数据");
             for(var elm in dictTrade.dictTrade_list_body){
                 item_account = dictTrade.dictTrade_list_body[elm];
                 trade_list[index] = {};
@@ -636,7 +628,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 trade_list[index]["ELEMENT"] = item_account;
                 trade_list[index]["COLUMN1"] = $('<div></div>');
                 trade_list[index]["COLUMN2"] = $('<div></div>');
-                trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.acountset();
+                trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
                 ////div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED)
                 
                 trade_list[index]["COMPONENT"].init(

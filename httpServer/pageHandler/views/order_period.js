@@ -230,7 +230,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         accountOBJ["ELEMENT"] = drawitem_data['ACCOUNTID']['ELEMENT'];
         accountOBJ["COLUMN1"] = $('<div></div>');
         accountOBJ["COLUMN2"] = $('<div></div>');
-        accountOBJ["COMPONENT"] = new oojs$.com.stock.component.acountset();
+        accountOBJ["COMPONENT"] = new oojs$.com.stock.component.accountset();
         accountOBJ["COMPONENT"].init(
             accountOBJ["COLUMN1"]
             ,accountOBJ["COLUMN2"]
@@ -241,6 +241,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
             ,drawitem_data['BUYAMOUNT']["ELEMENT"]
             ,drawitem_data['PERCENT']["ELEMENT"]
             ,true
+            ,drawitem_data['ACCOUNTID']['ELEMENT']
         );
 
         self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
@@ -286,7 +287,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
             self.tb.empty()
         }
         if(self.preOerder_ctrl_div==null){
-            self.preOerder_ctrl_div = $('<div id="preOerder_ctrl_div"></div>');
+            self.preOerder_ctrl_div = $('<div></div>');
             self.preOerder_ctrl_div.appendTo(container);
         }
         
@@ -603,7 +604,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 trade_list[index]["ELEMENT"] = item_account;
                 trade_list[index]["COLUMN1"] = $('<div></div>');
                 trade_list[index]["COLUMN2"] = $('<div></div>');
-                trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.acountset();
+                trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
                  
                 trade_list[index]["COMPONENT"].init(
                     trade_list[index]["COLUMN1"]
@@ -615,6 +616,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                     ,item_account['BUYAMOUNT']
                     ,item_account['PERCENT']
                     ,true
+                    ,item_account
                 );
             }
             console.log("trade_list",JSON.stringify(trade_list));

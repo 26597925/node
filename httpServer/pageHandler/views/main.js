@@ -774,7 +774,7 @@ var oojs$ = {
 
 /**
 * var accountset = new oojs$.com.stock.component.accountset();
-* accountset.init( div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED);
+* accountset.init( div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT);
 * console.log(accountset.val());=>{ACCOUNTID:"123456",BORROW:0,BUYAMOUNT:"",BUYCOUNT:"",CHECKED:true,DIRTYPE:9,PERCENT:""}
 */
 oojs$.ns("com.stock.component.accountset");
@@ -844,6 +844,11 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.BUYCOUNT='';
                     self.BUYAMOUNT='';
                     self.PERCENT='';
+                    if(self.ACCOUNT!=null){
+                        if(self.ACCOUNT.hasOwnProperty('PERCENT'))){
+                            self.PERCENT=self.ACCOUNT['PERCENT'];
+                        }
+                    }
                 }
                 break;
         }
@@ -899,11 +904,12 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.INPUT = null;
         self.CHECK = null;
         self.LABEL_UNIT = null;
+        self.ACCOUNT = null;
+        delete self.ACCOUNT;
         self.init = null;
         delete self.init;
         self.append_select_tradetype = null;
         delete self.append_select_tradetype;
-
     }
     ,div1:null
     ,div2:null
@@ -919,13 +925,14 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,BUYCOUNT:''
     ,BUYAMOUNT:''
     ,PERCENT:''
+    ,ACCOUNT:null
     ,select_tradetype:[
         {id:"BUYCOUNT",name:"交易股数"}
         ,{id:"BUYAMOUNT",name:"交易金额"}
         ,{id:"PERCENT",name:"交易比例"}
     ]//帐户用
     
-    ,init:function(div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED){
+    ,init:function(div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT){
         //column1
         var self = this;
         div1.empty();
@@ -937,6 +944,8 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.BUYAMOUNT = BUYAMOUNT;
         self.PERCENT = PERCENT;
         self.CHECKED = CHECKED;
+        self.ACCOUNT = ACCOUNT;
+        
         var checkbox = self.CHECK = $('<input></input>',{
             'type':'checkbox'
 
@@ -978,10 +987,8 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     {'scope':self},
                     self.DIRTYPE
                 );
-
                 div2.append(self.SELECT_DIRTYPE);
             }
-
             
         }else if(DIRTYPE == 1){//卖出
             if(BORROW == 0){
@@ -1314,9 +1321,7 @@ oojs$.com.stock.preload=oojs$.createClass({
     ,TRADE:[]
     ,STATUS:{'TRADE':0,'PGROUP':0}
     ,STOCKS:null
-    ,CAPITAL:null
     ,isLoadStock:false
-    ,isLoadCapital:false
     ,getStock:function(){
         var self = this;
         if(self.STOCKS == null && !self.isLoadStock ){
@@ -1345,25 +1350,6 @@ oojs$.com.stock.preload=oojs$.createClass({
             })
         }else{
             return self.STOCKS;
-        }
-    }
-    ,getCapital:function(){
-        var self = this;
-        if(self.CAPITAL==null && !self.isLoadCapital){
-            self.isLoadCapital = true;
-            oojs$.httpGet("/capital",function(result,textStatus,token){
-                if(result.success){
-                    self.STOCKS = [];
-                    self.CAPITAL= JSON.parse(result.data);
-                    return self.CAPITAL;
-                    self.isLoadCapital = false;
-                }else{
-                    // oojs$.showError(result.message);
-                    self.isLoadCapital = false;
-                }
-            });
-        }else{
-            return self.CAPITAL;
         }
     }
     ,getPGroupItem:function(){
