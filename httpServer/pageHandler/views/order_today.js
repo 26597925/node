@@ -80,7 +80,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,order_today_tab2_clk:function(event){
         var self = this;
         dictTrade.load_userAccount(function(){
-            if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init") 
+            if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
                 self.status = "notinit";
                 $('#accordion').accordion({'active':0});
                 oojs$.dispatch("ready");
@@ -252,6 +252,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,drawitem_data['BUYAMOUNT']["ELEMENT"]
             ,drawitem_data['PERCENT']["ELEMENT"]
             ,true
+            ,drawitem_data['ACCOUNTID']['ELEMENT']
         );
 
         self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
@@ -641,6 +642,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     ,item_account['BUYAMOUNT']
                     ,item_account['PERCENT']
                     ,true
+                    ,item_account
                 );
             }
             console.log("trade_list",JSON.stringify(trade_list));
