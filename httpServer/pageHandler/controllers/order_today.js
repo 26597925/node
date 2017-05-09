@@ -234,7 +234,6 @@ var http_post=function(){
         res.setEncoding('utf8');
         res.on('data', function (body) {
             console.log('Body: ' + body);
-
         });
     });
 

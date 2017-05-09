@@ -54,22 +54,33 @@ exports.capital = function(){
     var uID = sessions.get_uID(self.req);
     var result = {'success':true,'data':''};
     if(self.req.post){
-        if( self.req.post.hasOwnProperty("accountid")){
-            proxy_capital(self.req.post["accountid"],function(){
-                if(arguments.length ==1){
-                    result.data = arguments[0];
-                    self.responseDirect(200,"text/json",JSON.stringify(result));
-                }else{
-                    result.message = "请求失败 code：001 proxy";
-                    result.success = false;
-                    self.responseDirect(200,"text/json",JSON.stringify(result));
-                }
-            });
-        }else{
-            result.message = "请求失败 code：002 proxy";
-            result.success = false;
-            self.responseDirect(200,"text/json",JSON.stringify(result));
-        }
+        //if( self.req.post.hasOwnProperty("accountid")){
+        proxy_capitals(self.req.post, function(){
+            if(arguments.length ==1){
+                result.data = arguments[0];
+                self.responseDirect(200,"text/json",JSON.stringify(result));
+            }else{
+                result.message = "请求失败 code：001 proxy";
+                result.success = false;
+                self.responseDirect(200,"text/json",JSON.stringify(result));
+            }
+
+        });
+        //     proxy_capital(self.req.post["accountid"],function(){
+        //         if(arguments.length ==1){
+        //             result.data = arguments[0];
+        //             self.responseDirect(200,"text/json",JSON.stringify(result));
+        //         }else{
+        //             result.message = "请求失败 code：001 proxy";
+        //             result.success = false;
+        //             self.responseDirect(200,"text/json",JSON.stringify(result));
+        //         }
+        //     });
+        // // }else{
+        //     result.message = "请求失败 code：002 proxy";
+        //     result.success = false;
+        //     self.responseDirect(200,"text/json",JSON.stringify(result));
+        // }
     }else{
         result.message = "请求失败 code：003 proxy";
         result.success = false;
@@ -78,6 +89,8 @@ exports.capital = function(){
 
 };
 
+
+
 //http://111.206.209.27:8080/account/detail?accountid=309219512983资金提示
 var proxy_capital = function(accountid,callback){
     var url = 'http://111.206.209.27:8080/account/detail?accountid='+accountid;
@@ -85,6 +98,7 @@ var proxy_capital = function(accountid,callback){
     // "account_muse": "1986.90", //可用
     // "account_value": "6544.00", //总市值
     // "account_msum": "8530.90" } //总资产
+
     http.get(url,function(res){
         // console.log("content-type",res.headers['content-type'] );
         var result="";
@@ -127,6 +141,41 @@ var proxy_stock = function(callback){
         stock_load = false;
         console.log("error>>>",err);
     })
+};
+
+var proxy_capitals = function(sendData,callback){
+    var result = JSON.stringify(sendData) ;
+    console.log( path.basename(__filename), "http_post",JSON.stringify( result) ) ;
+    var options = {
+        //hostname: '111.206.209.27',
+        host:'111.206.209.27',
+        port: 8080,
+        path: '/account/detail?',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    var req = http.request(options, function(res) {
+        console.log('Status: ' + res.statusCode);
+        console.log('Headers: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (body) {
+            console.log('Body: ' + body);
+            if(callback){
+                callback(body);
+            }
+        });
+    });
+
+
+    req.on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+    });
+
+    req.write(result);
+    req.end();
 };
 
 

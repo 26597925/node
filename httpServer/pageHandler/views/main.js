@@ -862,6 +862,11 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             dirtyep = $(self.SELECT_DIRTYPE).val()
         }
 
+        if(self.INPUT.val()){
+            oojs$.showError("请选择交易策略并输入信息");
+            return null;
+        }
+
         if(self.SELECT){
             var one_third_slct = $(self.SELECT).val();
             switch(one_third_slct){
@@ -878,11 +883,20 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             case "PERCENT":
                 self.BUYCOUNT='';
                 self.BUYAMOUNT='';
-                self.PERCENT=self.INPUT.val();;
+                self.PERCENT=self.INPUT.val();
+                if(!regular.checkFloat(self.PERCENT)){
+                    oojs$.showError("输入的比例非法");
+                    return null;
+                }
+                if(Number(self.PERCENT)>1){
+                    oojs$.showError("输入的比例超出范围已经大于1");
+                    return null;
+                }
                 break;
             }
         }
         
+
         return {
             'CHECKED':checked
             ,'ACCOUNTID':self.ACCOUNTID
@@ -1459,7 +1473,7 @@ oojs$.addEventListener("ready",function(){
     });
 $(document).ready(function(){
     $("#accordion").accordion({
-        active: 2
+        active: 3
     });
     
     var showTopInfo = function(){
