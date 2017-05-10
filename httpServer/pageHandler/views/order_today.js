@@ -260,16 +260,20 @@ oojs$.com.stock.order_today = oojs$.createClass(
         
         oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
             console.log(JSON.stringify(arguments));
-            
-            var capitals = JSON.parse(result);
-            if(capitals && capitals.length>0 
-                && capitals[0].hasOwnProperty('status')
-                && capitals[0]['status'] == 200){
-                accountOBJ["COMPONENT"].addCapital(capitals[0])
-                self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+            if(result.success){
+                var capitals = JSON.parse(result.data);
+                if(capitals && capitals.length>0 
+                    && capitals[0].hasOwnProperty('status')
+                    && capitals[0]['status'] == 200){
+                    accountOBJ["COMPONENT"].addCapital(capitals[0])
+                    self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+                }else{
+                    oojs$.showError('您的资金验证出了问题!');
+                }
             }else{
                 oojs$.showError('您的资金验证出了问题!');
             }
+            
             
         });
         
@@ -670,22 +674,25 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 console.log("trade_list",JSON.stringify(trade_list));
                 oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                     console.log(JSON.stringify(arguments));
-                    var capitals = JSON.parse(result);
-
-                    if(capitals){
-                        for(var i = 0; i < trade_list.length; i++){
-                            for(var elm in capitals){
-                                var item_capital = capitals[elm];
-                                if(String(trade_list[i]["ELEMENT"]['ACCOUNTID']) == String(item_capital.accountid) ){
-                                    if(String(item_capital.status) != "200"){
-                                        oojs$.showError("您的账号："+item_capital.accountid+"资金验证存在问题");
-                                        return;
+                    if(result.success){
+                        var capitals = JSON.parse(result.data);
+                        if(capitals){
+                            for(var i = 0; i < trade_list.length; i++){
+                                for(var elm in capitals){
+                                    var item_capital = capitals[elm];
+                                    if(String(trade_list[i]["ELEMENT"]['ACCOUNTID']) == String(item_capital.accountid) ){
+                                        if(String(item_capital.status) != "200"){
+                                            oojs$.showError("您的账号："+item_capital.accountid+"资金验证存在问题");
+                                            return;
+                                        }
+                                        trade_list[i]["COMPONENT"].addCapital(item_capital);
                                     }
-                                    trade_list[i]["COMPONENT"].addCapital(item_capital);
                                 }
                             }
+                            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
+                        }else{
+                            oojs$.showError("您的资金验证存在问题");
                         }
-                        self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
                     }else{
                         oojs$.showError("您的资金验证存在问题");
                     }
