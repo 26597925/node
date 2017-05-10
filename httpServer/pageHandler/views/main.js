@@ -974,7 +974,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.BUYAMOUNT='';
                     self.PERCENT='';
                 }
-                if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse') && Number(self.BUYAMOUNT) > Number(self.CAPITAL.account_muse) ){
+                if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse')  ){
                     self.INPUT.val(self.CAPITAL.account_muse);
                 }
                 break;
