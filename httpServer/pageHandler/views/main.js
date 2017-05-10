@@ -904,16 +904,17 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             div2.append(self.LABEL_UNIT);
         }
     }
-/****
-*capital = {account_msum:"8026.90",
-account_muse:"1986.90",
-account_value:"6040.00",
-accountid:"309219512983",
-status:"200",
-tradeid:"1",
-userid:"20000"}
-*/
+    /****
+    *capital = {account_msum:"8026.90",
+    account_muse:"1986.90",
+    account_value:"6040.00",
+    accountid:"309219512983",
+    status:"200",
+    tradeid:"1",
+    userid:"20000"}
+    */
     ,addCapital:function(CAPITAL){
+        var self = this;
         self.CAPITAL = CAPITAL;
     }
     ,ck_change:function(event){
