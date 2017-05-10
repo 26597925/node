@@ -780,151 +780,6 @@ var oojs$ = {
 oojs$.ns("com.stock.component.accountset");
 oojs$.com.stock.component.accountset =oojs$.createClass({
     NAME:"account"
-    ,ck_change:function(event){
-        var self = event.data['scope'];
-        if ($(this).is(':checked')) {
-            if(self.INPUT){
-                self.INPUT.prop('disabled',false);
-            }
-
-            if(self.SELECT_DIRTYPE){
-                self.SELECT_DIRTYPE.prop('disabled',false);
-            }
-
-            if(self.SELECT){
-                self.SELECT.prop('disabled',false);
-            }
-        }else{
-            self.BUYCOUNT='';
-            self.BUYAMOUNT='';
-            self.PERCENT='';
-
-            if(self.INPUT){
-                self.INPUT.val('');
-                self.INPUT.prop('disabled',true);
-            }
-
-            if(self.SELECT_DIRTYPE){
-                self.SELECT_DIRTYPE.prop('disabled',true);
-            }
-
-            if(self.SELECT){
-                self.SELECT.val('-1');
-                self.SELECT.prop('disabled',true);
-            }
-            if(self.LABEL_UNIT){
-                self.LABEL_UNIT.text("");
-            }
-        }
-    }
-    ,select_change:function(event){
-        var self = event.data['scope'];
-        console.log("select_change",self.SELECT.val(),"select_change");
-        self.INPUT.val('');
-        switch(self.SELECT.val()){
-            case "BUYCOUNT":
-                if(self.LABEL_UNIT){
-                    self.LABEL_UNIT.text("股");
-                    self.BUYCOUNT='';
-                    self.BUYAMOUNT='';
-                    self.PERCENT='';
-                }
-                break;
-            case "BUYAMOUNT":
-                if(self.LABEL_UNIT){
-                    self.LABEL_UNIT.text("¥");
-                    self.BUYCOUNT='';
-                    self.BUYAMOUNT='';
-                    self.PERCENT='';
-                }
-                break;
-            case "PERCENT":
-                if(self.LABEL_UNIT){
-                    self.LABEL_UNIT.text("％");
-                    self.BUYCOUNT='';
-                    self.BUYAMOUNT='';
-                    self.PERCENT='';
-                    if(self.ACCOUNT!=null){
-                        if( self.ACCOUNT.hasOwnProperty('PERCENT') ){
-                            self.INPUT.val(self.ACCOUNT['PERCENT']);
-                        }
-                    }
-                }
-                break;
-        }
-    }
-    ,val:function(){
-        var self = this;
-        var checked = $(self.CHECK).is(':checked');
-        var dirtyep = self.NEWDIRTYPE;
-        
-        if( self.SELECT_DIRTYPE ){
-            dirtyep = $(self.SELECT_DIRTYPE).val()
-        }
-
-        if(self.INPUT.val()){
-            oojs$.showError("请选择交易策略并输入信息");
-            return null;
-        }
-
-        if(self.SELECT){
-            var one_third_slct = $(self.SELECT).val();
-            switch(one_third_slct){
-                case "BUYCOUNT":
-                self.BUYCOUNT = self.INPUT.val();
-                self.BUYAMOUNT='';
-                self.PERCENT='';
-                break;
-            case "BUYAMOUNT":
-                self.BUYCOUNT='';
-                self.BUYAMOUNT=self.INPUT.val();;
-                self.PERCENT='';
-                break;
-            case "PERCENT":
-                self.BUYCOUNT='';
-                self.BUYAMOUNT='';
-                self.PERCENT=self.INPUT.val();
-                if(!regular.checkFloat(self.PERCENT)){
-                    oojs$.showError("输入的比例非法");
-                    return null;
-                }
-                if(Number(self.PERCENT)>1){
-                    oojs$.showError("输入的比例超出范围已经大于1");
-                    return null;
-                }
-                break;
-            }
-        }
-        
-
-        return {
-            'CHECKED':checked
-            ,'ACCOUNTID':self.ACCOUNTID
-            ,'DIRTYPE':dirtyep
-            ,'BORROW':self.BORROW
-            ,'BUYCOUNT':self.BUYCOUNT
-            ,'BUYAMOUNT':self.BUYAMOUNT
-            ,'PERCENT':self.PERCENT
-            ,'INPUT':self.INPUT
-        };
-    }
-    ,destroy:function(){
-        if(div1){
-            div1.empty();
-        }
-        if(div2){
-            div2.empty();
-        }
-        self.INPUT = null;
-        self.CHECK = null;
-        self.LABEL_UNIT = null;
-        self.ACCOUNT = null;
-        delete self.ACCOUNT;
-        self.init = null;
-        delete self.init;
-        self.append_select_tradetype = null;
-        delete self.append_select_tradetype;
-    }
     ,div1:null
     ,div2:null
     ,INPUT:null
@@ -940,6 +795,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,BUYAMOUNT:''
     ,PERCENT:''
     ,ACCOUNT:null
+    ,CAPITAL:null
     ,select_tradetype:[
         {id:"BUYCOUNT",name:"交易股数"}
         ,{id:"BUYAMOUNT",name:"交易金额"}
@@ -1023,8 +879,6 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                 }
                 div2.append(self.SELECT_DIRTYPE);
             }
-
-            
         }else if(DIRTYPE == 9){//撤单
             self.NEWDIRTYPE = 9
             label_value = $('<label></label>').text("撤单");
@@ -1040,8 +894,6 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.select_change
                 );
             }
-
-            
             div2.append(self.SELECT);
             self.INPUT = $('<input></input>',{type:'text'});
             if(!CHECKED){
@@ -1052,7 +904,151 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             div2.append(self.LABEL_UNIT);
         }
     }
+/****
+*capital = {account_msum:"8026.90",
+account_muse:"1986.90",
+account_value:"6040.00",
+accountid:"309219512983",
+status:"200",
+tradeid:"1",
+userid:"20000"}
+*/
+    ,addCapital:function(CAPITAL){
+        self.CAPITAL = CAPITAL;
+    }
+    ,ck_change:function(event){
+        var self = event.data['scope'];
+        if ($(this).is(':checked')) {
+            if(self.INPUT){
+                self.INPUT.prop('disabled',false);
+            }
 
+            if(self.SELECT_DIRTYPE){
+                self.SELECT_DIRTYPE.prop('disabled',false);
+            }
+
+            if(self.SELECT){
+                self.SELECT.prop('disabled',false);
+            }
+        }else{
+            self.BUYCOUNT='';
+            self.BUYAMOUNT='';
+            self.PERCENT='';
+
+            if(self.INPUT){
+                self.INPUT.val('');
+                self.INPUT.prop('disabled',true);
+            }
+
+            if(self.SELECT_DIRTYPE){
+                self.SELECT_DIRTYPE.prop('disabled',true);
+            }
+
+            if(self.SELECT){
+                self.SELECT.val('-1');
+                self.SELECT.prop('disabled',true);
+            }
+            if(self.LABEL_UNIT){
+                self.LABEL_UNIT.text("");
+            }
+        }
+    }
+    ,select_change:function(event){
+        var self = event.data['scope'];
+        console.log("select_change",self.SELECT.val(),"select_change");
+        self.INPUT.val('');
+        switch(self.SELECT.val()){
+            case "BUYCOUNT":
+                if(self.LABEL_UNIT){
+                    self.LABEL_UNIT.text("股");
+                    self.BUYCOUNT='';
+                    self.BUYAMOUNT='';
+                    self.PERCENT='';
+                }
+                break;
+            case "BUYAMOUNT":
+                if(self.LABEL_UNIT){
+                    self.LABEL_UNIT.text("¥");
+                    self.BUYCOUNT='';
+                    self.BUYAMOUNT='';
+                    self.PERCENT='';
+                }
+                if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse') && Number(self.BUYAMOUNT) > Number(self.CAPITAL.account_muse) ){
+                    self.INPUT.val(self.CAPITAL.account_muse);
+                }
+                break;
+            case "PERCENT":
+                if(self.LABEL_UNIT){
+                    self.LABEL_UNIT.text("％");
+                    self.BUYCOUNT='';
+                    self.BUYAMOUNT='';
+                    self.PERCENT='';
+                    if(self.ACCOUNT!=null){
+                        if( self.ACCOUNT.hasOwnProperty('PERCENT') ){
+                            self.INPUT.val(self.ACCOUNT['PERCENT']);
+                        }
+                    }
+                }
+                break;
+        }
+    }
+    ,val:function(){
+        var self = this;
+        var checked = $(self.CHECK).is(':checked');
+        var dirtyep = self.NEWDIRTYPE;
+        
+        if( self.SELECT_DIRTYPE ){
+            dirtyep = $(self.SELECT_DIRTYPE).val()
+        }
+
+        if(self.INPUT.val()){
+            oojs$.showError("请选择交易策略并输入信息");
+            return null;
+        }
+
+        if(self.SELECT){
+            var one_third_slct = $(self.SELECT).val();
+            switch(one_third_slct){
+                case "BUYCOUNT":
+                self.BUYCOUNT = self.INPUT.val();
+                self.BUYAMOUNT='';
+                self.PERCENT='';
+                break;
+            case "BUYAMOUNT":
+                self.BUYCOUNT='';
+                self.BUYAMOUNT=self.INPUT.val();;
+                self.PERCENT='';
+                if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse') && Number(self.BUYAMOUNT) > Number(self.CAPITAL.account_muse) ){
+                    oojs$.showError("您输入的资金大于可用的资金");
+                    return null;
+                }
+                break;
+            case "PERCENT":
+                self.BUYCOUNT='';
+                self.BUYAMOUNT='';
+                self.PERCENT=self.INPUT.val();
+                if(!regular.checkFloat(self.PERCENT)){
+                    oojs$.showError("您输入的比例非法");
+                    return null;
+                }
+                if(Number(self.PERCENT)>1){
+                    oojs$.showError("您输入的比例超出范围已经大于1");
+                    return null;
+                }
+                break;
+            }
+        }
+        return {
+            'CHECKED':checked
+            ,'ACCOUNTID':self.ACCOUNTID
+            ,'DIRTYPE':dirtyep
+            ,'BORROW':self.BORROW
+            ,'BUYCOUNT':self.BUYCOUNT
+            ,'BUYAMOUNT':self.BUYAMOUNT
+            ,'PERCENT':self.PERCENT
+            ,'INPUT':self.INPUT
+        };
+    }
     ,append_select_tradetype: function(CHECKED){
         var self = this;
         var select = $('<select></select>',{
@@ -1076,6 +1072,23 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             );
         }
         return select;
+    }
+    ,destroy:function(){
+        if(div1){
+            div1.empty();
+        }
+        if(div2){
+            div2.empty();
+        }
+        self.INPUT = null;
+        self.CHECK = null;
+        self.LABEL_UNIT = null;
+        self.ACCOUNT = null;
+        delete self.ACCOUNT;
+        self.init = null;
+        delete self.init;
+        self.append_select_tradetype = null;
+        delete self.append_select_tradetype;
     }
 })
 
@@ -1473,7 +1486,7 @@ oojs$.addEventListener("ready",function(){
     });
 $(document).ready(function(){
     $("#accordion").accordion({
-        active: 3
+        active: 2
     });
     
     var showTopInfo = function(){
@@ -1501,7 +1514,7 @@ $(document).ready(function(){
 
 <%- jsRegist %>
 
-    // oojs$.heartTime();
+     oojs$.heartTime();
 });
 
 </script>
