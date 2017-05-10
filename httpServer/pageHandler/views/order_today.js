@@ -75,18 +75,18 @@ oojs$.com.stock.order_today = oojs$.createClass(
     }
 
     ,order_today_tab1_clk:function(){
-        var self = this;
+        var self = order_today;
         order_today.load_order_today();
     }
 
     ,order_today_tab2_clk:function(event){
-        var self = this;
+        var self = order_today;
         dictTrade.load_userAccount(function(){
             if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
                 self.status = "notinit";
                 $('#accordion').accordion({'active':0});
                 oojs$.dispatch("ready");
-            }else if(dictTrade.dictTrade_list_body.length > 0  && self.status == "init"){
+            }else if(dictTrade.dictTrade_list_body.length > 0 ){
                 policy.load_subscribe(function () {
                     console.log("order\n","load subscrible\n");
                     self.status = "notinit";
@@ -254,10 +254,25 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,drawitem_data['BUYAMOUNT']["ELEMENT"]
             ,drawitem_data['PERCENT']["ELEMENT"]
             ,true
-            ,drawitem_data['ACCOUNTID']['ELEMENT']
+            ,null
         );
-
-        self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+        var sendAccounts = [{'accountid':drawitem_data['ACCOUNTID']['ELEMENT']}]
+        
+        oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
+            console.log(JSON.stringify(arguments));
+            
+            var capitals = JSON.parse(result);
+            if(capitals && capitals.length>0 
+                && capitals[0].hasOwnProperty('status')
+                && capitals[0]['status'] == 200){
+                accountOBJ["COMPONENT"].addCapital(capitals[0])
+                self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+            }else{
+                oojs$.showError('您的资金验证出了问题!');
+            }
+            
+        });
+        
     }
     ,appendTB_modifyorder_flush:function(policy_head,policy_data,account_list){
         var self = this;
@@ -624,8 +639,11 @@ oojs$.com.stock.order_today = oojs$.createClass(
             var index = 0;
             var item_account = null;
             console.log("同时请求账号中的数据");
+            
+            var sendAccounts = [];
             for(var elm in dictTrade.dictTrade_list_body){
                 item_account = dictTrade.dictTrade_list_body[elm];
+                sendAccounts.push({"accountid":item_account['ACCOUNTID']})
                 trade_list[index] = {};
                 
                 trade_list[index]["ELEMENT"] = item_account;
@@ -646,9 +664,37 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     ,true
                     ,item_account
                 );
+                index++;
             }
-            console.log("trade_list",JSON.stringify(trade_list));
-            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
+            if(sendAccounts.length>0){
+                console.log("trade_list",JSON.stringify(trade_list));
+                oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
+                    console.log(JSON.stringify(arguments));
+                    var capitals = JSON.parse(result);
+
+                    if(capitals){
+                        for(var i = 0; i < trade_list.length; i++){
+                            for(var elm in capitals){
+                                var item_capital = capitals[elm];
+                                if(String(trade_list[i]["ELEMENT"]['ACCOUNTID']) == String(item_capital.accountid) ){
+                                    if(String(item_capital.status) != "200"){
+                                        oojs$.showError("您的账号："+item_capital.accountid+"资金验证存在问题");
+                                        return;
+                                    }
+                                    trade_list[i]["COMPONENT"].addCapital(item_capital);
+                                }
+                            }
+                        }
+                        self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
+                    }else{
+                        oojs$.showError("您的资金验证存在问题");
+                    }
+                });
+            }else{
+                oojs$.showError("您还没有添加账号");
+            }
+
+            
         })
     }
     ,appendTB_neworder_flush:function(policy_head,policy_data,account_list){
@@ -717,20 +763,15 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 for(var elm in account_list[i]["ELEMENT"]){
                     account_result[i][elm] = account_list[i]["ELEMENT"][elm];
                 }
-
+                if(!account_list[i]["COMPONENT"].val() ){return; }//accountset返回的null的情况
                 for( var elm in  account_list[i]["COMPONENT"].val() ){
-                    if(elm == "INPUT" && $.trim(account_list[i]["COMPONENT"][elm].val())==""){
-                        oojs$.showError("请选择交易策略并输入信息");
-                        return;
-                    }else{
-                        account_result[i][elm] = account_list[i]["COMPONENT"][elm];
-                    }
+                    account_result[i][elm] = account_list[i]["COMPONENT"][elm];
                 }
             }
         }
 
         if(account_result.length ==0){
-            oojs$.showError("请添加账户");
+            //oojs$.showError("请添加账户");
             return;
         }
         console.log('account_list',JSON.stringify(account_result));
