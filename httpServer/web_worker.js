@@ -10,10 +10,19 @@ var web_DB_config = require(path.join(__dirname,"web_DB_config.js"));
 
 var pgconfig = require(path.join(__dirname,'pageHandler','models','PageConfig'));
 var route = require(path.join(__dirname,'pageHandler','models','Route'));
+var wsconfig = require(path.join(__dirname,'pageHandler','models','WSSConfig'));
+var wssRoute = require(path.join(__dirname,'pageHandler','models','WSSRoute'));
 
-var root = this;
-var workerList = new Array();
+var self = this;
+var wss = null;
 
+// this.wss.broadcast = function broadcast(data) {
+//     wss.clients.forEach(function each(client) {
+//         if (client.readyState === WebSocket.OPEN) {
+//             client.send(data);
+//         }
+//     });
+// };
 exports.runPageServer = function( port )
 {
 	port = port || 20080;
@@ -56,28 +65,48 @@ exports.runPageServer = function( port )
 			});
         }
 	}).listen(port);
-    var wss = new WebSocket.Server({ server });
-    wss.on('connection', function (ws) {
-        var id = setInterval(function () {
-            ws.send(JSON.stringify(process.memoryUsage()), function () { /* ignore errors */ });
-        }, 100);
-        console.log('started client interval');
-        ws.on('close', function () {
-            console.log('stopping client interval');
-            clearInterval(id);
-        });
+
+    self.wss = new WebSocket.Server({ server });
+    self.wss.on('connection', function (ws) {
+        handlerWss(ws);
     });
 };
 
+var handlerWss = function(ws){
+    // ws.onopen = open;
+    // ws.onmessage = message;
+    // ws.onclose = close;
+
+    ws.on('open',function(){
+		console.log('open');
+	});
+
+    ws.on('message',function(data){
+		var clientData = JSON.parse(data);
+        console.log('type',clientData.type);
+        var actionInfo_ws = wssRoute.getActionInfo(clientData.type);
+
+        if(actionInfo_ws){
+            var controller_ws = require(path.join(__dirname,'pageHandler','ws',actionInfo_ws.controller));
+            if(controller_ws[actionInfo_ws.action]){
+                var ws_ct = new ws_context(ws,data);
+                controller_ws[actionInfo_ws.action].apply(ws_ct);
+            }
+        }
+
+    });
+
+    ws.on('close',function(){
+        console.log('close root');
+    });
+
+};
+
 var handlerRequest = function(req, res){
-  
   	var actionInfo = route.getActionInfo(req.url, req.method);
     if(actionInfo.action){
-       
         var controller = require(path.join(__dirname,'pageHandler','controllers',actionInfo.controller));
-        
         if(controller[actionInfo.action]){
-
             var ct = new controllerContext(req, res);
             controller[actionInfo.action].apply(ct, actionInfo.args);
         }else{
@@ -87,6 +116,7 @@ var handlerRequest = function(req, res){
       staticFileServer (req, res);
     }
 };
+
 var stocks = {'date':new Date(),'data':null};
 var count = 0;
 var cumulation = function(){
@@ -103,6 +133,12 @@ var setStocks = function(data){
 
 var getStocks = function(data){
     return stocks
+};
+
+var ws_context = function(ws,data){
+    this.alias = "root";
+    this.ws = ws;
+    this.data = data;
 };
 
 

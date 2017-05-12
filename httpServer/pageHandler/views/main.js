@@ -455,22 +455,94 @@ var oojs$ = {
 		}
 		return dest;
 	}
+    /****
+    * oojs$.sendMessage({'type':"helloe",'other':'something'})
+    *
+    *
+    **/
+    ,_ws:null
+    ,_ws_catch:[]
+    ,_ws_status:'init'
+    ,sendWSMessage:function(sendDt){
+        var self = this;
+        if(self._ws == null){
+            var host = window.document.location.host.replace(/:.*/, '');
+            //self._ws = new WebSocket('ws://' + host + ':20080');
+            this._ws = new WebSocket('ws://' + host + ':80');
+            self._ws.onopen = function(){
+                self._ws_status = "open";
+                if(self._ws_catch.length>0){
+                    for(var i = 0; i < self._ws_catch.length; i++){
+                        self._ws.send(JSON.stringify(self._ws_catch[i]));
+                    }
+                }
+            };
+            self._ws.onmessage = function(evt){
+                console.log(evt.data);
+                if(evt.hasOwnProperty('data') && evt.data.hasOwnProperty('type')){
+                    oojs$.dispatch(evt.data['type'],evt.data);
+                }
+            };
+            self._ws.onerror = function (e) {
+                alert("An error occured while connecting... " + e.data);
+                self._ws = null;
+            };
+            self._ws.onclose = function () {
+                alert("hello.. The coonection has been clsoed");
+                self._ws = null;
+                self._ws_status = "init"
+            };
+        }
+
+        if(self._ws_status == "init"){
+            if(sendDt.hasOwnProperty("type")){
+                self._ws_catch.push(sendDt);
+            }
+        }else{
+            if(sendDt.hasOwnProperty("type")){
+                self._ws.send(JSON.stringify(sendDt));
+            }
+        }
+    }
 
 	,_events:{}
 
 	,addEventListener: function(eventName, callback){
 		this._events[eventName] = this._events[eventName] || [];
-		this._events[eventName].push(callback);
+        for (var i = 0, len = this._events[eventName].length; i < len; i++) 
+        {
+            if(this._events[eventName][i] === callback ){
+                return;
+            }
+        }
+        this._events[eventName].push(callback);
 	}
 
     ,removeEventListener: function(eventName, callback){
-       //??
+        var events = this._events[eventName];
+        for(var i = 0, len = events.length; i < len; i++){
+            if(callback === events[i]){
+                events[i] = null;
+                events.splice(i,1);
+            }
+        }
+    }
+
+    ,clearEventListener: function(eventName, callback){
+        var events = this._events[eventName];
+        for(var i = 0, len = events.length; i < len; i++){
+            events[i] = null;
+        }
+        delete this._events[eventName];
     }
 
 	,dispatch:function(eventName, _){
         /**
+         * function f(){console.log(arguments)}
+		 * oojs$.addEventListener("ready",f);
 		 * oojs$.dispatch("ready");
-		 * oojs$.addEventListener("ready",function(){console.log("ready")});
+         * oojs$.removeEventListener("ready",f);
+         * oojs$.dispatch("ready");
          */
 		var events = this._events[eventName];
 		var args = Array.prototype.slice.call(arguments, 1);
@@ -701,7 +773,7 @@ var oojs$ = {
 					dataType:"json",
 					success:function(result,textStatus){
 						if(result.success){
-							console.log( "success!" );
+							//console.log( "success!" );
                             //self.heartTime();
 						}else{
                             self.closeHeartTime();
@@ -1515,7 +1587,7 @@ $(document).ready(function(){
 
 <%- jsRegist %>
 
-     oojs$.heartTime();
+    oojs$.heartTime();
 });
 
 </script>

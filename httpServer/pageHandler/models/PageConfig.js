@@ -1,7 +1,6 @@
 //
 var route = require('./Route');
 
-
 route.map({
     method:'get',
     url:/^\/$/i,

@@ -6,7 +6,7 @@ var web_DB_config = function()
     //"115.182.51.49","root","OGNkNGUyZmM3ZWE","winners",3306
 
    
-	this.databasesName = "winners_test";
+	this.databasesName = "winners";
     this.selectTB = false;
     this.connection = null;
     this.pool = null;
