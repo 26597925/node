@@ -484,11 +484,10 @@ var oojs$ = {
                 }
             };
             self._ws.onerror = function (e) {
-                alert("An error occured while connecting... " + e.data);
+                
                 self._ws = null;
             };
             self._ws.onclose = function () {
-                alert("hello.. The coonection has been clsoed");
                 self._ws = null;
                 self._ws_status = "init"
             };

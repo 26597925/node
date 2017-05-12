@@ -11,7 +11,6 @@ exports.submit_find = function(USERID){
 
     var self = this;
     console.log(JSON.stringify(self.req.post));
-
     var result = {'success':true,'message':'登录成功'};
     if(self.req.post){
         if(self.req.post.hasOwnProperty("UENAME") && self.req.post.hasOwnProperty("EMAIL")){
@@ -19,7 +18,7 @@ exports.submit_find = function(USERID){
             sql = util.format(sql,self.req.post["UENAME"],self.req.post["EMAIL"]);
             db.query(sql,function(){
                 if(arguments.length == 1){
-                    mail.getPWD(self.req.post["EMAIL"],arguments[0]['PASSWORD'],function(){
+                    mail.getPWD(self.req.post["EMAIL"],arguments[0][0]['PASSWORD'],function(){
                         console.log(JSON.stringify(arguments));
                         if(arguments[0]=="success"){
                             self.responseDirect(200,'text/json',JSON.stringify(result));

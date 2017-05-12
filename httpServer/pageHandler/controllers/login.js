@@ -61,21 +61,54 @@ var add_newUser = function(context){
 exports.logup_submit = function(){
     var self = this;
     var result = {'success':true,'message':'登录成功'};
-    if(self.req.post){
-        var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='%s'";
+    //
+    if(self.req.post
+        && self.req.post.hasOwnProperty('UENAME')
+        && self.req.post.hasOwnProperty('PASSWORD')
+        && self.req.post.hasOwnProperty('PHONENUMBER')
+        && self.req.post.hasOwnProperty('EMAIL')){
+
+        var sql = "SELECT" +
+            " `USERID`," +
+            //" `GROUPID`," +
+            " `UENAME`," +
+            " `PHONENUMBER`," +
+            " `PASSWORD`," +
+            " `EMAIL`" +
+            "  FROM `tb_user_basic` where " +
+            " `UENAME`='%s'" +
+            " or " +
+            " `PHONENUMBER`='%s'" +
+            " or " +
+            " `EMAIL`='%s'";
             // " and `PASSWORD`='%s'";
-        sql = util.format(sql,this.req.post["UENAME"]);//,this;
+        sql = util.format(sql,
+            this.req.post["UENAME"],
+            self.req.post['PHONENUMBER'],
+            self.req.post['EMAIL']);
         db.query(sql,function(){
             
             if(arguments.length==0){
                 add_newUser(self);
             }else if(arguments.length==1){
-                if(arguments[0]["PASSWORD"] == self.req.post["PASSWORD"]  ){
-                    result = {'success':true,'message':'登录成功'};
-                    self.responseDirect(200,"text/json",JSON.stringify(result));
-                }else{
-                    result = {'success':false,'data':"find password",'message':'该用户注册过logup code:0'};
-                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                
+                for(var i = 0; i < arguments[0].length; i++){
+                    if(arguments[0][i]["UENAME"] == self.req.post['UENAME']){
+                        //'data':"find password",
+                        result = {'success':false,'message':'该用户已经注册过 code:0'};
+                        self.responseDirect(200,"text/json",JSON.stringify(result));
+                        return;
+                    }else if(arguments[0][i]["PHONENUMBER"] == self.req.post['PHONENUMBER']){
+                        //'data':"find password",
+                        result = {'success':false,'message':'该电话已经注册过 code:1'};
+                        self.responseDirect(200,"text/json",JSON.stringify(result));
+                        return;
+                    }else if(arguments[0][i]["EMAIL"] == self.req.post['EMAIL']){
+                        //'data':"find password",
+                        result = {'success':false,'message':'该邮箱已经注册过 code:2'};
+                        self.responseDirect(200,"text/json",JSON.stringify(result));
+                        return;
+                    }
                 }
 
             }else{

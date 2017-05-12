@@ -72,7 +72,7 @@ $(document).ready(function(){
             return;
         }
 
-        var re= /^[1-9][0-9]{5}$/;
+        var re= /^[0-9][0-9]{5}$/;
         if(!re.test(ZIPCODE)){
             $("#message").text("您输入的邮编不正确");
             $("#login").prop('disabled',false);
@@ -107,7 +107,7 @@ $(document).ready(function(){
                     window.location.href = "/main";
                 }else if(!result.success && result.data == "find password"){
                     $("#message").empty();
-                    $("#message").append($("<label>该用户已经注册过</label>"));
+                    $("#message").append($("<label>"+result.message+"</label>"));
                     var href = $('<a href="#">找回密码</a>');
                     href.click(function(event){
                         window.location.href =  "/findpassword";
