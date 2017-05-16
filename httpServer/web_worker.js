@@ -35,7 +35,7 @@ this.broadcast = function (data) {
 exports.runPageServer = function( port )
 {
 	port = port || 80;
-    //port = port || 20080;
+    // port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 		if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
@@ -46,16 +46,16 @@ exports.runPageServer = function( port )
 
 		}else if(req.url == '/checkImg' && req.method.toLowerCase() == 'get'){
 			var random = parseInt(9*Math.random()+1)*10000+parseInt(10000*Math.random());
-            var p = new captchapng(80,30,'12345'); // width,height,numeric captcha
+            var p = new captchapng(80,30,random); // width,height,numeric captcha
             p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
             p.color(0, 0, 80, 255); // Second color: paint (red, green, blue, alpha)
 
             var img = p.getBase64();
             var imgbase64 = new Buffer(img,'base64');
-            response.writeHead(200, {
+            res.writeHead(200, {
                 'Content-Type': 'image/png'
             });
-            response.end(imgbase64);
+            res.end(imgbase64);
 			console.log("需要把验证吗存储在数据库中");
             // var controller = require(path.join(__dirname,'pageHandler','controllers','upload.js'));
             // var ct = new controllerContext(req, res);
