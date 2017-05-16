@@ -8,8 +8,15 @@ route_ws.map({
 });
 
 route_ws.map({
+    type:'order_period',
+    controller:'order_period',
+    action:'message'
+});
+
+route_ws.map({
     type:'market',
     controller:'market',
     action:'message'
 });
+
 

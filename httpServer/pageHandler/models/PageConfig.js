@@ -165,6 +165,13 @@ route.map({
 });
 
 //================================
+route.map({
+    method:'post',
+    url:/^\/order_today\/dynamic\/?$/i,
+    controller:'order_today',
+    action:'dynamic'
+});
+
 
 route.map({
     method:'post',

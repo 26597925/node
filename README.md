@@ -13,6 +13,9 @@
 <li>https://nodemailer.com/about/  </li>
 <li>npm install node-schedule   </li>
 <li>npm install phantomjs   </li>
+<span>update xcode</span>
+<li>npm install -g phantomjs-prebuilt</li>
+
 <li>npm install ejs  </li>
 <li>npm install express --save  </li>
 <li>npm install mysql  </li>

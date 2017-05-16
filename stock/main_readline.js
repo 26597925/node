@@ -15,9 +15,31 @@ var main = function(){
 	_self.getindex = 0;
 	_self.esindex = 0;
 	_self.judge = false;
-	
+	// _self.readline = _self.readline || new http_get.request_readline();
+
+	_self.request_readline = function (url,callback){
+	// this.objReadline = null;
+		
+		http.get(url,function(res){
+			res.setEncoding("utf8");
+			_self.objReadline = readline.createInterface({  
+			    input: res,
+			    output: null
+			});
+
+			_self.objReadline.on('line', (line)=>{
+				debugger;
+				_myself.objReadline.pause();
+				callback(line);
+			});  
+
+			_self.objReadline.on('close', ()=>{ 
+				callback("readline >> close"); 
+			}); 
+		});
+	}
+
 	_self.addNewdate = function(){
-		debugger;
 		var pre = unit_date.Format(_self.date,"yyyy-MM-dd");
 		if(_self.subOffday<48){
 			pre = pre
@@ -41,25 +63,33 @@ var main = function(){
 
 
 	_self.insertdataOk = function(){
-		
-		if(_self.judge && _self.esindex == _self.getindex){
+		debugger;
+		if(_self.request_readline 
+			&& _self.request_readline.objReadline){
 			
-			_self.judge = false;
-			_self.getindex = 0;
-			_self.esindex = 0;
-			_self.readline(_self.addNewdate(),unit_date.Format(_self.date,"yyyy-MM-dd"));
+			 _self.request_readline.objReadline.objReadline.resume();
+			if(_self.judge && _self.esindex == _self.getindex){
+				debugger;
+				_self.judge = false;
+				_self.getindex = 0;
+				_self.esindex = 0;
+				_self.readline(_self.addNewdate(),unit_date.Format(_self.date,"yyyy-MM-dd"));
+			}
+
 		}
 	}
-
+_self.iii = 0
 	_self.readline = function(url,param2){
 		if(!url){
 			return;
 		}
+		_self.iii++;
+		console.log(_self.iii);
 		debugger;
 		config.main.info("readline:",_self.subOffday,_self.offsetday,url);
 		console.log("readline:",_self.subOffday,_self.offsetday,url);
 
-		http_get.request_readline(url,function(result){
+		_self.request_readline(url,function(result){
 			if(result.indexOf("readline >> close") == 0){
 				debugger;
 				console.log(path.basename(__filename),">>","readline >> close");
@@ -70,13 +100,13 @@ var main = function(){
 				
 			}else{
 				_self.getindex++;
-
 				insertES.insertES_stock.insertdata(result,param2);
 			}
 
 		});
 	}
-	_self.readline(_self.addNewdate(),unit_date.Format(_self.date,"yyyy-MM-dd"));
+	console.log(_self.addNewdate())
+	// _self.readline(_self.addNewdate(),unit_date.Format(_self.date,"yyyy-MM-dd"));
 }
 
 exports.main = new main();

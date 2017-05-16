@@ -18,6 +18,7 @@ var main = function(){
 	_self.fileName = [];
 	_self.index = 0;
 	_self.pre = "";
+	_self.filePath = "";
 
 	_self.client = new elasticsearch.Client({
 		hosts : [ '10.127.92.39:9200', '10.127.92.40:9200', '10.127.92.41:9200' ]
@@ -228,19 +229,25 @@ var main = function(){
 		}else{
 			_self.index++;
 		}
-		_self.readFile();
+		// _self.readFile();
 	}
 }
 
 var mainobj = exports.main = new main();
+
+
 mainobj.addNewdate();
 mainobj.createFileName();
-mainobj.pre = "2016-12-01-00"
-mainobj.insertdataOk();
+
+// mainobj.filePath = 
+// mainobj.pre = "2016-12-01-00"
+// mainobj.insertdataOk();
 
 
 
 
+
+//wget  "http://111.206.211.60:8001/stock_data/2016-12-01-01.data"
 ///==================================================
 
 // var rule = new schedule.RecurrenceRule();

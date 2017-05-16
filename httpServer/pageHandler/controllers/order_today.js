@@ -8,9 +8,23 @@ const policy = require('./policy.js');
 //const user_account = require('./user_account.js');
 
 exports.select_preorder = function(){
+    var parentAlias = this.alias;
     this.alias = path.basename(__filename);
     var self = this;
-    var uID = sessions.get_uID(self.req);
+
+    var uID;
+    if(parentAlias == 'root'){
+        uID = sessions.get_uID(self.req);
+    }else if(parentAlias == 'order_today.js' || parentAlias == 'market.js'){
+        uID = self.uID;
+    }
+    if(!uID){
+        result = {'success':false,'message':path.basename(__filename).replace('.js','')+'数据错误'};
+        self.responseDirect(200,"text/json",JSON.stringify(result));
+        console.log("error order_today is null");
+        return;
+    }
+
 
     var result = {'success':true,'data':''};
     var sql  = 'SELECT' +
@@ -57,6 +71,7 @@ exports.select_preorder = function(){
 
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else if(arguments.length==0){
+
             result = {'success':true,'data':[]};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
@@ -66,14 +81,6 @@ exports.select_preorder = function(){
     });
 
 };
-
-// exports.select_userPolicyGID = function(){
-//     this.alias = path.basename(__filename);
-//     this.callback = callback_userPolicyGID;
-//     console.log( path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
-//     policy.select_alreadySubscrible.apply(this,arguments[0],"test123_567");
-//
-// };
 
 exports.insert_preorder = function(){
     var  self = this;
@@ -218,7 +225,7 @@ var http_post=function(){
     //result = result.replace("\"","'");
     console.log( path.basename(__filename), "http_post", result);
     var options = {
-        hostname: '111.206.209.27',
+        //hostname: '111.206.209.27',
         host:'111.206.209.27',
         port: 8080,
         path: '/order/dynamic',
@@ -334,5 +341,27 @@ exports.update_ordertoday = function(){
             }
         });
     }
+};
 
+
+exports.dynamic = function(){
+    var  self = this;
+    var uID = sessions.get_uID(self.req);
+    var result = {'success':true,'data':''};
+
+    if(self.req.post){
+
+        if(self.req.post.hasOwnProperty('orderid')
+            && self.req.post.hasOwnProperty('accountid')
+            && self.req.post.hasOwnProperty('tradeid')
+            && self.req.post.hasOwnProperty('userid')
+            && self.req.post.hasOwnProperty('policyid')
+        ){
+            self.responseDirect(200,"application/json",JSON.stringify(result));
+            //self.root.broadcast({'type':'order_today','action':'new_data','data':''});
+            self.root.broadcast({'type':'market','action':'new_data','data':''});
+        }
+        //     result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
+        //     self.responseDirect(200,"application/json",JSON.stringify(result));
+    }
 };

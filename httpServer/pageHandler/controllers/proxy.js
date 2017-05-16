@@ -16,7 +16,7 @@ exports.stocks = function(){
         result = {'success':false,'data':''};
         self.responseDirect(200,"text/json",JSON.stringify(result));
     }
-    console.log(">>>>\n",unit_date.Format(stocks.date,"yyyy-MM-dd") != unit_date.Format(new Date(),"yyyy-MM-dd"));
+
 	if(stocks.data == null){
         //request
         proxy_stock(function(_result){

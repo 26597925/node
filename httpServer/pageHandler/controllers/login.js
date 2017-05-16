@@ -91,7 +91,7 @@ exports.logup_submit = function(){
             if(arguments.length==0){
                 add_newUser(self);
             }else if(arguments.length==1){
-                
+
                 for(var i = 0; i < arguments[0].length; i++){
                     if(arguments[0][i]["UENAME"] == self.req.post['UENAME']){
                         //'data':"find password",

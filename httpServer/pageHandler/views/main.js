@@ -455,6 +455,13 @@ var oojs$ = {
 		}
 		return dest;
 	}
+
+    ,getCookie: function (name) {
+        function escape(s) { return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, '\\$1'); };
+        var match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
+        return match ? match[1] : null;
+    }
+
     /****
     * oojs$.sendMessage({'type':"helloe",'other':'something'})
     *
@@ -464,11 +471,13 @@ var oojs$ = {
     ,_ws_catch:[]
     ,_ws_status:'init'
     ,sendWSMessage:function(sendDt){
+        if(sendDt){
+            sendDt.uID = oojs$.getCookie('uID');
+        }
         var self = this;
         if(self._ws == null){
             var host = window.document.location.host.replace(/:.*/, '');
-            //self._ws = new WebSocket('ws://' + host + ':20080');
-            this._ws = new WebSocket('ws://' + host + ':80');
+            this._ws = new WebSocket('ws://' + location.hostname+(location.port ? ':'+location.port: ''));
             self._ws.onopen = function(){
                 self._ws_status = "open";
                 if(self._ws_catch.length>0){
@@ -784,7 +793,30 @@ var oojs$ = {
 					beforeSend: function(xhr){
 						xhr.withCredentials = true;
 					}
+                    //
+                    ,
+                    xhr: function() {
+                        // create an XMLHttpRequest
+                        var xhr = new XMLHttpRequest();
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == 4) {
+                                if (xhr.status == 404) {
+                                    // I can live with that, log it and go on
+                                    alert("404");
+                                    console.log("file missing");
+                                }
+                                else {
+                                    // Wohoo, all is fine, do loading stuff
+                                }
+                            }
+                            // listen to the 'progress' event
+                            return xhr;
+                        }
+                    }
+           
+                    //
 				});
+
 			},30*1000);
 		}
 	}

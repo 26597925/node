@@ -1,11 +1,15 @@
 const WebSocket = require('ws');
+// const cookie = require('cookie');
+// const cookieParser = require('cookie-parser');
+
 var http = require('http');
 var url = require("url");
 var path = require("path");
 var fs = require("fs");
 var ejs = require('ejs');
 var querystring = require("querystring");
-
+//var ccap = require('ccap')();
+var captchapng = require('captchapng');
 var web_DB_config = require(path.join(__dirname,"web_DB_config.js"));
 
 var pgconfig = require(path.join(__dirname,'pageHandler','models','PageConfig'));
@@ -14,19 +18,24 @@ var wsconfig = require(path.join(__dirname,'pageHandler','models','WSSConfig'));
 var wssRoute = require(path.join(__dirname,'pageHandler','models','WSSRoute'));
 
 var self = this;
-var wss = null;
+self.wss = null;
 
-// this.wss.broadcast = function broadcast(data) {
-//     wss.clients.forEach(function each(client) {
-//         if (client.readyState === WebSocket.OPEN) {
-//             client.send(data);
-//         }
-//     });
-// };
+this.broadcast = function (data) {
+	if(data.hasOwnProperty('type') && data.hasOwnProperty('action')){
+        if(self.wss){
+            self.wss.clients.forEach(function each(client) {
+                if (client.readyState === WebSocket.OPEN) {
+					client.send(JSON.stringify(data));
+                }
+            });
+        }
+	}
+};
+
 exports.runPageServer = function( port )
 {
 	port = port || 80;
-
+    //port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 		if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
@@ -35,7 +44,24 @@ exports.runPageServer = function( port )
             var ct = new controllerContext(req, res);
             controller['upload'].apply(ct);
 
-		}else
+		}else if(req.url == '/checkImg' && req.method.toLowerCase() == 'get'){
+			var random = parseInt(9*Math.random()+1)*10000+parseInt(10000*Math.random());
+            var p = new captchapng(80,30,'12345'); // width,height,numeric captcha
+            p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
+            p.color(0, 0, 80, 255); // Second color: paint (red, green, blue, alpha)
+
+            var img = p.getBase64();
+            var imgbase64 = new Buffer(img,'base64');
+            response.writeHead(200, {
+                'Content-Type': 'image/png'
+            });
+            response.end(imgbase64);
+			console.log("需要把验证吗存储在数据库中");
+            // var controller = require(path.join(__dirname,'pageHandler','controllers','upload.js'));
+            // var ct = new controllerContext(req, res);
+            // controller['upload'].apply(ct);
+
+        }else
         {
             // console.log(path.basename(__filename),"url:", req.url);
             var _bufData = '';
@@ -44,20 +70,26 @@ exports.runPageServer = function( port )
             })
 			.on('end', function () {
 				var reqData = "";
-
+				//console.log(JSON.stringify(req.headers));
 				if ("POST" == req.method.toUpperCase()) {
-					if (req.headers.accept.indexOf('application/json') != -1) {
+					if ( (req.headers.hasOwnProperty('content-type') && req.headers['content-type'].indexOf('application/json') != -1)
+						|| req.headers.accept.indexOf('application/json') != -1) {
+
 						if (_bufData.length > 0) {
 							try {
+
+                                _bufData = _bufData.replace(/\\n/g,"");
+                                _bufData = _bufData.replace(/\\/g, "");
 								reqData = JSON.parse(_bufData);
+
 							} catch (err) {
-								console.log("not json format");
+								console.log("not json format",err);
 							}
 						} else {
 							reqData = {};
 						}
 					} else {
-						reqData = querystring.parse(_bufData);
+						reqData = querystring.parse(_bufData.toString());
 					}
 				}
 				req.post = reqData;
@@ -82,24 +114,26 @@ var handlerWss = function(ws){
 	});
 
     ws.on('message',function(data){
-		var clientData = JSON.parse(data);
-        console.log('type',clientData.type);
-        var actionInfo_ws = wssRoute.getActionInfo(clientData.type);
+    	try{
+			var clientData = JSON.parse(data);
+			console.log('type',clientData.type);
+            // ws.mz_type = clientData.type;
+            // ws.mz_aciton = clientData.action;
+			var actionInfo_ws = wssRoute.getActionInfo(clientData.type);
 
-        if(actionInfo_ws){
-            var controller_ws = require(path.join(__dirname,'pageHandler','ws',actionInfo_ws.controller));
-            if(controller_ws[actionInfo_ws.action]){
-                var ws_ct = new ws_context(ws,data);
-                controller_ws[actionInfo_ws.action].apply(ws_ct);
-            }
-        }
-
+			if(actionInfo_ws){
+				var controller_ws = require(path.join(__dirname,'pageHandler','ws',actionInfo_ws.controller));
+				if(controller_ws[actionInfo_ws.action]){
+					var ws_ct = new ws_context(ws,clientData);
+					controller_ws[actionInfo_ws.action].apply(ws_ct);
+				}
+			}
+        }catch(err){console.log('error',err.message)}
     });
 
     ws.on('close',function(){
         console.log('close root');
     });
-
 };
 
 var handlerRequest = function(req, res){
@@ -137,6 +171,7 @@ var getStocks = function(data){
 
 var ws_context = function(ws,data){
     this.alias = "root";
+    this.root = self;
     this.ws = ws;
     this.data = data;
 };
@@ -146,6 +181,7 @@ var controllerContext = function(req, res){
 	this.alias = "root";
     this.req = req;
     this.res = res;
+    this.root = self;
     this.setStocks = setStocks;
     this.getStocks = getStocks;
 	this.cumulation = cumulation;

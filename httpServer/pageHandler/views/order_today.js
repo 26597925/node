@@ -66,14 +66,16 @@ oojs$.com.stock.order_today = oojs$.createClass(
         $("#order_today_tabs_a1").click(this.order_today_tab1_clk);
         $("#order_today_tabs_a2").click(this.order_today_tab2_clk);
         
-        
         preload.getStock(function(){
             if(oojs$.getPanelID() == 2){
                 order_today.order_today_tab1_clk();
             }
         });
+        oojs$.addEventListener('order_today',self.handler_ordtoday);
     }
-
+    ,handler_ordtoday:function(dt){
+        //order_today_list
+    }
     ,order_today_tab1_clk:function(){
         var self = order_today;
         order_today.load_order_today();
@@ -256,7 +258,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,true
             ,null
         );
-        var sendAccounts = [{'accountid':drawitem_data['ACCOUNTID']['ELEMENT']}]
+        var sendAccounts = [{'accountid':drawitem_data['ACCOUNTID']['ELEMENT']}];
         
         oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
             console.log(JSON.stringify(arguments));
@@ -273,8 +275,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
             }else{
                 oojs$.showError('您的资金验证出了问题!');
             }
-            
-            
         });
         
     }
@@ -491,7 +491,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,load_order_today:function(){
         var self = this;
         var sendData = {};
-
+        //oojs$.sendWSMessage({'type':'order_today','action':'list','data':''});
         oojs$.httpPost_json("/select_preorder",sendData,function(result,textStatus,token){
             if(result.success){
                 self.order_today_list = [];

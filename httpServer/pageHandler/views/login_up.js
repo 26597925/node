@@ -114,6 +114,8 @@ $(document).ready(function(){
                         event.preventDefault();
                     });
                     $('#message').append(href);
+                }else if(!result.success){
+                    $("#message").append($("<label>"+result.message+"</label>"));
                 }
                 $("#login").prop('disabled',false);
             },
