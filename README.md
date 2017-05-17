@@ -24,7 +24,10 @@
 <li>npm install --save ws </li>
 <span>https://github.com/websockets/ws</span>
 </ul>
-
+<ul>
+<li>npm install iconv-lite</li>
+<li>npm install bufferhelper</li>
+</ul>
 <span>
 yum install -y gcc-c++ make
 curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -

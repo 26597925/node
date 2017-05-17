@@ -487,13 +487,13 @@ var oojs$ = {
                 }
             };
             self._ws.onmessage = function(evt){
-                console.log(evt.data);
-                if(evt.hasOwnProperty('data') && evt.data.hasOwnProperty('type')){
-                    oojs$.dispatch(evt.data['type'],evt.data);
+                console.log('main',evt.data);
+                var jsonObj = JSON.parse(evt.data);
+                if(jsonObj.hasOwnProperty('type')){
+                    oojs$.dispatch(jsonObj['type'],jsonObj);
                 }
             };
             self._ws.onerror = function (e) {
-                
                 self._ws = null;
             };
             self._ws.onclose = function () {

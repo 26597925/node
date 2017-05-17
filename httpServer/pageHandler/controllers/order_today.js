@@ -358,10 +358,10 @@ exports.dynamic = function(){
             && self.req.post.hasOwnProperty('policyid')
         ){
             self.responseDirect(200,"application/json",JSON.stringify(result));
-            //self.root.broadcast({'type':'order_today','action':'new_data','data':''});
-            self.root.broadcast({'type':'market','action':'new_data','data':''});
+            self.root.broadcast({'type':'order_today','action':'new_data','data':''});
+        }else{
+            result = {'success':false,'data':'','message':path.basename(__filename).replace('.js','')+'操作数据失败'};
         }
-        //     result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
-        //     self.responseDirect(200,"application/json",JSON.stringify(result));
+
     }
 };

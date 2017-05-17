@@ -48,6 +48,14 @@ route.map({
 });
 
 route.map({
+    method:'post',
+    url:/^\/updateUserInfo\/?$/i,
+    controller:'login',
+    action:'updateUserInfo'
+});
+
+
+route.map({
     method:'get',
     url:/^\/updateLoginTime\/?$/i,
     controller:'login',

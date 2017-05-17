@@ -277,3 +277,81 @@ exports.getUserInfo = function(USERID){
        }
     });
 };
+
+exports.updateUserInfo = function(){
+    var self = this;
+    var uID = sessions.get_uID(self.req);
+    var result = {'success':true,'data':''};
+    // // USERID
+    // // GROUPID
+    // // UENAME
+    // UCNAME
+    // PHONENUMBER
+    // PASSWORD
+    // ADDRESS
+    // ZIPCODE
+    // // TYPEID
+    // // STATUS
+    // // LASTLOGIN
+    // // SESSIONID
+    // // ONLINE
+    // // ADDTIME
+    // MODTIME
+    // EMAIL
+    // // REMARK
+    // // INVOKE
+    if(self.req.post && self.req.post.hasOwnProperty('UENAME')){
+        var updates = [];
+        if(self.req.post.hasOwnProperty('UCNAME')){
+            //`POLICYPARAM` = "%s"
+            updates.push('`UCNAME`="'+self.req.post['UCNAME']+'"');
+        }
+        if( self.req.post.hasOwnProperty('PHONENUMBER')){
+            updates.push('`PHONENUMBER`="'+self.req.post['PHONENUMBER']+'"');
+        }
+        if( self.req.post.hasOwnProperty('PASSWORD')){
+            updates.push('`PASSWORD`="'+self.req.post['PASSWORD']+'"');
+        }
+        if( self.req.post.hasOwnProperty('ADDRESS')){
+            updates.push('`ADDRESS`="'+self.req.post['ADDRESS']+'"');
+        }
+        if( self.req.post.hasOwnProperty('ZIPCODE')){
+            updates.push('`ZIPCODE`="'+self.req.post['ZIPCODE']+'"');
+        }
+        if( self.req.post.hasOwnProperty('EMAIL')){
+            updates.push('`EMAIL`="'+self.req.post['EMAIL']+'"');
+        }
+
+        updates.push('`MODTIME`="'+unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+'"');
+
+        if(updates.length>0){
+            var sql = 'UPDATE `tb_user_basic` SET';
+            for(var i = 0; i < updates.length; i++){
+                if(i!=0){
+                    sql += ","
+                }
+                sql += updates[i];
+            }
+
+            sql += ' WHERE ' +
+                '`USERID` =  ' + uID+
+                ' and `UENAME` ="'+self.req.post['UENAME']+'"';
+
+            db.query(sql,function () {
+                if(arguments.length  == 1){
+                    result.data = [];//arguments[0];
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }else{
+                    result = {'success':false,'message':'user 数据库异常 '};
+                    self.responseDirect(200,"text/json",JSON.stringify(result));
+                }
+            });
+
+        }else{
+            result = {'success':false,'message':''};
+            self.responseDirect(200,"text/json",JSON.stringify(result));
+        }
+
+    }
+
+};

@@ -38,6 +38,10 @@ oojs$.com.stock.user=oojs$.createClass({
             ID:"ZIPCODE",
             NAME:"邮编"
         }
+        ,{
+            ID:"CTRL",
+            NAME:"操作"
+        }
     ]//增加修改基准数据
     ,userInfo:[]
 	,init:function(){
@@ -48,12 +52,19 @@ oojs$.com.stock.user=oojs$.createClass({
         $( "#user_tabs_a2" ).click({"self":self},self.clk_user_tabs_a2);
         $( "#user_tabs_a3" ).click({"self":self},self.clk_user_tabs_a3);
         $( '#user' ).click(function(){
-            self.clk_user_tabs_a1(self);
+            self.clk_user_tabs_a1();
         });
 
 	}
 
-    ,clk_user_tabs_a1:function(self){
+    ,clk_user_tabs_a1:function(evt){
+        var self;
+        if(evt){
+            self = evt.data.self;
+        }else{
+            self = this;
+        }
+         
         console.log(self);
         self.loadUserInfo(function(){
             if(arguments.length==0){
@@ -64,12 +75,59 @@ oojs$.com.stock.user=oojs$.createClass({
         });
     }
 
-    ,clk_user_tabs_a2:function(self){
-
+    ,clk_user_tabs_a2:function(evt){
+        var self = evt.data.self;
+        self.appendTB_chgInfo();
     }
 
-    ,clk_user_tabs_a3:function(self){
+    ,clk_user_tabs_a3:function(evt){
 
+    }
+    ,clk_submit_a2: function(evt){
+        console.log(evt.data);
+        var item = evt.data.item;
+        var self = evt.data.self;
+        var sendData = {};
+        for(var elm in item){
+            console.log(typeof item[elm]["ELEMENT"]);
+            if(typeof item[elm]["ELEMENT"] == 'string'){
+                sendData[elm] = item[elm]["ELEMENT"];
+            }else{
+                sendData[elm] = item[elm]["ELEMENT"].val();
+            }
+        }
+
+        sendData['CTRL'] = null;
+        delete sendData['CTRL'];
+        
+        oojs$.httpPost_json( '/updateUserInfo', sendData, function(){
+            console.log(arguments);
+        } );
+    }
+    
+    ,appendTB_chgInfo: function(){
+        var self = this;
+        $('#user_tabs_2').empty();
+        var tb = $('<table></table>', {
+            'class':"display dataTable"
+        });
+        tb.appendTo($('#user_tabs_2'));
+        var item = {};
+        
+        for(var elm in self.userInfo[0]){
+            item[elm] = {};
+            if(elm == 'UENAME'){
+                item[elm]["ELEMENT"] = self.userInfo[0][elm];
+            }else{
+                item[elm]["ELEMENT"] = $('<input type="text" value="'+self.userInfo[0][elm]+'"></input>');
+            }
+        }
+        var btn = $('<input></input>',{'type':"button",value:"提交"}).click(
+            {"item":item, "self":self}
+            ,self.clk_submit_a2
+        );
+        item['CTRL'] =  {'ELEMENT':btn,'COLSPAN':2}
+        oojs$.appendTB_item_D2(tb, self.list_benchmark_head, item);
     }
 
     ,appendTB_userInfo:function(){

@@ -73,9 +73,34 @@ oojs$.com.stock.order_today = oojs$.createClass(
         });
         oojs$.addEventListener('order_today',self.handler_ordtoday);
     }
+    //action new_data
     ,handler_ordtoday:function(dt){
-        //order_today_list
+        /*** action
+        client  <-->    server
+        null    <-->    new_data
+        list    <-->    list
+
+        dt{type,action,data}
+        */
+        console.log('order_today dt:',dt);
+        var self = order_today;
+        switch(dt.action){
+            case "new_data":
+                if(oojs$.getPanelID() == 2){
+                    console.log("sendWSMessage list")
+                    oojs$.sendWSMessage({'type':'order_today','action':'list','data':''});
+                }
+                break;
+            case "list":
+                console.log('order_today list:',dt.data)
+                self.order_today_list = dt.data.data;
+                if(self.order_today_list.length != 0 ){
+                    self.appendTB_order_today();
+                }
+                break;
+        }
     }
+
     ,order_today_tab1_clk:function(){
         var self = order_today;
         order_today.load_order_today();
