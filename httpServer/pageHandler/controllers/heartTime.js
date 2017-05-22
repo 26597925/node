@@ -4,7 +4,7 @@ const fs = require('fs');
 const ejs = require('ejs');
 const sessions = require(path.join(__dirname,"sessions.js"));
 const login = require(path.join(__dirname,"login.js"));
-const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
+const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
 

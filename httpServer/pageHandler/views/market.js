@@ -74,18 +74,21 @@ oojs$.com.stock.market = oojs$.createClass(
         
         this.market_tab1_clk();
         $('#testbtn').click(self.testClick);
-        var send = [{"accountid":"309219512983"},{"accountid":"309219249819"}];
-        oojs$.httpPost_json('/capital',send,function(){
-            console.log(JSON.stringify(arguments));
-        });
+        oojs$.addEventListener('market',self.handler);
+        //oojs$.addEventListener('order_today',self.handler);
+        oojs$.sendWSMessage({'type':'market','action':'list','data':'111'});
+    }
+    ,handler(){
+      console.log('handler',JSON.stringify(arguments));
     }
     ,testClick:function(){
         var self = market;
         self.table.fnClearTable();
         self.table.fnAddData(self.data1);
+        oojs$.sendWSMessage({'type':'order_today','action':'list','data':'111'});
     }
     ,click:function(){
-        console.log(JSON.stringify(arguments));
+        console.log(">>>",JSON.stringify(arguments));
     }
     ,close_socket:function(){
         var self = this;

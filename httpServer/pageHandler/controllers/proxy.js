@@ -2,7 +2,7 @@ const http = require('http');
 const util = require('util');
 const path = require('path');
 const sessions = require(path.join(__dirname,"sessions.js"));
-const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
+const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 var stock_load = false;
 exports.stocks = function(){
@@ -143,6 +143,8 @@ var proxy_stock = function(callback){
     })
 };
 
+
+
 var proxy_capitals = function(sendData,callback){
     var result = JSON.stringify(sendData) ;
     console.log( path.basename(__filename), "http_post",JSON.stringify( result) ) ;
@@ -179,3 +181,4 @@ var proxy_capitals = function(sendData,callback){
 };
 
 
+exports.stock_load = proxy_stock;

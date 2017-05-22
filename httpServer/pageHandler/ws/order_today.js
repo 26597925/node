@@ -7,7 +7,7 @@ const path = require('path');
 const WebSocket = require('ws');
 
 const sessions = require(path.join(__dirname,'..','controllers',"sessions.js"));
-const db = require(path.join(__dirname, "..", "..", "web_DB_config.js"));
+const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 const hp_order_today = require(path.join(__dirname,'..','controllers',"order_today.js"));
 var _ws = null;

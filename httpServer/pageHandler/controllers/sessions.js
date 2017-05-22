@@ -1,7 +1,6 @@
 const path = require("path");
 const util = require('util');
 const unit_date = require(path.join(__dirname, "..", "..", "..","js_unit","unit_date.js"));
-const config = require(path.join(__dirname,"..","..","..","config.js"));
 
 exports.createSID = function () {
     var now = new Date();
