@@ -15,6 +15,7 @@ var dispatcher = function(){
     this.processTotal = 10;
     var count = this.processTotal;
     this.dispatch = function(){
+        console.log('fork Parse.js');
         while (count > 0){
             count--;
             this.workers[count] = cp.fork("./stockParse/Parse.js",['count'+count],{'env':{'id':count,'second':3000}});
