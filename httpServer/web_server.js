@@ -35,8 +35,8 @@ this.broadcast = function (data) {
 
 exports.runPageServer = function( port )
 {
-	// port = port || 80;
-    port = port || 20080;
+	port = port || 80;
+    // port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 		if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
