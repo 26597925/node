@@ -6,7 +6,7 @@ var web_DB_config = function()
     //"115.182.51.49","root","OGNkNGUyZmM3ZWE","winners",3306
 
    
-	this.databasesName = "winners";
+	this.databasesName = "winners_test";
     this.selectTB = false;
     this.connection = null;
     this.pool = null;
@@ -15,8 +15,8 @@ var web_DB_config = function()
     this.dbcfg =
     {
         connectionLimit:                20,
-        host:                           "123.56.243.117",//"115.182.51.49",
-        port:                           3306,//3307,
+        host:                           '127.0.0.1',
+        port:                           3306,
         user:                           "root",
         password:                       "OGNkNGUyZmM3ZWE",//"root",
         database:                       this.databasesName,
