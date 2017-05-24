@@ -14,29 +14,75 @@ const pgconfig = require(path.join(__dirname,'pageHandler','models','PageConfig'
 const route = require(path.join(__dirname,'pageHandler','models','Route'));
 const wsconfig = require(path.join(__dirname,'pageHandler','models','WSSConfig'));
 const wssRoute = require(path.join(__dirname,'pageHandler','models','WSSRoute'));
-
-
+const descrip = require(path.join(__dirname,'..','bean','des_stock'));
 
 var self = this;
-self.wss = null;
+self.wss = null;//web socket server
+this.stocks = {'date':new Date(),'data':null};//stock {date,data[{name,code},....]}
+this.count = 0;//order id count
+this.stock_list = {};
+this.timestamp = [];
+this.title_stock = descrip.tx_title();
+this.marketPgCount = 5;
 
-this.broadcast = function (data) {
 
-	if(data && data.hasOwnProperty('type') && data.hasOwnProperty('action')){
+
+this.broadcast = function (broadcastData) {
+
+	if(broadcastData && broadcastData.hasOwnProperty('type') && broadcastData.hasOwnProperty('action')){
         if(self.wss){
-            self.wss.clients.forEach(function each(client) {
+
+            self.wss.clients.forEach(function each(client){
                 if (client.readyState === WebSocket.OPEN) {
-					client.send(JSON.stringify(data));
+
+                    switch (broadcastData.type) {
+                        case bean.WSS_ORDERTODAY:
+                            client.send(JSON.stringify(broadcast_data));
+                            break;
+
+                        case bean.WSS_MARKET:
+                            // var len = broadcastData.data.length;
+                            // this.stocks.data:[{name,code}]
+
+                            if (self.stocks && self.stocks.data) {
+                                var page = 0;
+                                var stocks_obj = JSON.parse(self.stocks.data);
+                                var sendData = new bean.entity_wss();
+                                sendData.type = bean.WSS_MARKET;
+                                sendData.action = 'detail';
+
+                                var item = {};
+                                item['timestamp'] = self.timestamp;
+                                item['title'] = self.title_stock;
+                                item['stock'] = {};
+                                for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
+
+                                    item['stock'][self.timestamp[tmid]] = {};
+                                    for (var i = page * self.marketPgCount; i < self.marketPgCount; i++) {
+                                        if (i >= stocks_obj.length) {
+                                            break;
+                                        }
+                                        item['stock'][self.timestamp[tmid]][stocks_obj[i].code] =
+                                            self.stock_list[self.timestamp[tmid]][stocks_obj[i].code];
+                                    }
+
+                                }
+                            }
+                            sendData.data = item;
+                            client.send(JSON.stringify(sendData));
+                            break;
+                    }
                 }
             });
         }
 	}
+
 };
 
 exports.runPageServer = function( port )
 {
 	port = port || 80;
-    // port = port || 20080;
+     // port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 		if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
@@ -58,9 +104,6 @@ exports.runPageServer = function( port )
             });
             res.end(imgbase64);
 			console.log("需要把验证吗存储在数据库中");
-            // var controller = require(path.join(__dirname,'pageHandler','controllers','upload.js'));
-            // var ct = new controllerContext(req, res);
-            // controller['upload'].apply(ct);
 
         }else
         {
@@ -101,14 +144,12 @@ exports.runPageServer = function( port )
 
     self.wss = new WebSocket.Server({ server });
     self.wss.on('connection', function (ws) {
+        console.log('1');
         handlerWss(ws);
     });
 };
 
 var handlerWss = function(ws){
-    // ws.onopen = open;
-    // ws.onmessage = message;
-    // ws.onclose = close;
 
     ws.on('open',function(){
         console.log('open');
@@ -116,8 +157,16 @@ var handlerWss = function(ws){
 
     ws.on('message',function(data){
     	try{
+
 			var clientData = JSON.parse(data);
-			console.log('type',clientData.type);
+
+			if(clientData.type == 'ready'){
+			    if(WebSocket.OPEN ==  ws.readyState){
+                    ws.send(JSON.stringify({'type':'ready','action':'init'}));
+                }
+			    return;
+            }
+
             // ws.mz_type = clientData.type;
             // ws.mz_aciton = clientData.action;
 			var actionInfo_ws = wssRoute.getActionInfo(clientData.type);
@@ -148,22 +197,21 @@ var handlerRequest = function(req, res){
             handler500(req, res, 'Error: controller "' + actionInfo.controller + '" without action "' + actionInfo.action + '"')
         }
     }else{
-      staticFileServer (req, res);
+        staticFileServer (req, res);
     }
 };
 
-var stocks = {'date':new Date(),'data':null};
-var count = 0;
+
 var cumulation = function(){
-	if(count>=10000){
-		count = 0;
+	if(this.count>=10000){
+        this.count = 0;
 	}
-	return count++;
+	return this.count++;
 };
 
-var setStocks = function(data){
-    stocks.date = new Date();
-    stocks.data = data;
+var setStocks = function(data){console.log('setStocks');
+    self.stocks.date = new Date();
+    self.stocks.data = data;
     if(process.hasOwnProperty('send')){
         var sendDate = new bean.stock();
         sendDate.type = bean.STOCKCODE;
@@ -173,15 +221,15 @@ var setStocks = function(data){
 };
 
 var getStocks = function(data){
-    return stocks
+    return self.stocks;
 };
 
-var getStock_market = function(id){
-    var sendDate = new bean.stock();
-    sendDate.type = bean.STOCKDATA;
-    sendDate.data = data;
-	process.send(sendDate);
-};
+// var getStock_market = function(id){
+//     var sendDate = new bean.stock();
+//     sendDate.type = bean.STOCKDATA;
+//     sendDate.data = data;
+// 	process.send(sendDate);
+// };
 
 var ws_context = function(ws,data){
     this.alias = "root";
@@ -295,8 +343,8 @@ var staticFileServer = function(req, res, filePath){
 
 
 var s_runPage = this.runPageServer(  );
-//load stock
 
+//load stock
 require(path.join(__dirname,'pageHandler','controllers','proxy')).stock_load(function(data){
     setStocks(data);
 });
@@ -306,12 +354,21 @@ require(path.join(__dirname,'pageHandler','controllers','proxy')).stock_load(fun
 //     console.log(`${index}: ${val}`);
 // });
 
+
+
 process.on("message",function(msg){
+
     switch( msg.type ){
         case bean.STOCKDATA:
+
+            self.stock_list = msg.data['stock_list'];
+            self.timestamp = msg.data['timestamp'];
+
             var sendDate = new bean.entity_wss();
-            sendDate.type = bean.STOCKDOWN;
-            //self.broadcast()
+            sendDate.type = bean.WSS_MARKET;
+            sendDate.action = "update";
+            self.broadcast(sendDate);
+
         	break;
     }
 

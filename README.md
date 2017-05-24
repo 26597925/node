@@ -25,8 +25,9 @@
 <span>https://github.com/websockets/ws</span>
 </ul>
 <ul>
-<li>npm install iconv-lite</li>
 <li>npm install bufferhelper</li>
+<li>npm install iconv-lite</li>
+
 </ul>
 <span>
 yum install -y gcc-c++ make

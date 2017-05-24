@@ -6,6 +6,7 @@ const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 const policy = require('./policy.js');
 //const user_account = require('./user_account.js');
+const bean = require(path.join(__dirname,"..","..","..",'bean','bean_entity'));
 
 exports.select_preorder = function(){
     var parentAlias = this.alias;
@@ -358,7 +359,12 @@ exports.dynamic = function(){
             && self.req.post.hasOwnProperty('policyid')
         ){
             self.responseDirect(200,"application/json",JSON.stringify(result));
-            self.root.broadcast({'type':'order_today','action':'new_data','data':''});
+
+            var sendDate = new bean.entity_wss();
+            sendDate.type = bean.WSS_ORDERTODAY;
+            sendDate.action = 'new_data';
+            sendDate.data = {};
+            self.root.broadcast(sendDate);
         }else{
             result = {'success':false,'data':'','message':path.basename(__filename).replace('.js','')+'操作数据失败'};
         }

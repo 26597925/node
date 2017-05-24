@@ -22,9 +22,9 @@ var stock = function(){
 exports.stock = stock;
 
 
-this.WSS_ORDERTODAY = 0;
-this.WSS_ORDERPERIOD = 1;
-this.WSS_MARKET = 2;
+this.WSS_ORDERTODAY = 'order_today';
+this.WSS_ORDERPERIOD = 'order_peroid';
+this.WSS_MARKET = 'market';
 
 var entity_wss = function(){
     this.type = '';

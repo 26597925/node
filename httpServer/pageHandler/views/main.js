@@ -477,6 +477,7 @@ var oojs$ = {
         var self = this;
         if(self._ws == null){
             var host = window.document.location.host.replace(/:.*/, '');
+            
             this._ws = new WebSocket('ws://' + location.hostname+(location.port ? ':'+location.port: ''));
             self._ws.onopen = function(){
                 self._ws_status = "open";
@@ -487,7 +488,7 @@ var oojs$ = {
                 }
             };
             self._ws.onmessage = function(evt){
-                console.log('main',evt.data);
+                //console.log('main',evt.data);
                 var jsonObj = JSON.parse(evt.data);
                 if(jsonObj.hasOwnProperty('type')){
                     oojs$.dispatch(jsonObj['type'],jsonObj);
@@ -1613,6 +1614,7 @@ $(document).ready(function(){
 	
     preload.load(function(){
         oojs$.dispatch("ready");
+        oojs$.sendWSMessage({'type':'ready','action':'init'})
     });
     
 

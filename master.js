@@ -18,7 +18,7 @@ var dispatcher = function(){
         console.log('fork Parse.js');
         while (count > 0){
             count--;
-            this.workers[count] = cp.fork("./stockParse/Parse.js",['count'+count],{'env':{'id':count,'second':3000}});
+            this.workers[count] = cp.fork("./crawler/crawler_stock.js",['count'+count],{'env':{'id':count}});
 
             this.workers[count].on("close",function(code,s){
                 console.log('master process close',code,s);
@@ -38,25 +38,11 @@ var dispatcher = function(){
                     case bean.STOCKDATA:
                         // msg.type
                         // msg.data
+
                         for(var elm in msg.data){
-                            for( var i = 0; i < self.stock_list.length; i++ ){
-                                if(self.stock_list[i].hasOwnProperty(elm)){
-                                    self.stock_list[i][elm] = self.stock_list[i][elm].concat(msg.data[elm]);
-                                    break;
-                                }
+                            if(self.stock_list.hasOwnProperty(elm)){
+                                self.stock_list[elm] = msg.data[elm];
                             }
-
-                        }
-
-                        // for(var i=0; i < self.stock_list.length; i++){
-                        //     for(var elm in  self.stock_list[i]){
-                        //         console.log('master length',elm,self.stock_list[i][elm].length);
-                        //     }
-                        //
-                        // }
-
-                        if(self.stock_list.length>10){
-                            self.stock_list.shift();
                         }
 
                         break;
@@ -123,6 +109,7 @@ var dispatcher = function(){
             var self_disp = this;
             this.IntervalId = setInterval(function(){
 
+
                 if(null == self.preDate ){
 
                     self.preDate = Math.floor(new Date().getTime()/1000)*1000;
@@ -131,28 +118,54 @@ var dispatcher = function(){
                 }else{
                     var date = new Date();
                     if(date.getTime()-self.preDate >=6000){
-
                         self.preDate = Math.floor(new Date().getTime()/1000)*1000;
                         self_disp.handlerHeartbeat();
-
-                        self.sendWebData();
                     }
                 }
+
+
             },500);
         }
     };
 
-    this.sendDate;
-    this.item;
+    this.sendDate = null;
     this.handlerHeartbeat = function(){
-        //console.log('\n\n heartbeat \n\n');
-        this.item = {};
-        this.item[self.preDate] = [];
-        self.stock_list.push(this.item);
-        sendDate = new bean.stock();
-        sendDate.type = bean.STOCKDOWN;
-        sendDate.data = {'timestamp':self.preDate};
-        disp.broadcast(sendDate);
+
+
+        self.stock_list[self.preDate] = {};
+
+        self.timeStamp.push(String(self.preDate));
+        if( self.timeStamp.length > 10 ){
+            self.timeStamp.shift();
+            for(var elm in self.stock_list){
+                if(self.timeStamp.indexOf(elm)==-1){
+                    self.stock_list[elm] = null;
+                    delete self.stock_list[elm];
+                }
+            }
+        }
+
+        //delete pre sendDate
+        if(this.sendDate){
+            for(var elm in this.sendDate){
+                if(this.sendDate[elm] && typeof(this.sendDate[elm]) == 'object'){
+                    for(var inelm in this.sendDate[elm]){
+                        if(this.sendDate[elm][inelm]){
+                            this.sendDate[elm][inelm] = null;
+                        }
+                        delete this.sendDate[elm][inelm];
+                    }
+                }
+                if(this.sendDate[elm]){this.sendDate[elm] = null;}
+                delete this.sendDate[elm];
+            }
+        }
+
+        this.sendDate = new bean.stock();
+        this.sendDate.type = bean.STOCKDOWN;
+        this.sendDate.data = {'timestamp':self.preDate};
+        disp.broadcast(this.sendDate);
+        self.sendWebData();
     };
 };
 
@@ -160,7 +173,20 @@ var disp = new dispatcher();
 disp.dispatch();
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-this.stock_list = [];
+/**
+ *		  		stock_list              obj
+ *		        ／      \
+ *		       ／        \
+ *		      timestamp  timestamp      obj
+ *		    	/
+ *		       /
+ *		        stock_code              obj
+ *		    	/
+ *		       /
+ *		       detail                   array
+ */
+this.stock_list = {};
+this.timeStamp = [];
 this.preDate = null;
 var self = this;
 
@@ -196,9 +222,7 @@ this.web_worker.on("message",function(msg){
             disp.broadcast(msg);
             disp.heartbeat();
             break;
-        // case bean.STOCKDATA:
-        //     this.web_worker.send(stock_list);
-        //     break;
+
     }
 
 });
@@ -206,6 +230,8 @@ this.web_worker.on("message",function(msg){
 this.sendWebData = function(){
     var sendDate = new bean.stock();
     sendDate.type = bean.STOCKDATA;
-    sendDate.data = this.stock_list;
-    this.web_worker.send(sendDate);
+    sendDate.data = {'timestamp':this.timeStamp,'stock_list':this.stock_list};
+    if(this.web_worker && this.web_worker.hasOwnProperty('channel')){
+        this.web_worker.send(sendDate);
+    }
 };

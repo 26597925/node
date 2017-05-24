@@ -74,12 +74,14 @@ oojs$.com.stock.market = oojs$.createClass(
         
         this.market_tab1_clk();
         $('#testbtn').click(self.testClick);
+        console.log('market');
         oojs$.addEventListener('market',self.handler);
         //oojs$.addEventListener('order_today',self.handler);
-        oojs$.sendWSMessage({'type':'market','action':'list','data':'111'});
+        //oojs$.sendWSMessage({'type':'market','action':'list','data':'111'});
     }
     ,handler(){
-      console.log('handler',JSON.stringify(arguments));
+      console.log('handler market',JSON.stringify(arguments));
+
     }
     ,testClick:function(){
         var self = market;
@@ -190,15 +192,7 @@ oojs$.com.stock.market = oojs$.createClass(
         oojs$.appendTB_list(panel,list_head,list_body);
     }
 
-    ,load_market:function(){
-        var self = this;
-        var sendData = {};
-        var host = window.document.location.host.replace(/:.*/, '');
-        // self.ws = new WebSocket('ws://' + host + ':20080');
-        // selfws.onmessage = function (event) {
-        //     console.log(JSON.stringify(event.data));
-        // };
-    }
+    
 });
 
 var market = new oojs$.com.stock.market();
