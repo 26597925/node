@@ -23,7 +23,7 @@ this.count = 0;//order id count
 this.stock_list = {};
 this.timestamp = [];
 this.title_stock = descrip.tx_title();
-this.marketPgCount = 5;
+this.marketPgCount = 100;
 
 
 
@@ -41,23 +41,24 @@ this.broadcast = function (broadcastData) {
                             break;
 
                         case bean.WSS_MARKET:
-                            // var len = broadcastData.data.length;
                             // this.stocks.data:[{name,code}]
-
                             if (self.stocks && self.stocks.data) {
                                 var page = 0;
                                 var stocks_obj = JSON.parse(self.stocks.data);
+
                                 var sendData = new bean.entity_wss();
                                 sendData.type = bean.WSS_MARKET;
                                 sendData.action = 'detail';
 
+                                if(self.timestamp.length<3){return;}
+
                                 var item = {};
-                                item['timestamp'] = [self.timestamp[0],self.timestamp[self.timestamp.length-1]];
+                                item['timestamp'] = [self.timestamp[0],self.timestamp[self.timestamp.length-2]];
                                 item['title'] = self.title_stock;
                                 item['code'] = [];
                                 item['stock'] = {};
                                 for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
-                                    if(!(tmid == 0 || tmid == self.timestamp.length-1)){
+                                    if(!(tmid == 0 || tmid == self.timestamp.length-2)){
                                         continue;
                                     }
                                     item['stock'][self.timestamp[tmid]] = {};
@@ -75,9 +76,11 @@ this.broadcast = function (broadcastData) {
                                     }
 
                                 }
+
+                                sendData.data = item;
+                                client.send(JSON.stringify(sendData));
                             }
-                            sendData.data = item;
-                            client.send(JSON.stringify(sendData));
+
                             break;
                     }
                 }

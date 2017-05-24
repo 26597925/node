@@ -72,24 +72,24 @@ var dispatcher = function(){
                 }
                 var sendDate = null;
                 for( var i = 0; i < this.processTotal; i++ ){
-                    //if( i==0   ){//|| i == 1
+                    // if( i==0   ){//|| i == 1
                         if(this.workers[i].channel){
                             sendDate = new bean.stock();
                             sendDate.type = bean.STOCKCODE;
                             sendDate.data = obj_stock_sun[i];
                             this.workers[i].send(sendDate);
                         }
-                     //}
+                    // }
                 }
 
                 break;
             case bean.STOCKDOWN:
                 for( var i = 0; i < this.processTotal; i++ ){
-                     //if(i==0 ){// || i == 1
+                     // if(i==0 ){// || i == 1
                         if(this.workers[i].channel){
                             this.workers[i].send(msg);
                         }
-                     //}
+                     // }
                 }
                 break;
 

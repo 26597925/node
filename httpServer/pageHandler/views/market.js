@@ -56,6 +56,7 @@ oojs$.com.stock.market = oojs$.createClass(
     }
     
     ,handler_market(result){
+      console.log(JSON.stringify(result))
       var self = this;
       if(result 
         && result.hasOwnProperty('data') 
@@ -72,7 +73,6 @@ oojs$.com.stock.market = oojs$.createClass(
             var name = self.list_benchmark_head[0];
             self.list_benchmark_head[0] = self.list_benchmark_head[1];
             self.list_benchmark_head[1] = name;
-            console.log('============title===========');
             self.appendTB_market();
         }
 
@@ -85,27 +85,33 @@ oojs$.com.stock.market = oojs$.createClass(
         ){
             self.data = [];
             var tmp_detail = [];
-
+            var name = ''
             for(var i = 0; i <  data['code'].length; i++){
-              tmp_detail = data['stock'][data['timestamp'][1]][data['code'][i]]
-              if(tmp_detail && tmp_detail.length>0){
+              tmp_detail = data['stock'][data['timestamp'][1]][data['code'][i]];
+
+              
+              if(tmp_detail && tmp_detail.length>2){
+                name = tmp_detail[0];
+                //
+                console.log()
+                tmp_detail[0] = "<a href='#' onclick='market.click_stock(\""+tmp_detail[1]+"\");'>"+tmp_detail[1]+"</a>";//'<a href="#'+tmp_detail[1]+'">'+tmp_detail[1]+'</a>';
+                tmp_detail[1] = name;
                 self.data.push(tmp_detail);
               }else{
-                tmp_detail = [];
-                for(var ii = 0; ii < self.list_benchmark_head.length; ii++){
-                  if(ii==0){
-                    tmp_detail[ii]=data['code'][i];
-                  }else{
-                    tmp_detail[ii]='-'
-                  }
-                }
-                self.data.push(tmp_detail);
-
-                
+                // tmp_detail = [];
+                // for(var ii = 0; ii < self.list_benchmark_head.length; ii++){
+                //   if(ii==0){
+                //     show = true;
+                //     tmp_detail[ii]=data['code'][i];
+                //   }else{
+                //     tmp_detail[ii]='-'
+                //   }
+                // }
+                // self.data.push(tmp_detail);
               }
             }
-            console.log(JSON.stringify(self.data));
-            if(self.dataTable){
+            
+            if(self.dataTable && self.data.length>0){
               self.dataTable.fnClearTable();
               self.dataTable.fnAddData(self.data);
             }
@@ -114,21 +120,14 @@ oojs$.com.stock.market = oojs$.createClass(
       
     }
 
-    // ,testClick:function(){
-    //     
-    //     self.table.fnClearTable();
-    //     self.table.fnAddData(self.data1);
-    //     oojs$.sendWSMessage({'type':'order_today','action':'list','data':'111'});
-    // }
     
+    ,click_stock:function(evt){
+      console.log(JSON.stringify(evt));
+
+    }
+
     ,market_tab1_clk:function(evt){
-        //var self = market;
-        // var 
-        // if(self.table == null){
-        //     self.table = $('#market_tb').dataTable( tableOptionsForOnlineUsers );
-        // }
-        // self.table.fnClearTable();
-        // self.table.fnAddData(self.data);
+        
     }
     
     ,market_tab2_clk:function(event){
@@ -147,7 +146,6 @@ oojs$.com.stock.market = oojs$.createClass(
           tr.append(th);
         }
         self.dataTable = $('#market_tb').dataTable( self.tableOptions );
-        //self.table.fnClearTable();
       }
 
     }
