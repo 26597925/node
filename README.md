@@ -21,6 +21,8 @@
 <li>npm install mysql  </li>
 <li>https://www.npmjs.com/package/mysql  </li>
  	https://www.elastic.co/guide/en/kibana/master/kibana-plugins.html <br />
+
+<li>https://cheerio.js.org/ </li>
 <li>npm install --save ws </li>
 <span>https://github.com/websockets/ws</span>
 </ul>

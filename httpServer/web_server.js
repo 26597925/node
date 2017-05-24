@@ -52,18 +52,26 @@ this.broadcast = function (broadcastData) {
                                 sendData.action = 'detail';
 
                                 var item = {};
-                                item['timestamp'] = self.timestamp;
+                                item['timestamp'] = [self.timestamp[0],self.timestamp[self.timestamp.length-1]];
                                 item['title'] = self.title_stock;
+                                item['code'] = [];
                                 item['stock'] = {};
                                 for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
-
+                                    if(!(tmid == 0 || tmid == self.timestamp.length-1)){
+                                        continue;
+                                    }
                                     item['stock'][self.timestamp[tmid]] = {};
+
                                     for (var i = page * self.marketPgCount; i < self.marketPgCount; i++) {
                                         if (i >= stocks_obj.length) {
                                             break;
                                         }
-                                        item['stock'][self.timestamp[tmid]][stocks_obj[i].code] =
-                                            self.stock_list[self.timestamp[tmid]][stocks_obj[i].code];
+                                        if(tmid == 0){
+                                            item['code'].push(stocks_obj[i].code);
+                                        }
+
+                                            item['stock'][self.timestamp[tmid]][stocks_obj[i].code] =
+                                                self.stock_list[self.timestamp[tmid]][stocks_obj[i].code];
                                     }
 
                                 }
@@ -82,7 +90,7 @@ this.broadcast = function (broadcastData) {
 exports.runPageServer = function( port )
 {
 	port = port || 80;
-     // port = port || 20080;
+    // port = port || 20080;
 	console.log('Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 		if(req.url == '/upload' && req.method.toLowerCase() == 'post'){

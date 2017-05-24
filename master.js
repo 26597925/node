@@ -135,7 +135,7 @@ var dispatcher = function(){
         self.stock_list[self.preDate] = {};
 
         self.timeStamp.push(String(self.preDate));
-        if( self.timeStamp.length > 10 ){
+        if( self.timeStamp.length > 11 ){
             self.timeStamp.shift();
             for(var elm in self.stock_list){
                 if(self.timeStamp.indexOf(elm)==-1){

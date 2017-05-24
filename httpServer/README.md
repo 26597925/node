@@ -186,6 +186,17 @@ oojs$.com.utils.Audio = oojs$.createClass(
 	}
 }
 
+
+<tfoot>
+    <tr>
+        <th>板块名称</th>
+        <th>最新价</th>
+        <th>涨跌额</th>
+        <th>跌幅</th>
+        <th>换手率</th>
+        <th>涨跌幅</th>
+    </tr>
+</tfoot>
 </pre>
 </p>
 

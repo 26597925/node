@@ -516,7 +516,8 @@ var oojs$ = {
 
 	,_events:{}
 
-	,addEventListener: function(eventName, callback){
+	,addEventListener: function(eventName, callback, scope){
+        if(!callback){return;}
 		this._events[eventName] = this._events[eventName] || [];
         for (var i = 0, len = this._events[eventName].length; i < len; i++) 
         {
@@ -524,6 +525,7 @@ var oojs$ = {
                 return;
             }
         }
+        callback['scope'] = scope;
         this._events[eventName].push(callback);
 	}
 
@@ -531,6 +533,10 @@ var oojs$ = {
         var events = this._events[eventName];
         for(var i = 0, len = events.length; i < len; i++){
             if(callback === events[i]){
+                if(events[i]['scope']){
+                    events[i]['scope'] = null;
+                    delete events[i]['scope'];
+                }
                 events[i] = null;
                 events.splice(i,1);
             }
@@ -540,6 +546,10 @@ var oojs$ = {
     ,clearEventListener: function(eventName, callback){
         var events = this._events[eventName];
         for(var i = 0, len = events.length; i < len; i++){
+            if(events[i]['scope']){
+                events[i]['scope'] = null;
+                delete events[i]['scope'];
+            }
             events[i] = null;
         }
         delete this._events[eventName];
@@ -561,7 +571,7 @@ var oojs$ = {
 		}
 		for (var i = 0, len = events.length; i < len; i++) 
 		{
-			events[i].apply(null, args);
+			events[i].apply(events[i]['scope'], args);
 		}
 	}
     /***
