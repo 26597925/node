@@ -31,14 +31,6 @@ oojs$.com.stock.market = oojs$.createClass(
       "sDom": '<"wrapper"flipt>',
       "sPaginationType": "full_numbers"
     }
-    // ,tableOptions: {
-    //     "fnInitComplete": function () {
-    //         var that = this;
-    //         this.$('td').click( function () {
-    //             console.log(this);
-    //         })
-    //     }
-    // }
     ,table:null
     ,dataTable:null
     ,init:function(){
@@ -56,7 +48,7 @@ oojs$.com.stock.market = oojs$.createClass(
     }
     
     ,handler_market(result){
-      console.log(JSON.stringify(result))
+      //console.log(JSON.stringify(result))
       var self = this;
       if(result 
         && result.hasOwnProperty('data') 
@@ -85,29 +77,31 @@ oojs$.com.stock.market = oojs$.createClass(
         ){
             self.data = [];
             var tmp_detail = [];
-            var name = ''
+            var name = '';
+            var sss = '';
             for(var i = 0; i <  data['code'].length; i++){
               tmp_detail = data['stock'][data['timestamp'][1]][data['code'][i]];
 
-              
               if(tmp_detail && tmp_detail.length>2){
                 name = tmp_detail[0];
-                //
-                console.log()
+                
                 tmp_detail[0] = "<a href='#' onclick='market.click_stock(\""+tmp_detail[1]+"\");'>"+tmp_detail[1]+"</a>";//'<a href="#'+tmp_detail[1]+'">'+tmp_detail[1]+'</a>';
                 tmp_detail[1] = name;
+                //console.log(sss.substr(0,4),sss.substr(4,2),sss.substr(6,2),sss.substr(8,2),sss.substr(10,2),sss.substr(12,2))
+                sss = tmp_detail[5];
+                tmp_detail[5] = /*sss.substr(0,4)+'-'+*/sss.substr(4,2)+'-'+sss.substr(6,2)+
+                ' '+sss.substr(8,2)+':'+sss.substr(10,2)+':'+sss.substr(12,2)
                 self.data.push(tmp_detail);
               }else{
-                // tmp_detail = [];
-                // for(var ii = 0; ii < self.list_benchmark_head.length; ii++){
-                //   if(ii==0){
-                //     show = true;
-                //     tmp_detail[ii]=data['code'][i];
-                //   }else{
-                //     tmp_detail[ii]='-'
-                //   }
-                // }
-                // self.data.push(tmp_detail);
+                tmp_detail = [];
+                for(var ii = 0; ii < self.list_benchmark_head.length; ii++){
+                  if(ii==0){
+                    tmp_detail[ii]=data['code'][i];
+                  }else{
+                    tmp_detail[ii]='-'
+                  }
+                }
+                self.data.push(tmp_detail);
               }
             }
             
@@ -124,7 +118,7 @@ oojs$.com.stock.market = oojs$.createClass(
       console.log(param);
       if(param == 'yes'){
         $('#accordion').accordion({'active':0});
-        oojs$.dispatch("ready", 'dictTrade_new');
+        oojs$.dispatch("ready", {'type':'showPanel','action':'dictTrade_new','origin':'market'});
       }
     }
 
@@ -132,22 +126,36 @@ oojs$.com.stock.market = oojs$.createClass(
       console.log(param);
       if(param == 'yes'){
         $('#accordion').accordion({'active':1});
-        oojs$.dispatch("ready", 'policy_list');
+        oojs$.dispatch("ready", {'type':'showPanel','action':'policy_list','origin':'market'});
       }
     }
 
     ,click_stock:function(param){
-      console.log(JSON.stringify(param));
-      if(policy.policy_subscribe.length == 0){
-        if(dictTrade.dictTrade_list_body.length == 0){
-          oojs$.showInfo("您还没有设置账户，是否现在设置账户",market.forward_dictTrade);
+      console.log('market stock',JSON.stringify(param));
+      if( dictTrade.is_load_tradelist && policy.is_load_subscribe ){
+        if( dictTrade.dictTrade_list_body.length == 0 ){
+          oojs$.showInfo("您还没有设置账户，是否现在设置账户?",market.forward_dictTrade);
+        }else if(policy.policy_subscribe.length == 0){
+          oojs$.showInfo("您还没有订阅策略，是否现在订阅策略?",market.forward_policy);
         }else{
-          oojs$.showInfo("您还没有订阅策略，是否现在订阅策略",market.forward_policy);
+          $('#accordion').accordion({'active':2});
+          oojs$.dispatch("ready", {'type':'showPanel','action':'order_new','origin':'market','data':param});
         }
       }else{
-        $('#accordion').accordion({'active':1});
-        oojs$.dispatch("ready", 'policy_new');
+        dictTrade.load_userAccount(function(){
+          policy.load_subscribe(function () {
+            if( dictTrade.dictTrade_list_body.length == 0 ){
+              oojs$.showInfo("您还没有设置账户，是否现在设置账户?",market.forward_dictTrade);
+            }else if(policy.policy_subscribe.length == 0){
+              oojs$.showInfo("您还没有订阅策略，是否现在订阅策略?",market.forward_policy);
+            }else{
+              $('#accordion').accordion({'active':2});
+              oojs$.dispatch("ready", {'type':'showPanel','action':'order_new','origin':'market','data':param});
+            }
+          })
+        })
       }
+      
     }
 
     ,market_tab1_clk:function(evt){

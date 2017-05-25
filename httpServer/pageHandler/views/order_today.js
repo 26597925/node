@@ -57,6 +57,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
     ,select_title:null//顶部下拉框数据结构
     ,status:'init'
     ,tb:null
+    ,action:''
+    ,stock_market:''
+    ,origin:''
     ,init:function(){
         var self = this;
         $( "#order_today_tabs" ).tabs();
@@ -68,7 +71,13 @@ oojs$.com.stock.order_today = oojs$.createClass(
         
         preload.getStock(function(){
             if(oojs$.getPanelID() == 2){
-                order_today.order_today_tab1_clk();
+                if(self.action == 'order_new'){
+                    $( "#order_today_tabs" ).tabs({ 'selected': 1 });
+                    order_today.order_today_tab2_clk();
+                }else{
+                    order_today.order_today_tab1_clk();
+                }
+                
             }
         });
         oojs$.addEventListener('order_today',self.handler_ordtoday);
@@ -287,13 +296,22 @@ oojs$.com.stock.order_today = oojs$.createClass(
         
         oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
             console.log(JSON.stringify(arguments));
-            if(result.success){
-                var capitals = JSON.parse(result.data);
+            if(result.success){//CAPITAL.account_muse
+                var capitals;
+                try{
+                    //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                    capitals = JSON.parse(result.data);
+                }catch(err){
+                    capitals = '';
+                    console.log('order_today',err);
+                    oojs$.showError('您的资金验证出了问题!');
+                }
                 if(capitals && capitals.length>0 
                     && capitals[0].hasOwnProperty('status')
                     && capitals[0]['status'] == 200){
                     accountOBJ["COMPONENT"].addCapital(capitals[0])
                     self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+
                 }else{
                     oojs$.showError('您的资金验证出了问题!');
                 }
@@ -633,9 +651,13 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         var item = policy.search_policyList_Item(USERID,POLICYID,policy.policy_subscribe);
         var drawitem_data = {};
+        if(self.stock_market != '' && self.origin == 'market'){
+           item['STOCKSET'] += (','+self.stock_market);
+        }
         for(var elm in item){
             drawitem_data[elm] = {ELEMENT:item[elm]};
         }
+
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
         start_component.init(STARTTIME,item["STARTTIME"]);
@@ -643,7 +665,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var ENDTIME = $('<div></div>');
         var end_component = new  oojs$.com.stock.component.hh_mm_ss();
         end_component.init(ENDTIME,item["ENDTIME"]);
-
 
         var stockset = new oojs$.com.stock.component.stockset();
         var STOCKSET = {
@@ -700,7 +721,15 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                     console.log(JSON.stringify(arguments));
                     if(result.success){
-                        var capitals = JSON.parse(result.data);
+                        var capitals;
+                        try{
+                            //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                            capitals= JSON.parse(result.data);
+                        }catch(err){
+                            capitals = '';
+                            console.log('order_today',err);
+                        }
+                        
                         if(capitals){
                             for(var i = 0; i < trade_list.length; i++){
                                 for(var elm in capitals){
@@ -876,5 +905,26 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
 var order_today = new oojs$.com.stock.order_today();
 oojs$.addEventListener("ready",function(){
+    console.log('order ready',JSON.stringify(arguments));
+    //{'type':'showPanel','action':'order_new','origin':'market','data':param}
+    if(typeof(arguments[0]) == 'object'){
+        var obj = arguments[0];
+        if(obj.hasOwnProperty('type') 
+            && obj.hasOwnProperty('action')
+            && obj.hasOwnProperty('data')){
+            switch(obj['type']){
+                case 'showPanel':
+                    order_today.action = obj['action'];
+                    order_today.stock_market = obj['data'];
+                    order_today.origin = obj['origin'];
+                    break;
+            }
+        }else{
+            order_today.action = '';
+            order_today.stock_market = '';
+            order_today.origin = '';
+        }
+    }
+    //order ready {"0":"order_new","1":"603788"}
     order_today.init();
 });

@@ -43,6 +43,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         }
     ]//增加修改基准数据
 	,dictTrade_list_body: []//券商列表数据
+    ,is_load_tradelist:false
 	,init:function(){
         var self = this;
 		$( "#dictTrade_tabs" ).tabs();
@@ -491,6 +492,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		var self = this;
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
 			if(result.success){
+                self.is_load_tradelist = true;
 				self.dictTrade_list_body = [];
                 console.log("trade\n","load_userAccount\n",JSON.stringify(result.data));
                 self.dictTrade_list_body = result.data;

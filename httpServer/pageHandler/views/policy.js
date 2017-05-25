@@ -9,6 +9,7 @@ oojs$.com.stock.policy = oojs$.createClass(
     ,item_Unsubscribe:null
     ,item_stockset1:''
     ,item_stockset2:''
+    ,is_load_subscribe:false
     ,list_benchmark_head: [
         {
             ID:"PGROUPID",
@@ -426,6 +427,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 
         oojs$.httpGet("/select_alreadySubscrible",function(result,textStatus,token){
             if(result.success){
+                self.is_load_subscribe = true;
                 console.log("load_subscribe",JSON.stringify(result.data));
                 self.policy_subscribe = [];
                 self.policy_subscribe = result.data;
@@ -541,5 +543,3 @@ var policy = new oojs$.com.stock.policy();
 oojs$.addEventListener("ready",function(){
 	policy.init();
 });
-
-
