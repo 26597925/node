@@ -42,7 +42,7 @@ this.broadcast = function (broadcastData) {
 						case bean.WSS_MARKET:
 							// this.stocks.data:[{name,code}]
 							if (self.stocks && self.stocks.data) {
-								var page = 10;
+								var page = 30;
 								var stocks_obj = JSON.parse(self.stocks.data);
 
 								var sendData = new bean.entity_wss();
@@ -55,9 +55,8 @@ this.broadcast = function (broadcastData) {
 								item['timestamp'] = [self.timestamp[0],self.timestamp[self.timestamp.length-2]];
 								item['title'] = self.title_stock;
 								item['code'] = [];
+								item['stock_total'] = stocks_obj.length;
 								item['stock'] = {};
-
-
 
 
 								for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
@@ -66,7 +65,8 @@ this.broadcast = function (broadcastData) {
 									}
 									item['stock'][self.timestamp[tmid]] = {};
 
-									for (var i = page * self.marketPgCount; i < self.marketPgCount; i++) {
+									for (var i = page * self.marketPgCount; i < (page+1)*self.marketPgCount; i++) {
+
 										if (i >= stocks_obj.length) {
 											break;
 										}
@@ -77,7 +77,6 @@ this.broadcast = function (broadcastData) {
 										item['stock'][self.timestamp[tmid]][stocks_obj[i].code] =
 											self.stock_list[self.timestamp[tmid]][stocks_obj[i].code];
 									}
-
 								}
 
 								sendData.data = item;
@@ -223,7 +222,7 @@ var cumulation = function(){
 	return this.count++;
 };
 
-var setStocks = function(data){console.log('setStocks');
+var setStocks = function(data){
 	self.stocks.date = new Date();
 	self.stocks.data = data;
 	if(process.hasOwnProperty('send')){

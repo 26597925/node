@@ -58,7 +58,7 @@ var getStockInfo = function(param,callback){
 this.param = [];
 
 process.on('message', function(msg) {
-	console.log('parse code STOCKCODE', process.env.id);
+	// console.log('parse code STOCKCODE', process.env.id);
   switch(msg.type){
 	case bean.STOCKCODE:
 	  this.param = [];
@@ -104,7 +104,7 @@ process.on('message', function(msg) {
 					clearInterval(intervalId);
 					return;
 				}
-				console.log('stock url ', process.env.id, count, self.param[count] );
+				//console.log('stock url ', process.env.id, count, self.param[count] );
 				new getStockInfo(self.param[count],function(){
 					if(arguments[0]){
 						new parseStocks( time, arguments[0] );

@@ -122,8 +122,8 @@ var dispatcher = function(){
 	this.heartbeat = function(){
 		if( this.IntervalId == null ){
 			var self_disp = this;
-			this.IntervalId = setInterval(function(){
 
+			this.IntervalId = setInterval(function(){
 
 				if(null == self.preDate ){
 
@@ -137,7 +137,6 @@ var dispatcher = function(){
 						self_disp.handlerHeartbeat();
 					}
 				}
-
 
 			},500);
 		}
