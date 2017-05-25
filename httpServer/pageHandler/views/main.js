@@ -861,6 +861,7 @@ var oojs$ = {
         return $('#accordion').accordion('option','active');
     }
     ,showPanel: function(){
+        hideAllPanel();
         var active = $('#accordion').accordion('option','active');
         switch(active){
             case 0:
@@ -1600,6 +1601,7 @@ oojs$.addEventListener("ready",function(){
         oojs$.showPanel();
     });
 $(document).ready(function(){
+    hideAllPanel();
     $("#accordion").accordion({
         active: 2
     });

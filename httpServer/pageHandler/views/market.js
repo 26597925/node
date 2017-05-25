@@ -49,7 +49,7 @@ oojs$.com.stock.market = oojs$.createClass(
         // $('#order_today').click({'scope':self},self.close_socket);
         // $('#order_period').click({'scope':self},self.close_socket);
         // $('#user').click({'scope':self},self.close_socket);
-        
+        //if(oojs$.getPanelID() == 3){}
         this.market_tab1_clk();
         oojs$.addEventListener('market',self.handler_market,self);
         
@@ -120,10 +120,34 @@ oojs$.com.stock.market = oojs$.createClass(
       
     }
 
-    
-    ,click_stock:function(evt){
-      console.log(JSON.stringify(evt));
+    ,forward_dictTrade:function(param){
+      console.log(param);
+      if(param == 'yes'){
+        $('#accordion').accordion({'active':0});
+        oojs$.dispatch("ready", 'dictTrade_new');
+      }
+    }
 
+    ,forward_policy:function(param){
+      console.log(param);
+      if(param == 'yes'){
+        $('#accordion').accordion({'active':1});
+        oojs$.dispatch("ready", 'policy_list');
+      }
+    }
+
+    ,click_stock:function(param){
+      console.log(JSON.stringify(param));
+      if(policy.policy_subscribe.length == 0){
+        if(dictTrade.dictTrade_list_body.length == 0){
+          oojs$.showInfo("您还没有设置账户，是否现在设置账户",market.forward_dictTrade);
+        }else{
+          oojs$.showInfo("您还没有订阅策略，是否现在订阅策略",market.forward_policy);
+        }
+      }else{
+        $('#accordion').accordion({'active':1});
+        oojs$.dispatch("ready", 'policy_new');
+      }
     }
 
     ,market_tab1_clk:function(evt){
