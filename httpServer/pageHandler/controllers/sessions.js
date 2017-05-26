@@ -66,19 +66,21 @@ exports.setCookie = function(req,res,sID,uID){
 	cookies = null;
 };
 
-exports.setCookieTime = function(req,res,sID,uID){
-    var cookies = this.parseCookies(req.headers.cookie);
+exports.setCookieCode = function(req,res,code){
+	var cookies = this.parseCookies(req.headers.cookie);
+	cookies["cookieID"] = code;
+	res.setHeader("Set-Cookie",invertParseCookies(cookies));
 
-    cookies["sID"] = sID;
-    cookies["uID"] = uID;
-    // res.setHeader("Set-Cookie",["sID=" + sID,"user=" + usr,"authorized=true","Secure"]);
-    res.setHeader("Set-Cookie",invertParseCookies(cookies));
+	cookies["cookieID"] = null;
+	delete cookies["cookieID"];
+	cookies = null;
+};
 
-    cookies["sID"] = null;
-    cookies["uID"] = null;
-    delete cookies["sID"];
-    delete cookies["uID"];
-    cookies = null;
+exports.getCookieCode = function(req,res){
+	var cookies = this.parseCookies(req.headers.cookie);
+	var code = cookies["cookieID"];
+	cookies = null;
+	return code;
 };
 
 exports.invertDate = function(sID){

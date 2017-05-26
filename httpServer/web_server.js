@@ -5,7 +5,6 @@ const path = require("path");
 const fs = require("fs");
 const ejs = require('ejs');
 const querystring = require("querystring");
-const captchapng = require('captchapng');
 
 const bean = require(path.join(__dirname,'..','bean','bean_entity'));
 
@@ -24,8 +23,6 @@ this.stock_list = {};
 this.timestamp = [];
 this.title_stock = descrip.tx_title();
 this.marketPgCount = 100;
-
-
 
 this.broadcast = function (broadcastData) {
 	if(broadcastData && broadcastData.hasOwnProperty('type') && broadcastData.hasOwnProperty('action')){
@@ -58,7 +55,6 @@ this.broadcast = function (broadcastData) {
 								item['stock_total'] = stocks_obj.length;
 								item['stock'] = {};
 
-
 								for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
 									if(!(tmid == 0 || tmid == self.timestamp.length-2)){
 										continue;
@@ -66,7 +62,6 @@ this.broadcast = function (broadcastData) {
 									item['stock'][self.timestamp[tmid]] = {};
 
 									for (var i = page * self.marketPgCount; i < (page+1)*self.marketPgCount; i++) {
-
 										if (i >= stocks_obj.length) {
 											break;
 										}
@@ -104,22 +99,7 @@ exports.runPageServer = function( port )
 			var ct = new controllerContext(req, res);
 			controller['upload'].apply(ct);
 
-	}else if(req.url == '/checkImg' && req.method.toLowerCase() == 'get'){
-		var random = parseInt(9*Math.random()+1)*10000+parseInt(10000*Math.random());
-			var p = new captchapng(80,30,random); // width,height,numeric captcha
-			p.color(0, 0, 0, 0);	// First color: background (red, green, blue, alpha)
-			p.color(0, 0, 80, 255); // Second color: paint (red, green, blue, alpha)
-
-			var img = p.getBase64();
-			var imgbase64 = new Buffer(img,'base64');
-			res.writeHead(200, {
-				'Content-Type': 'image/png'
-			});
-			res.end(imgbase64);
-		console.log("需要把验证吗存储在数据库中");
-
-		}else
-		{
+	}else{
 			// console.log(path.basename(__filename),"url:", req.url);
 			var _bufData = '';
 			req.on('data', function (chunkData) {
@@ -135,12 +115,12 @@ exports.runPageServer = function( port )
 			if (_bufData.length > 0) {
 				try {
 
-								_bufData = _bufData.replace(/\\n/g,"");
-								_bufData = _bufData.replace(/\\/g, "");
-				reqData = JSON.parse(_bufData);
+          _bufData = _bufData.replace(/\\n/g,"");
+          _bufData = _bufData.replace(/\\/g, "");
+				  reqData = JSON.parse(_bufData);
 
 				} catch (err) {
-				console.log("not json format",err);
+				  console.log("not json format",err);
 				}
 			} else {
 				reqData = {};

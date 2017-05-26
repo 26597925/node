@@ -252,12 +252,22 @@ route.map({
 
 //================================
 route.map({
-    method:'post',
-    url:/^\/upload\/?$/i,
-    controller:'upload',
-    action:'upload'
+	method:'post',
+	url:/^\/upload\/?$/i,
+	controller:'upload',
+	action:'upload'
 });
+
 //================================
+route.map({
+	method:'post',
+	url:/^\/verifyCode\/?$/i,
+	controller:'verifyCode',
+	action:'verifyCode'
+});
+
+//================================
+
 route.map({
     method:'get',
     url:/^\/exit\/?$/i,

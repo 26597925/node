@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const ejs = require('ejs');
 const sessions = require(path.join(__dirname,"sessions.js"));
+const verifyCode = require(path.join(__dirname,"verifyCode.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
@@ -66,8 +67,16 @@ exports.logup_submit = function(){
         && self.req.post.hasOwnProperty('UENAME')
         && self.req.post.hasOwnProperty('PASSWORD')
         && self.req.post.hasOwnProperty('PHONENUMBER')
-        && self.req.post.hasOwnProperty('EMAIL')){
-
+        && self.req.post.hasOwnProperty('EMAIL')
+	      && self.req.post.hasOwnProperty('VERIFY')
+    ){
+      var verify =  self.req.post['VERIFY'];
+      console.log(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))), String(verify));
+	    if(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))) != String(verify) ){
+		    result = {'success':false,'message':'校验码验证失败'};
+		    self.responseDirect(200,"text/json",JSON.stringify(result));
+		    return;
+	    }
         var sql = "SELECT" +
             " `USERID`," +
             //" `GROUPID`," +
@@ -157,14 +166,21 @@ var getIp = function(req){
 exports.login = function(args){
 
 	var self = this;
-    var ip =  getIp(this.req);
-    var usr = args["usr"] || null;
-    var psw = args["psw"] || null;
-    // SELECT `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, 
-    //`PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `MODTIME`, 
-    //`ONLINE`, `ADDTIME`, `MODTIME`, `REMARK` FROM `tb_user_basic`
-    
-    if(usr && psw){
+  var ip =  getIp(this.req);
+  var usr = args["usr"] || null;
+  var psw = args["psw"] || null;
+  var verify = args["verify"] || null;
+  // SELECT `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`,
+  //`PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `MODTIME`,
+  //`ONLINE`, `ADDTIME`, `MODTIME`, `REMARK` FROM `tb_user_basic`
+
+  if(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))) != String(verify) ){
+	  result = {'success':false,'message':'校验码验证失败，请重新登录'};
+	  self.responseDirect(200,"text/json",JSON.stringify(result));
+	  return;
+  }
+
+  if(usr && psw){
         var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='"+usr+"' and `PASSWORD`='"+psw+"'";
         var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){

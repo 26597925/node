@@ -2,12 +2,38 @@
 <script language="javascript" type="text/javascript" src="/public/js/jquery.crypt.js"></script>
 <script language="javascript" type="text/javascript" src="/public/js/jquery.jqplot.min.js"></script>
 <script type="text/javascript">
-$(document).ready(function(){
-    var showTopInfo = function(){
-        $("#topinfo").html("<a id='topinfousr' href='/#'>返回</a>")
-    };
-    showTopInfo();
+var showTopInfo = function(){
+    $("#topinfo").html("<a id='topinfousr' href='/#'>返回</a>")
+};
 
+var loadImage2 =function ()
+{
+    var xmlHTTP = new XMLHttpRequest();
+    xmlHTTP.open('POST','/verifyCode',true);
+    // Must include this line - specifies the response type we want
+    xmlHTTP.responseType = 'arraybuffer';
+
+    xmlHTTP.onload = function(e)
+    {
+        var arr = new Uint8Array(this.response);
+        // Convert the int array to a binary string
+        // We have to use apply() as we are converting an *array*
+        // and String.fromCharCode() takes one or more single values, not
+        // an array.
+        var raw = String.fromCharCode.apply(null,arr);
+        // This works!!!
+        var b64=btoa(raw);
+        var dataURL="data:image/jpeg;base64,"+b64;
+        document.getElementById("image").src = dataURL;
+    };
+
+    xmlHTTP.send();
+}
+
+$(document).ready(function(){
+    
+    showTopInfo();
+    loadImage2();
     $("#login").click(function(){
         $("#login").prop('disabled',true);
         $("#message").text("");
@@ -85,6 +111,8 @@ $(document).ready(function(){
             $("#login").prop('disabled',false);
             return;
         }
+
+        var verifyCode = $.trim($("#verifyCode").val());
         var sendData = {
             'UENAME':UENAME
             ,'PASSWORD':PASSWORD
@@ -93,6 +121,7 @@ $(document).ready(function(){
             ,'ADDRESS':ADDRESS
             ,'ZIPCODE':ZIPCODE
             ,'EMAIL':EMAIL
+            ,'VERIFY':verifyCode
         };
 
         $.ajax({
@@ -114,8 +143,11 @@ $(document).ready(function(){
                         event.preventDefault();
                     });
                     $('#message').append(href);
+                    loadImage2();
                 }else if(!result.success){
+                    $("#message").empty();
                     $("#message").append($("<label>"+result.message+"</label>"));
+                    loadImage2();
                 }
                 $("#login").prop('disabled',false);
             },
