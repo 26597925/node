@@ -22,7 +22,7 @@ this.count = 0;//order id count
 this.stock_list = {};
 this.timestamp = [];
 this.title_stock = descrip.tx_title();
-this.marketPgCount = 100;
+this.marketPgCount = 50;
 
 this.broadcast = function (broadcastData) {
 	if(broadcastData && broadcastData.hasOwnProperty('type') && broadcastData.hasOwnProperty('action')){
@@ -39,7 +39,7 @@ this.broadcast = function (broadcastData) {
 						case bean.WSS_MARKET:
 							// this.stocks.data:[{name,code}]
 							if (self.stocks && self.stocks.data) {
-								var page = 30;
+								var page = client.currentPage || 0;
 								var stocks_obj = JSON.parse(self.stocks.data);
 
 								var sendData = new bean.entity_wss();
@@ -53,6 +53,7 @@ this.broadcast = function (broadcastData) {
 								item['title'] = self.title_stock;
 								item['code'] = [];
 								item['stock_total'] = stocks_obj.length;
+								item['stock_pgct'] = self.marketPgCount;
 								item['stock'] = {};
 
 								for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
@@ -137,7 +138,6 @@ exports.runPageServer = function( port )
 
 	self.wss = new WebSocket.Server({ server });
 	self.wss.on('connection', function (ws) {
-		console.log('1');
 		handlerWss(ws);
 	});
 };
@@ -162,14 +162,14 @@ var handlerWss = function(ws){
 
 			// ws.mz_type = clientData.type;
 			// ws.mz_aciton = clientData.action;
-		var actionInfo_ws = wssRoute.getActionInfo(clientData.type);
+			var actionInfo_ws = wssRoute.getActionInfo(clientData.type);
 
-		if(actionInfo_ws){
-		var controller_ws = require(path.join(__dirname,'pageHandler','ws',actionInfo_ws.controller));
-		if(controller_ws[actionInfo_ws.action]){
-			var ws_ct = new ws_context(ws,clientData);
-			controller_ws[actionInfo_ws.action].apply(ws_ct);
-		}
+			if(actionInfo_ws){
+			var controller_ws = require(path.join(__dirname,'pageHandler','ws',actionInfo_ws.controller));
+			if(controller_ws[actionInfo_ws.action]){
+				var ws_ct = new ws_context(ws,clientData);
+				controller_ws[actionInfo_ws.action].apply(ws_ct);
+			}
 		}
 		}catch(err){console.log('error',err.message)}
 	});
@@ -229,6 +229,7 @@ var ws_context = function(ws,data){
 	this.root = self;
 	this.ws = ws;
 	this.data = data;
+
 };
 
 

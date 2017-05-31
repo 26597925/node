@@ -23,8 +23,8 @@ exports.message = function(){
     self.uID = this.data.uID;
     if(self.data && self.data.hasOwnProperty('action')){
         switch(this.data.action){
-            case 'list':
-                console.log("action list");
+            case 'paginate':
+                _ws.currentPage = self.data.data;
                 break;
         }
     }
