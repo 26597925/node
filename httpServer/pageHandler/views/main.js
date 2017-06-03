@@ -799,7 +799,7 @@ var oojs$ = {
 					success:function(result,textStatus){
 						if(result.success){
 							//console.log( "success!" );
-                            //self.heartTime();
+                            self.heartTime();
 						}else{
                             self.closeHeartTime();
 							oojs$.showError(result.message,function(){
