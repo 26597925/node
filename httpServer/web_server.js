@@ -37,7 +37,7 @@ this.broadcast = function (broadcastData) {
 							break;
 
 						case bean.WSS_MARKET:
-							// this.stocks.data:[{name,code}]
+							// self.stocks.data:[{name,code}]
 							if (self.stocks && self.stocks.data) {
 								var page = client.currentPage || 0;
 								var stocks_obj = JSON.parse(self.stocks.data);
@@ -196,10 +196,10 @@ var handlerRequest = function(req, res){
 
 
 var cumulation = function(){
-	if(this.count>=10000){
-		this.count = 0;
+	if(self.count>=10000){
+		self.count = 0;
 	}
-	return this.count++;
+	return self.count++;
 };
 
 var setStocks = function(data){

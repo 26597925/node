@@ -119,8 +119,8 @@ exports.insert_orderPeriod = function(){
         ",%s" + // 8 DIRTYPE
         ",'%s'" +//9 STOCKSET
         // ",%s" + //10 DEALSTOCK
-        ",%s" + // 11 STARTTIME
-        ",%s" + // 12 ENDTIME
+        ",'%s'" + // 11 STARTTIME
+        ",'%s'" + // 12 ENDTIME
         ",%s" + // 13 ISTEST
         ",%s" + // 14 BUYCOUNT
         ",%s" + // 15 BUYAMOUNT
@@ -146,8 +146,8 @@ exports.insert_orderPeriod = function(){
         }
 
         ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
-        STARTTIME = unit_date.objToNumber(self.req.post[i]['STARTTIME']);
-        ENDTIME = unit_date.objToNumber(self.req.post[i]['ENDTIME']);
+        STARTTIME = unit_date.Format(new Date(self.req.post[i]['STARTTIME']),"yyyy-MM-dd HH:mm:ss");
+        ENDTIME = unit_date.Format(new Date(self.req.post[i]['ENDTIME']),"yyyy-MM-dd HH:mm:ss");
 
         BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
@@ -266,8 +266,8 @@ exports.update_orderPeriod = function(){
             " `POLICYPARAM`='%s' ," +
             // " `DIRTYPE`=%s ," +
             " `STOCKSET`='%s' ," +
-            " `STARTTIME`=%s ," +
-            " `ENDTIME`=%s ," +
+            " `STARTTIME`='%s' ," +
+            " `ENDTIME`='%s' ," +
             // " `ISTEST`=%s ," +
             " `BUYCOUNT`=%s ," +
             " `BUYAMOUNT`=%s ," +
@@ -283,8 +283,8 @@ exports.update_orderPeriod = function(){
             "`ROWID`='%s'";
         // ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
         var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
-        STARTTIME = unit_date.objToNumber(self.req.post[0]['STARTTIME']);
-        ENDTIME = unit_date.objToNumber(self.req.post[0]['ENDTIME']);
+        STARTTIME = unit_date.Format(new Date(self.req.post[0]['STARTTIME']),"yyyy-MM-dd HH:mm:ss");
+        ENDTIME = unit_date.Format(new Date(self.req.post[0]['ENDTIME']),"yyyy-MM-dd HH:mm:ss");
         BUYCOUNT = unit_date.string2int(self.req.post[0]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
         PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);

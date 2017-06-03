@@ -71,6 +71,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
     }
 
     ,order_period_tab2_clk:function(event){
+        preload.getStock();
 
         dictTrade.load_userAccount(function(){
             policy.load_subscribe(function () {
@@ -94,7 +95,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 }
             })
         });
-        preload.getStock();
+        
     }
 
     ,option_append: function(select,obj,filter){
@@ -157,7 +158,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         delete sendData['ONETHIRD'];
         delete sendData['CTRL'];
         console.log("switch",JSON.stringify(sendData))
-        oojs$.httpPost_json("/update_ordertoday",[sendData],function(result,textStatus,token){
+        oojs$.httpPost_json("/update_orderPeriod",[sendData],function(result,textStatus,token){
                 if(result.success){
                     // if( type == 1){
                     //     policy.policy_tab1_click();
@@ -197,16 +198,20 @@ oojs$.com.stock.order_period = oojs$.createClass(
     ,appendTB_modify_order:function(){
         var self = this;
         var drawitem_data = arguments[0];
-        console.log('appendTB_modify_order\n',JSON.stringify(drawitem_data));
+        console.log('order_period appendTB_modify_order\n',JSON.stringify(drawitem_data));
         drawitem_data['PGROUPID']['ORIGIN'] = drawitem_data['PGROUPID']['ELEMENT'];
         drawitem_data['PGROUPID']['ELEMENT'] = preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
-        start_component.init(STARTTIME,oojs$.toHMSOBJ(drawitem_data['STARTTIME']['ELEMENT']));
+        var start_s = oojs$.Format(new Date(drawitem_data['STARTTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss');
+        var hh_mm_ss = {'hh':start_s[3],'mm':start_s[4],'ss':start_s[5]};
+        start_component.init(STARTTIME,hh_mm_ss,'datepicker',new Date(drawitem_data['STARTTIME']['ELEMENT']));
 
         var ENDTIME = $('<div></div>');
         var end_component = new  oojs$.com.stock.component.hh_mm_ss();
-        end_component.init(ENDTIME,oojs$.toHMSOBJ(drawitem_data["ENDTIME"]['ELEMENT']));
+        start_s = oojs$.Format(new Date(drawitem_data['ENDTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss');
+        var hh_mm_ss = {'hh':start_s[3],'mm':start_s[4],'ss':start_s[5]};
+        end_component.init(ENDTIME,hh_mm_ss,'datepicker',new Date(drawitem_data['ENDTIME']['ELEMENT']));
 
 
         var stockset = new oojs$.com.stock.component.stockset();
@@ -248,7 +253,17 @@ oojs$.com.stock.order_period = oojs$.createClass(
         oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
             console.log(JSON.stringify(arguments));
             if(result.success){
-                var capitals = JSON.parse(result.data);
+                
+                var capitals;
+
+                try{
+                    //alert("change appendTB_modify_order result.data ")
+                    //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                    capitals= JSON.parse(result.data);
+                }catch(err){
+                    capitals = '';
+                    console.log('order_today',err);
+                }
                 if(capitals && capitals.length>0 
                     && capitals[0].hasOwnProperty('status')
                     && capitals[0]['status'] == 200){
@@ -474,7 +489,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var self = this;
         var sendData = {};
 
-        oojs$.httpPost_json("/select_preorder",sendData,function(result,textStatus,token){
+        oojs$.httpPost_json("/select_orderPeriod",sendData,function(result,textStatus,token){
             if(result.success){
                 self.order_period_list = [];
                 self.order_period_list = result.data;
@@ -584,13 +599,13 @@ oojs$.com.stock.order_period = oojs$.createClass(
             drawitem_data[elm] = {ELEMENT:item[elm]};
         }
         var STARTTIME = $('<div></div>');
+        
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
-        start_component.init(STARTTIME,item["STARTTIME"]);
+        start_component.init(STARTTIME,item["STARTTIME"],'datepicker');
 
         var ENDTIME = $('<div></div>');
         var end_component = new  oojs$.com.stock.component.hh_mm_ss();
-        end_component.init(ENDTIME,item["ENDTIME"]);
-
+        end_component.init(ENDTIME,item["ENDTIME"],'datepicker');
 
         var stockset = new oojs$.com.stock.component.stockset();
         var STOCKSET = {
@@ -614,8 +629,12 @@ oojs$.com.stock.order_period = oojs$.createClass(
             var trade_list = [];
             var index = 0;
             var item_account = null;
+            console.log("同时请求账号中的数据");
+            
+            var sendAccounts = [];
             for(var elm in dictTrade.dictTrade_list_body){
                 item_account = dictTrade.dictTrade_list_body[elm];
+                sendAccounts.push({"accountid":item_account['ACCOUNTID']});
                 trade_list[index] = {};
                 
                 trade_list[index]["ELEMENT"] = item_account;
@@ -638,13 +657,23 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 index++;
             }
 
-            console.log("trade_list",JSON.stringify(trade_list));
+            console.log("order_period trade_list ",JSON.stringify(trade_list));
             if(sendAccounts.length>0){
                 console.log("trade_list",JSON.stringify(trade_list));
                 oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                     console.log(JSON.stringify(arguments));
-                    if(result.success){
-                        var capitals = JSON.parse(result.data);
+                    if(result.success ){
+                        var capitals;
+
+                        try{
+                            //alert("change handler_policy result.data ")
+                            //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                            capitals= JSON.parse(result.data);
+                        }catch(err){
+                            capitals = '';
+                            console.log('order_today',err);
+                        }
+
                         if(capitals){
                             for(var i = 0; i < trade_list.length; i++){
                                 for(var elm in capitals){
@@ -660,14 +689,14 @@ oojs$.com.stock.order_period = oojs$.createClass(
                             }
                             self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
                         }else{
-                            oojs$.showError("您的资金验证存在问题");
+                            oojs$.showError("您的资金验证存在问题  code 3");
                         }
                     }else{
-                        oojs$.showError("您的资金验证存在问题");
+                        oojs$.showError("您的资金验证存在问题  code 2");
                     }
                 });
             }else{
-                oojs$.showError("您还没有添加账号");
+                oojs$.showError("您还没有添加账号 code 1");
             }
 
         })
@@ -786,7 +815,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         console.log("sendData",JSON.stringify(sendData));
         
         if(type == "add"){
-            oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
+            oojs$.httpPost_json("/insert_orderPeriod",sendData,function(result,textStatus,token){
                 if(result.success){
                     $( "#order_period_tabs" ).tabs({ selected: 0 });
                     order_period.order_period_tab1_clk();
@@ -795,7 +824,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 }
             });
         }else if(type == "modify"){
-            oojs$.httpPost_json("/update_ordertoday",sendData,function(result,textStatus,token){
+            oojs$.httpPost_json("/update_orderPeriod",sendData,function(result,textStatus,token){
                 if(result.success){
                     
                     $( "#order_period_tabs" ).tabs({ selected: 0 });

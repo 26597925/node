@@ -173,7 +173,10 @@ var proxy_capitals = function(sendData,callback){
 
 
     req.on('error', function(e) {
-        console.log('problem with request: ' + e.message);
+      console.log('problem with request: ' + e.message);
+	    if(callback){
+		    callback();
+	    }
     });
 
     req.write(result);

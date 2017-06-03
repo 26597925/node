@@ -321,21 +321,30 @@ var oojs$ = {
     */
     ,generateHMDOption: function(){
 		var htmltag = arguments[0];
-        // var hh_id = arguments[1];
-        // var mm_id = arguments[2];
-        // var ss_id = arguments[3];
+        var type = '';
+        if(arguments.length>1){
+            type = arguments[1];
+        }
 
 		htmltag.empty();
+
+        if(type!='' && type == 'datepicker')
+        {
+            var input = $('<input></input>',{
+                'type':'text'
+            }).datepicker({ dateFormat: 'yy年mm月dd日' });
+            input.datepicker('setDate',new Date());
+            htmltag.append(input);
+        }
+
 		var tmpval = '';
         var select=null;
 
         htmltag.append($('<label>时</label>'));
         select= $('<select ></select>',{
-            // id:hh_id,
             style:"height:25px;width:30px;-webkit-appearance: none;"
         });
 		for(var i = 0; i < 24; i++){
-
             tmpval = i<=9?("0"+i):i;
             select.append("<option value='"
                 +tmpval+"'>"
@@ -346,7 +355,6 @@ var oojs$ = {
         htmltag.append($('<label>:分</label>'));
 
         select= $('<select ></select>',{
-            // id:mm_id,
             style:"height:25px;width:30px;-webkit-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
@@ -361,7 +369,6 @@ var oojs$ = {
         htmltag.append($('<label>:秒</label>'));
 
         select= $('<select></select>',{
-            // id:ss_id,
             style:"height:25px;width:30px;-webkit-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
@@ -371,7 +378,6 @@ var oojs$ = {
                 +tmpval+"</option>");
         }
         htmltag.append(select);
-
 
 		return htmltag;
 	}
@@ -1117,7 +1123,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             dirtyep = $(self.SELECT_DIRTYPE).val()
         }
 
-        if(self.INPUT.val()){
+        if($.trim(self.INPUT.val()) == ""){
             oojs$.showError("请选择交易策略并输入信息");
             return null;
         }
@@ -1210,18 +1216,41 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
 
 /**
 * var hh_mm_ss = new oojs$.com.stock.component.hh_mm_ss();
-* hh_mm_ss.init(div,{ hh:0, mm:1, ss:2 })
+* hh_mm_ss.init(div,{ hh:0, mm:1, ss:2 }[,'datepicker'])
 * console.log(hh_mm_ss.val())=>{ hh:0, mm:1, ss:2 }
 */
 oojs$.ns("com.stock.component.hh_mm_ss");
 oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
     NAME:"hh_mm_ss"
     ,kids:null
+    ,inputs:null
+    ,type:''
     ,val:function(){
+        if(this.type == 'datepicker'){
+            var date = new Date($(this.inputs[0]).datepicker('getDate'));
+            date.setHours($(this.kids[0]).val());
+            date.setMinutes($(this.kids[1]).val());
+            date.setSeconds($(this.kids[2]).val());
+
+            return date.toJSON();
+            //return {'yMd':date.toJSON(),'hh':$(this.kids[0]).val(),'mm':$(this.kids[1]).val(),'ss':$(this.kids[2]).val()};;
+        }
         return {hh:$(this.kids[0]).val(),"mm":$(this.kids[1]).val(),"ss":$(this.kids[2]).val()};;
     }
-    ,init:function(div,hh_mm_ss){
-        oojs$.generateHMDOption(div);
+    ,init:function(div, hh_mm_ss, datepicker, date){
+        if(datepicker && datepicker == 'datepicker'){
+            this.type = datepicker;
+            oojs$.generateHMDOption(div,datepicker);
+            this.inputs = div.find( "input" );
+            if( date!=null ){
+                $(this.inputs[0]).datepicker('setDate',date);
+            }
+        }else{
+            this.type = '';
+            oojs$.generateHMDOption(div);
+        }
+        
+
         this.kids = div.find( "select" );
         var hh = parseInt(hh_mm_ss["hh"]);
         var mm = parseInt(hh_mm_ss["mm"]);
@@ -1230,7 +1259,7 @@ oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
         $(this.kids[1]).val(mm<=9?"0"+mm:mm);
         $(this.kids[2]).val(ss<=9?"0"+ss:ss);
     }
-
+    
 })
 /****
 * var stockset = new oojs$.com.stock.component.stockset();
