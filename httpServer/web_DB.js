@@ -141,7 +141,7 @@ var web_DB_config = function()
                 .on('end', function() {
                 // all rows have been received
 
-                    console.log(path.basename(__filename),'query-end',rows);
+                    //console.log(path.basename(__filename),'query-end',rows);
 
                     if(rows.length == 0){
                         if(callback){

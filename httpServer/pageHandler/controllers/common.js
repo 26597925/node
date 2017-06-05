@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const ejs = require('ejs');
 const sessions = require(path.join(__dirname,"sessions.js"));
+const heartTime = require(path.join(__dirname,"heartTime.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
@@ -100,8 +101,21 @@ var renderPage = function(){
 };
 
 exports.main = function(){
-    var self = this;
-    self.responseDirect(200,"text/html",renderPage());
+  var self = this;
+	var parentAlias = this.alias;
+	this.alias = path.basename(__filename);
+	
+	heartTime.heartTime.apply(self, [judgeMain]);
+ 
+};
+
+var judgeMain = function(param,self){
+    console.log('common',param);
+    if(param == 'failse'){
+	    self.render(['login.html','login.js'], {message:''});
+    }else if(param == 'success'){
+        self.responseDirect(200,"text/html",renderPage());
+    }
 };
 
 var renderCommonPage = function(file_js,file_html,common_js){

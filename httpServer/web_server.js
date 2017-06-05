@@ -24,68 +24,69 @@ this.timestamp = [];
 this.title_stock = descrip.tx_title();
 this.marketPgCount = 50;
 
-this.broadcast = function (broadcastData) {
+var handler_client = function(client,broadcastData){
 	if(broadcastData && broadcastData.hasOwnProperty('type') && broadcastData.hasOwnProperty('action')){
-		if(self.wss){
-
-			self.wss.clients.forEach(function each(client){
-				if (client.readyState === WebSocket.OPEN) {
-
-					switch (broadcastData.type) {
-						case bean.WSS_ORDERTODAY:
-							client.send(JSON.stringify(broadcast_data));
-							break;
-
-						case bean.WSS_MARKET:
-							// self.stocks.data:[{name,code}]
-							if (self.stocks && self.stocks.data) {
-								var page = client.currentPage || 0;
-								var stocks_obj = JSON.parse(self.stocks.data);
-
-								var sendData = new bean.entity_wss();
-								sendData.type = bean.WSS_MARKET;
-								sendData.action = 'detail';
-
-								if(self.timestamp.length<3){return;}
-
-								var item = {};
-								item['timestamp'] = [self.timestamp[0],self.timestamp[self.timestamp.length-2]];
-								item['title'] = self.title_stock;
-								item['code'] = [];
-								item['stock_total'] = stocks_obj.length;
-								item['stock_pgct'] = self.marketPgCount;
-								item['stock'] = {};
-
-								for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
-									if(!(tmid == 0 || tmid == self.timestamp.length-2)){
-										continue;
-									}
-									item['stock'][self.timestamp[tmid]] = {};
-
-									for (var i = page * self.marketPgCount; i < (page+1)*self.marketPgCount; i++) {
-										if (i >= stocks_obj.length) {
-											break;
-										}
-										if(tmid == 0){
-											item['code'].push(stocks_obj[i].code);
-										}
-
-										item['stock'][self.timestamp[tmid]][stocks_obj[i].code] =
-											self.stock_list[self.timestamp[tmid]][stocks_obj[i].code];
-									}
-								}
-
-								sendData.data = item;
-								client.send(JSON.stringify(sendData));
+		if (client.readyState === WebSocket.OPEN) {
+			
+			switch (broadcastData.type) {
+				case bean.WSS_ORDERTODAY:
+					client.send(JSON.stringify(broadcast_data));
+					break;
+				
+				case bean.WSS_MARKET:
+					// self.stocks.data:[{name,code}]
+					if (self.stocks && self.stocks.data) {
+						var page = client.currentPage || 0;
+						var stocks_obj = JSON.parse(self.stocks.data);
+						
+						var sendData = new bean.entity_wss();
+						sendData.type = bean.WSS_MARKET;
+						sendData.action = 'detail';
+						
+						if(self.timestamp.length<3){return;}
+						
+						var item = {};
+						item['timestamp'] = [self.timestamp[0],self.timestamp[self.timestamp.length-2]];
+						item['title'] = self.title_stock;
+						item['code'] = [];
+						item['stock_total'] = stocks_obj.length;
+						item['stock_pgct'] = self.marketPgCount;
+						item['stock'] = {};
+						
+						for (var tmid = 0; tmid < self.timestamp.length; tmid++) {
+							if(!(tmid == 0 || tmid == self.timestamp.length-2)){
+								continue;
 							}
-
-							break;
+							item['stock'][self.timestamp[tmid]] = {};
+							
+							for (var i = page * self.marketPgCount; i < (page+1)*self.marketPgCount; i++) {
+								if (i >= stocks_obj.length) {
+									break;
+								}
+								if(tmid == 0){
+									item['code'].push(stocks_obj[i].code);
+								}
+								
+								item['stock'][self.timestamp[tmid]][stocks_obj[i].code] =
+									self.stock_list[self.timestamp[tmid]][stocks_obj[i].code];
+							}
+						}
+						
+						sendData.data = item;
+						client.send(JSON.stringify(sendData));
 					}
-				}
-			});
+					break;
+			}
 		}
 	}
+};
 
+this.broadcast = function (broadcastData) {
+	if(self.wss){
+		self.wss.clients.forEach(function each(client){
+			handler_client(client,broadcastData)
+		});
+	}
 };
 
 exports.runPageServer = function( port )
