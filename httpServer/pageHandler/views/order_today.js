@@ -428,7 +428,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             "<option value='-1'>请选择策略名称</option>"
         );
 
-        self.order_select3.change(null,self.handler_policy);
+        self.order_select3.change({'from':'appendTB_control'},self.handler_policy);
         self.order_select3.prop("disabled", true);
         td.append( self.order_select3 );
         
@@ -492,13 +492,13 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
             }
             //<a id="sign_up" class="sign_new">Sign up</a>
-            
+            one_third = '';
             if(parseInt(list[elm]['BUYCOUNT'])>0){
                 one_third = parseInt(list[elm]['BUYCOUNT'])+"股";
             }else if(parseInt(list[elm]['BUYAMOUNT'])>0){
                 one_third = parseInt(list[elm]['BUYAMOUNT'])+"¥";
-            }else if(parseInt(list[elm]['PERCENT'])>0){
-                one_third = parseInt(list[elm]['PERCENT'])+"％";
+            }else if(Number(list[elm]['PERCENT'])>0){
+                one_third = Number(list[elm]['PERCENT'])+"％";
             }
             list_body[elm]['ONETHIRD'] = {'ELEMENT':one_third};
             list_body[elm]['POLICYID'] = {'ELEMENT':list[elm]['POLICYID']};//{ELEMENT:preload.getPGroupItem(list[elm]['POLICYID'])};
@@ -637,7 +637,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var USERID = '';
         var POLICYID = '';
         var self = order_today;
-        if(event.data == null){
+        var from = '';
+        if(event.data != null && event.data.hasOwnProperty('from') ){
+            from = event.data.from;
             var obj = $(this).find("option:selected");
             var name = obj.text();
             var key_value = obj.val().split("_");
@@ -716,8 +718,11 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 );
                 index++;
             }
+
             if(sendAccounts.length>0){
                 console.log("trade_list",JSON.stringify(trade_list));
+                //if(from == ''){
+                    
                 oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                     console.log(JSON.stringify(arguments));
                     if(result.success){
@@ -745,12 +750,17 @@ oojs$.com.stock.order_today = oojs$.createClass(
                             }
                             self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
                         }else{
-                            oojs$.showError("您的资金验证存在问题");
+                            oojs$.showError("您的资金验证存在问题 code data 604");
                         }
                     }else{
-                        oojs$.showError("您的资金验证存在问题");
+                        oojs$.showError("您的资金验证存在问题 code url 404");
                     }
                 });
+//
+                // }else if(from == ''){
+                //     self.appendTB_neworder_flush(policyHead, drawitem_data, trade_list);
+                // }
+
             }else{
                 oojs$.showError("您还没有添加账号");
             }
@@ -758,6 +768,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             
         })
     }
+    
     ,appendTB_neworder_flush:function(policy_head,policy_data,account_list){
         var self = this;
 

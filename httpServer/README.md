@@ -186,7 +186,7 @@ oojs$.com.utils.Audio = oojs$.createClass(
 	}
 }
 
-
+<!--
 <tfoot>
     <tr>
         <th>板块名称</th>
@@ -197,6 +197,7 @@ oojs$.com.utils.Audio = oojs$.createClass(
         <th>涨跌幅</th>
     </tr>
 </tfoot>
+-->
 </pre>
 </p>
 

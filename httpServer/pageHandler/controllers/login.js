@@ -6,7 +6,7 @@ const sessions = require(path.join(__dirname,"sessions.js"));
 const verifyCode = require(path.join(__dirname,"verifyCode.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
-
+const getIP = require('ipware')().get_ip;
 
 var add_newUser = function(context){
     var self = context;
@@ -136,7 +136,10 @@ exports.logup_submit = function(){
 
 exports.exit = function(){
     var self = this;
-    var ip =  getIp(this.req);
+    var ip =  getIP(this.req);
+    if(ip && ip.hasOwnProperty('clientIp')){
+        ip = ip['clientIp'];
+    }
     var uID = sessions.get_uID(self.req);
     var result = {'success':true,'data':''};
     sessions.destory(self.req,self.res);
@@ -144,29 +147,16 @@ exports.exit = function(){
     self.responseDirect(200,"text/json",JSON.stringify(result));
 };
 
-var getIp = function(req){
-    debugger;
-    var ip = '';
-    if(req.hasOwnProperty("headers")
-        && req.headers.hasOwnProperty('x-forwarded-for')){
-        ip = req.headers['x-forwarded-for']
-    }else{
-        if(req.hasOwnProperty('connection') && req.connection.hasOwnProperty('remoteAddress')){
-            ip = req.connection.remoteAddress;
-        }else if(req.hasOwnProperty('socket') && req.socket.hasOwnProperty('remoteAddress')){
-            ip = req.socket.remoteAddress;
-        }else if(req.hasOwnProperty('connection') && req.connection.hasOwnProperty('socket')
-            && req.connection.socket.hasOwnProperty('remoteAddress')){
-            ip = req.connection.socket.remoteAddress;
-        }
-    }
-    return ip;
-};
+
 
 exports.login = function(args){
 
 	var self = this;
-  var ip =  getIp(this.req);
+  var ip =  getIP(this.req);
+	if(ip && ip.hasOwnProperty('clientIp')){
+		ip = ip['clientIp'];
+	}
+  
   var usr = args["usr"] || null;
   var psw = args["psw"] || null;
   var verify = args["verify"] || null;
