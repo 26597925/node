@@ -58,13 +58,21 @@ var select_combinePolicy = function(){
             console.log(path.basename(__filename).replace('.js',''),"select_combinePolicy",arguments[0]);
 
             var groupList = [];
+	          result1 = [];
+	         
             for(var i=0; i < arguments[0].length; i++){
-                groupList = groupList.concat(arguments[0][i]["USETYPE"].split(","));
+	            groupList=[];
+	            groupList = arguments[0][i]["USETYPE"].split(",");
+	            if(groupList.indexOf(groupID.toString())>=0){
+		            result1.push(arguments[0][i]);
+              }
+              //groupList = groupList.concat(arguments[0][i]["USETYPE"].split(","));
             }
 
-            if(groupList.indexOf(groupID.toString())>=0){
-
-                result1= arguments[0];
+            // if(groupList.indexOf(groupID.toString())>=0){
+            //
+            //     result1= arguments[0];
+	          if( result1.length > 0 ){
                 db.query(sql2,function(){
                     if(arguments.length==1){
                         result2=arguments[0];
@@ -74,8 +82,8 @@ var select_combinePolicy = function(){
                         result.data = combinePolicyResult(result1,[]);
                         self.responseDirect(200,"text/json",JSON.stringify(result));
                     }
-                })
-
+                });
+            
             }else{
                 result = {'success':true,'data':''};
                 self.responseDirect(200,"text/json",JSON.stringify(result));
