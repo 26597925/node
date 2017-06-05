@@ -185,6 +185,7 @@ exports.login = function(args){
         var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){
             if( arguments.length==1 ){
+                console.log('login USERID',arguments[0][0]['USERID']);
                 insert_tb_log_login(arguments[0][0]['USERID'],ip);
                 updateUserLoginTime(arguments[0][0]['USERID'],self);
             }else{
