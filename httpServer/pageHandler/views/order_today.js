@@ -198,8 +198,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         }
         if(String(sendData['FLAG_USER']) == "0"){
            sendData['FLAG_USER'] = "1";
-        }
-        if(String(sendData['FLAG_USER']) == "1"){
+        }else if(String(sendData['FLAG_USER']) == "1"){
             sendData['FLAG_USER'] = "0"
         }
         sendData['ADDTIME']=null;
