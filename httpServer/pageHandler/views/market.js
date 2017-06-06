@@ -47,7 +47,7 @@ oojs$.com.stock.market = oojs$.createClass(
 
     }
     
-    ,handler_market(result){
+    ,handler_market:function(result){
       //console.log(JSON.stringify(result))
       var self = this;
       if(result 
