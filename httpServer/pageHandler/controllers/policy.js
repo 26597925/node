@@ -25,9 +25,7 @@ exports.select_subscrible = function(){
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
     })
-
-    // INSERT INTO `tb_policy_usage` (`POLICYID`, `PGROUPID`, `PNAME`, `DIRTYPE`, `USERID`, `USETYPE`, `POLICYPARAM`, `STARTTIME`, `ENDTIME`, `STOCKSET`, `BUYPERCENT`, `SELLPERCENT`, `ISTEST`, `PRICES`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES ('12', '0', '打板买入', '0', '0', '1,3,4', '1500', '0000-00-00', '0000-00-00', NULL, '0.3', '1', '0', '1000', '2017-03-30 10:49:12', '0000-00-00 00:00:00', NULL);
-    // INSERT INTO `tb_policy_usage` (`USERID`, `POLICYID`, `POLICYPARAM`) VALUES ('2000', '0', '0')
+   
 };
 
 var select_combinePolicy = function(){
@@ -122,7 +120,7 @@ var combinePolicyResult=function(){
         {
             MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
         }
-        // obj[ result2[i]['USERID']+"_"+result2[i]['POLICYID'] ] =
+        console.log("policy combinePolicyResult:",new Buffer(result2[i]['POLICYPARAM'], 'base64').toString('UTF8'));
         obj[result2[i]['POLICYID'] ] =
         {
             USERID:result2[i]['USERID'],
@@ -130,7 +128,7 @@ var combinePolicyResult=function(){
             PNAME :result2[i]['PNAME'],
             DIRTYPE: result2[i]['DIRTYPE'],
             POLICYID :result2[i]['POLICYID'],
-            POLICYPARAM :result2[i]['POLICYPARAM'],
+            POLICYPARAM :JSON.parse(new Buffer(result2[i]['POLICYPARAM'], 'base64').toString('UTF8')),
             STARTTIME :unit_date.toHMS(result2[i]['STARTTIME']),
             ENDTIME :unit_date.toHMS(result2[i]['ENDTIME']),
             STOCKSET :result2[i]['STOCKSET'],
@@ -150,7 +148,6 @@ var combinePolicyResult=function(){
     for(var i = 0; i < result1.length; i++){
 
         // if(obj.hasOwnProperty(result1[i]['USERID']+"_"+result1[i]['POLICYID'])){
-        //result1[i]['USERID']+"_"+
         if(obj.hasOwnProperty(result1[i]['POLICYID'])){
             continue;
         }else{
@@ -159,14 +156,15 @@ var combinePolicyResult=function(){
             {
                 MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
             }
-
-            obj[ result1[i]['USERID']+"_"+result1[i]['POLICYID'] ] = {
+	
+	          console.log("policy combinePolicyResult:",new Buffer(result1[i]['POLICYPARAM'], 'base64').toString('UTF8'));
+	          obj[ result1[i]['USERID']+"_"+result1[i]['POLICYID'] ] = {
                 USERID:result1[i]['USERID'],
                 PGROUPID:result1[i]['PGROUPID'],
                 PNAME :result1[i]['PNAME'],
                 DIRTYPE: result1[i]['DIRTYPE'],
                 POLICYID :result1[i]['POLICYID'],
-                POLICYPARAM :result1[i]['POLICYPARAM'],
+                POLICYPARAM :JSON.parse(new Buffer(result1[i]['POLICYPARAM'], 'base64').toString('UTF8')),
                 STARTTIME :unit_date.toHMS(result1[i]['STARTTIME']),
                 ENDTIME :unit_date.toHMS(result1[i]['ENDTIME']),
                 STOCKSET :result1[i]['STOCKSET'],
@@ -217,6 +215,7 @@ exports.select_alreadySubscrible = function(){
             for(var i = 0; i < result.data.length; i++){
                 result.data[i]['STARTTIME'] = unit_date.toHMS(result.data[i]['STARTTIME']);
                 result.data[i]['ENDTIME'] = unit_date.toHMS(result.data[i]['ENDTIME']);
+	              result.data[i]['POLICYPARAM'] = JSON.parse(new Buffer(result.data[i]['POLICYPARAM'], 'base64').toString('UTF8'));
             }
 
             self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -239,17 +238,16 @@ exports.update_subscrible = function(){
 
         var sql = '';
         var db_type = 'insert';
-        sql = "SELECT `USERID`, `POLICYID` FROM  tb_policy_usage where USERID="+
-            // self.req.post['USERID']
-            uID
-            +" and POLICYID="+self.req.post["POLICYID"];
+        sql = "SELECT `USERID`, `POLICYID` FROM  tb_policy_usage where USERID="
+            + uID
+            + " and POLICYID="+self.req.post["POLICYID"];
         db.query(sql,function(){
             if(arguments.length==1){
                 db_type = 'update';
             }
 
-            self.req.post['POLICYPARAM'] = (!self.req.post['POLICYPARAM'])?"":self.req.post['POLICYPARAM'];
-            console.log("<<<<<",self.req.post['STARTTIME']);
+	          self.req.post['POLICYPARAM'] = new Buffer(self.req.post['POLICYPARAM']).toString('base64');
+            console.log("policy update_subscrible:",self.req.post['POLICYPARAM']);
             var STARTTIME = unit_date.objToNumber(self.req.post['STARTTIME']); // (!self.req.post['STARTTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['STARTTIME'];
             var ENDTIME = unit_date.objToNumber(self.req.post['ENDTIME']); //(!self.req.post['ENDTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['ENDTIME'];
 

@@ -342,7 +342,7 @@ var oojs$ = {
 
         htmltag.append($('<label>时</label>'));
         select= $('<select ></select>',{
-            style:"height:25px;width:30px;-webkit-appearance: none;"
+            style:"height:25px;width:50px;-webkit-appearance: none;"
         });
 		for(var i = 0; i < 24; i++){
             tmpval = i<=9?("0"+i):i;
@@ -355,7 +355,7 @@ var oojs$ = {
         htmltag.append($('<label>:分</label>'));
 
         select= $('<select ></select>',{
-            style:"height:25px;width:30px;-webkit-appearance: none;"
+            style:"height:25px;width:50px;-webkit-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
 
@@ -369,7 +369,7 @@ var oojs$ = {
         htmltag.append($('<label>:秒</label>'));
 
         select= $('<select></select>',{
-            style:"height:25px;width:30px;-webkit-appearance: none;"
+            style:"height:25px;width:50px;-webkit-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
             tmpval = i<=9?("0"+i):i;
@@ -580,6 +580,39 @@ var oojs$ = {
 			events[i].apply(events[i]['scope'], args);
 		}
 	}
+    /***
+     * usage
+     * oojs$.generateSelect(select,data)
+     * param
+     * select: $('<select></select>',{id:'id'})
+     * data:{"used":1,"data":[{"ID":0,"NAME":"name0"},{"ID":1,"NAME":"name1"},{"ID":2,"NAME":"name2"}]} 
+     *
+     */
+    ,generateSelect: function(select,data){
+        if( select && data.hasOwnProperty('data') && data.data.length>0 ){
+            for( var i = 0; i < data.data.length; i++ ){
+                select.append("<option  value='"+data.data[i].ID+"'>"+data.data[i].NAME+"</option>")
+            }
+            if(data.hasOwnProperty('used')){
+                select.val(data.data.used);
+            }
+        }
+    }
+    /***
+     * usage
+     * oojs$.fetch_paramName(data)
+     * data:{"used":1,"data":[{"ID":0,"NAME":"name0"},{"ID":1,"NAME":"name1"},{"ID":2,"NAME":"name2"}]} 
+     */
+    ,fetch_paramName:function(data){
+        if(  data.hasOwnProperty('used') &&data.hasOwnProperty('data') && data.data.length>0 ){
+            for(var i = 0; i < data.data.length; i++ ){
+                if(String(data.data[i].ID) == String(data.used)){
+                    return String(data.data[i].NAME)
+                }
+            }
+        }
+        return '';
+    }
     /***
      * usage
      * oojs$.appendTB_list(panel,list_head,list_body)
@@ -1571,12 +1604,28 @@ oojs$.com.stock.preload=oojs$.createClass({
                 return "撤单";
         }
     }
+    ,getExecute:function(){
+        switch (parseInt(arguments[0])){
+            case 0 :
+                return "等待中";
+            case 1 :
+                return "已读取";
+            case 2:
+                return "等待交易";
+            case 3:
+                return "部分成交";
+            case 4:
+                return "全部完成";
+         } 
+    }
     ,getFrom:function(){
         switch (parseInt(arguments[0])){
             case 1 :
                 return "周期单";
             case 2:
                 return "盘中单";
+            case 3:
+                return "隔日单";
          } 
     }
     ,checkAllload:function(){
@@ -1629,6 +1678,8 @@ var preload = new oojs$.com.stock.preload();
 oojs$.addEventListener("ready",function(){
         oojs$.showPanel();
     });
+var shareObj = {};
+
 $(document).ready(function(){
     hideAllPanel();
     $("#accordion").accordion({

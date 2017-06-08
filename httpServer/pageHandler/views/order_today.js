@@ -142,7 +142,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
                             order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
                             $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
                             order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
-                            console.log(parseInt(policy.policy_subscribe[0]['POLICYID']))
                             $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
                         }
                     }
@@ -174,8 +173,10 @@ oojs$.com.stock.order_today = oojs$.createClass(
         //订单详情
         var self = event.data.scope;
         self.detail = event.data.data;
-        console.log(JSON.stringify(event.data));
+        console.log('order_today_btn_detail',JSON.stringify(event.data));
+        shareObj.detailName = 'order_today';
         var p=window.open("detailOrder.html");
+        
     }
     ,order_today_btn_chg:function(event){
         //修改
@@ -269,6 +270,14 @@ oojs$.com.stock.order_today = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             drawitem_data["STOCKSET"]['ELEMENT']);
 
+        drawitem_data['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]};
+        drawitem_data['DIRTYPE'] = {'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])};
+
+        var select= $('<select ></select>',{
+            style:"height:25px;width:80px;-webkit-appearance: none;"
+        });
+        oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
+        drawitem_data['POLICYPARAM'] = {'ELEMENT': select,'element':drawitem_data['POLICYPARAM']['ELEMENT']};
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -393,9 +402,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
         self.order_select1 = $('<select></select>',{
             id:'order_select1'
         });
-        self.order_select1.append(
-            "<option  value='-1'>请选择交易类型</option>"
-        );
+        // self.order_select1.append(
+        //     "<option  value='-1'>请选择交易类型</option>"
+        // );
         // self.option_append(self.order_select1, self.select_title, policy.getDirtype);
         self.order_select1.change(self.handler_dirtype);
         td.append( self.order_select1 );
@@ -406,9 +415,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
         self.order_select2 = $('<select></select>',{
             id:'order_select2'
         });
-        self.order_select2.append(
-            "<option  value='-1'>请选择策略类型</option>"
-        );
+        // self.order_select2.append(
+        //     "<option  value='-1'>请选择策略类型</option>"
+        // );
 
         self.order_select2.prop("disabled", true);
         self.order_select2.change(self.handler_group);
@@ -423,9 +432,9 @@ oojs$.com.stock.order_today = oojs$.createClass(
             id:'order_select3'
         });
 
-        self.order_select3.append(
-            "<option value='-1'>请选择策略名称</option>"
-        );
+        // self.order_select3.append(
+        //     "<option value='-1'>请选择策略名称</option>"
+        // );
 
         self.order_select3.change({'from':'appendTB_control'},self.handler_policy);
         self.order_select3.prop("disabled", true);
@@ -455,17 +464,17 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var list = null;
         list = this.order_today_list;
 
-       
         var one_third = '';
         var btnName = '';
         var href = null;
         var hrefs = null;
         var div = null;
         var stocks = [];
+        var status = '';
         for(var elm = 0; elm < list.length; elm++){
             list_body[elm] = {};
             for(var  inner in  list[elm]){
-                list_body[elm][inner] = {ELEMENT: list[elm][inner]};
+                list_body[elm][inner] = {'ELEMENT': list[elm][inner]};
             }
             // getFrom
             list_body[elm]['STOCKSET'] = {
@@ -490,6 +499,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 
                 list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
             }
+            status = list[elm]['STATUS'];
+            list_body[elm]['STATUS'] = {'ELEMENT':preload.getExecute(list[elm]['STATUS']),'ORIGIN': status };
             //<a id="sign_up" class="sign_new">Sign up</a>
             one_third = '';
             if(parseInt(list[elm]['BUYCOUNT'])>0){
@@ -509,11 +520,15 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 {'data':list_body[elm],'scope':self},
                 order_today.order_today_btn_detail
             );
-
-            $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
+             if(status == "3"||status == "4"){
+                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
+            }else {//if(status == "0"||status == "1")
+                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
                 order_today.order_today_btn_chg
-            );
+                );
+            }
+            
 
             btnName = "X";
             if(parseInt(list_body[elm]['FLAG_USER']['ELEMENT']) == 1){
@@ -525,7 +540,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 order_today.order_today_btn_switch
             );
 
-            list_body[elm]['CTRL'] = {ELEMENT:div};
+            list_body[elm]['CTRL'] = {'ELEMENT':div};
         }
         oojs$.appendTB_list(panel,list_head,list_body);
     }
@@ -572,7 +587,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         obj[appendObj['PGROUPID']].push({
             "POLICYID":appendObj["POLICYID"]
-            ,"PNAME":appendObj["PNAME"]+(appendObj["USERID"]+""=="0"?"":"(自定义)")
+            ,"PNAME":appendObj["PNAME"]+appendObj["USERID"]
             ,"USERID":appendObj["USERID"]
         });
 
@@ -584,11 +599,11 @@ oojs$.com.stock.order_today = oojs$.createClass(
         self.order_select3.empty();
         self.order_select2.prop("disabled", false);
         self.order_select3.prop("disabled", true);
-        self.order_select2.append(
-            "<option  value='-1'>请选择策略类型</option>"
-        );
+        // self.order_select2.append(
+        //     "<option  value='-1'>请选择策略类型</option>"
+        // );
 
-        var value = -1
+        var value = -1;
         if(event.data != null){
             value = event.data.value;
         }else{
@@ -596,21 +611,21 @@ oojs$.com.stock.order_today = oojs$.createClass(
         }
         
         self.option_append(self.order_select2,self.select_title[value],function(pp){
-            return policy.find_item_policyGID(pp)["NAME"];
+            return preload.getPGroupItem(pp)["NAME"];
         });
 
-        self.order_select3.append(
-            "<option value='-1'>请选择策略名称</option>"
-        );
+        // self.order_select3.append(
+        //     "<option value='-1'>请选择策略名称</option>"
+        // );
     }
 
     ,handler_group: function(event){
         var self = order_today;
         self.order_select3.empty();
         self.order_select3.prop("disabled", false);
-        self.order_select3.append(
-            "<option value='-1'>请选择策略名称</option>"
-        );
+        // self.order_select3.append(
+        //     "<option value='-1'>请选择策略名称</option>"
+        // );
         // var value = -1
         // if(event.data != null){
         //     value = event.data.value;
@@ -629,7 +644,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
     }
     ,handler_policy: function(event){
-        // console.log(">>>>>>>>>>",
+        // console.log("order_today >>>>>>>>>>",
         // self.order_select1.val(),
         // self.order_select2.val(),
         // this.value,$(this).find("option:selected").text() );
@@ -679,7 +694,15 @@ oojs$.com.stock.order_today = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             item["STOCKSET"]);
 
-        drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
+        drawitem_data['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]};
+        drawitem_data['DIRTYPE'] = {'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])};
+
+        var select= $('<select ></select>',{
+            style:"height:25px;width:80px;-webkit-appearance: none;"
+        });
+        oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
+        drawitem_data['POLICYPARAM'] = {'ELEMENT': select, 'element':drawitem_data['POLICYPARAM']['ELEMENT']};
+        drawitem_data["STARTTIME"] = {'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
 
@@ -815,6 +838,11 @@ oojs$.com.stock.order_today = oojs$.createClass(
         if(type == 'modify'){
             policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
         }
+
+        var used = policy_data['POLICYPARAM']['ELEMENT'].val();
+        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['element'];
+        policy_data['POLICYPARAM']['used'] = used;
+
         for(var elm in policy_data){
             if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){
@@ -823,6 +851,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 policy_data[elm] = policy_data[elm]['ELEMENT'];
             }
         }
+
         console.log("policy_data\n",JSON.stringify(policy_data));
         console.log("account_list\n",JSON.stringify(account_list));
         var account_result = []
@@ -886,7 +915,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
             }
         }
 
-        
         console.log("sendData",JSON.stringify(sendData));
         
         if(type == "add"){

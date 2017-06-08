@@ -315,28 +315,28 @@ var oojs$ = {
          *<p id="dialogtext" style=""></p>
          *</div>
 		 * */
-        $("#dialogtext").text(text);
-        $( "#dialog" ).dialog({
-            resizable: false,
-            height: "auto",
-            width: 400,
-            modal: true,
-            buttons: {
-                "确定": function() {
+        // $("#dialogtext").text(text);
+        // $( "#dialog" ).dialog({
+        //     resizable: false,
+        //     height: "auto",
+        //     width: 400,
+        //     modal: true,
+        //     buttons: {
+        //         "确定": function() {
 
-                    $( this ).dialog( "close" );
-                    if(callback){
-                        callback("yes");
-                    }
-                },
-                "取消": function() {
-                    $( this ).dialog( "close" );
-                    if(callback){
-                        callback("no");
-                    }
-                }
-            }
-        });
+        //             $( this ).dialog( "close" );
+        //             if(callback){
+        //                 callback("yes");
+        //             }
+        //         },
+        //         "取消": function() {
+        //             $( this ).dialog( "close" );
+        //             if(callback){
+        //                 callback("no");
+        //             }
+        //         }
+        //     }
+        // });
     }
 
 	,showError:function (text,callback) {
@@ -345,11 +345,11 @@ var oojs$ = {
          *<p id="dialogtext" style=""></p>
          *</div>
          * */
-        $("#dialogtext").text(text);
-        $("#dialog").dialog({
-            buttons: {"Ok":function(){$(this).dialog("close");if(callback){callback()};}},
-            modal:true
-        });
+        // $("#dialogtext").text(text);
+        // $("#dialog").dialog({
+        //     buttons: {"Ok":function(){$(this).dialog("close");if(callback){callback()};}},
+        //     modal:true
+        // });
     }
 
 	,apply : function(dest, source) {
@@ -395,6 +395,21 @@ var oojs$ = {
 			events[i].apply(null, args);
 		}
 	}
+    /***
+     * usage
+     * oojs$.fetch_paramName(data)
+     * data:{"used":1,"data":[{"ID":0,"NAME":"name0"},{"ID":1,"NAME":"name1"},{"ID":2,"NAME":"name2"}]} 
+     */
+    ,fetch_paramName:function(data){
+        if( data && data.hasOwnProperty('used') &&data.hasOwnProperty('data') && data.data.length>0 ){
+            for(var i = 0; i < data.data.length; i++ ){
+                if(String(data.data[i].ID) == String(data.used)){
+                    return String(data.data[i].NAME)
+                }
+            }
+        }
+        return '';
+    }
     /***
      * usage
      * oojs$.appendTB_list(panel,list_head,list_body)

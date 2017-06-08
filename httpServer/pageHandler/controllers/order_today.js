@@ -66,6 +66,8 @@ exports.select_preorder = function(){
             result.data = arguments[0];
 
             for(var i = 0; i < result.data.length; i++){
+	              result.data[i]['POLICYPARAM'] = JSON.parse(new Buffer(result.data[i]['POLICYPARAM'], 'base64').toString('UTF8'))
+                //new Buffer(self.req.post['POLICYPARAM']).toString('base64');
                 result.data[i]['ADDTIME'] = unit_date.Format( new Date(result.data[i]['ADDTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['ADDTIME']);
                 result.data[i]['MODTIME'] = unit_date.Format(new Date(result.data[i]['MODTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['MODTIME']);
             }
@@ -147,7 +149,7 @@ exports.insert_preorder = function(){
 
     var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
     var reportServer = [];
-
+    var _POLICYPARAM = '';
     for( var i = 0; i < self.req.post.length; i++ ){
         if(i!=0){
             sqldata += ",";
@@ -169,7 +171,7 @@ exports.insert_preorder = function(){
             ,self.req.post[i]['TRADEID']//5 TRADEID
             ,self.req.post[i]['POLICYID']//6 POLICYID
             ,self.req.post[i]['PNAME']//6_1 PNAME
-            ,self.req.post[i]['POLICYPARAM']//7 POLICYPARAM
+            ,new Buffer(self.req.post['POLICYPARAM']).toString('base64')//7 POLICYPARAM
             ,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
             ,self.req.post[i]['STOCKSET']//9 STOCKSET
             ,STARTTIME// 11 STARTTIME
@@ -181,7 +183,15 @@ exports.insert_preorder = function(){
             // ,self.req.post[i]['FLAG']// 18 FLAG
             ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
         );
-
+        if(
+	        self.req.post.hasOwnProperty('POLICYPARAM')
+          && self.req.post['POLICYPARAM']
+          && self.req.post['POLICYPARAM'].hasOwnProperty('used')
+        ){
+	        _POLICYPARAM = self.req.post['POLICYPARAM']['used'];
+        }
+	      
+	      
         reportServer.push(
             {
                 "orderid":String(ORDERID)
@@ -190,7 +200,7 @@ exports.insert_preorder = function(){
                 ,"tradeid":String(self.req.post[i]['TRADEID'])
                 ,"userid":String(uID)
                 ,"policyid":String(self.req.post[i]['POLICYID'])
-                ,"policyparam":String(self.req.post[i]['POLICYPARAM'])
+                ,"policyparam":String(_POLICYPARAM)
                 ,"dirtype":String(self.req.post[i]['DIRTYPE'])
                 ,"istest":String(self.req.post[i]['ISTEST'])
                 ,"starttime":String(STARTTIME)
@@ -297,7 +307,7 @@ exports.update_ordertoday = function(){
         PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
 
         sql  = util.format(sql
-            ,unit_date.string2_(self.req.post[0]['POLICYPARAM'])
+            ,new Buffer(self.req.post[0]['POLICYPARAM']).toString('base64')
             ,unit_date.string2_(self.req.post[0]['STOCKSET'])
             ,STARTTIME
             ,ENDTIME
@@ -309,6 +319,14 @@ exports.update_ordertoday = function(){
             ,self.req.post[0]['ROWID']
         );
         var reportServer = [];
+	      var _POLICYPARAM = '';
+        if(
+            self.req.post[0].hasOwnProperty('POLICYPARAM')
+            && self.req.post[0]['POLICYPARAM']
+            && self.req.post[0]['POLICYPARAM'].hasOwnProperty('used')
+        ){
+            _POLICYPARAM = self.req.post[0]['POLICYPARAM']['used'];
+        }
         reportServer.push(
             {
                 "orderid":self.req.post[0]['ORDERID']
@@ -317,7 +335,7 @@ exports.update_ordertoday = function(){
                 ,"tradeid":String(self.req.post[0]['TRADEID'])
                 ,"userid":String(uID)
                 ,"policyid":String(self.req.post[0]['POLICYID'])
-                ,"policyparam":String(self.req.post[0]['POLICYPARAM'])
+                ,"policyparam":String(_POLICYPARAM)
                 ,"dirtype":String(self.req.post[0]['DIRTYPE'])
                 ,"istest":String(self.req.post[0]['ISTEST'])
                 ,"starttime":String(STARTTIME)

@@ -24,6 +24,10 @@ oojs$.com.stock.policy = oojs$.createClass(
             NAME:"交易类型"
         }
         ,{
+            ID:"POLICYPARAM",
+            NAME:"子策略类型"
+        }
+        ,{
             ID:"STARTTIME",
             NAME:"开始时间"
         }
@@ -48,39 +52,9 @@ oojs$.com.stock.policy = oojs$.createClass(
             NAME:"操作"
         }
     ]
-    ,getDirtype:function(){
-        switch (parseInt(arguments[0])){
-            case 0:
-                return "买入";
-            case 1:
-                return "卖出";
-            case 2:
-                return "融资买入";
-            case 3:
-                return "融券卖出";
-            case 4:
-                return "买券还券";
-            case 5:
-                return "卖券还款";
-            case 6:
-                return "现券还券";
-            case 9:
-                return "撤单";
-        }
-    }
     ,valideDate:function(){
         var obj = arguments[0];
         return obj["hh"]+":"+obj["mm"]+":"+obj["ss"];
-    }
-    
-    ,find_item_policyGID: function(id){
-        for( var i = 0; i < preload.PGROUP.length; i++ ){
-            if(String(preload.PGROUP[i]["ID"]) == String(id)){
-                return preload.PGROUP[i];
-            }
-        }
-        oojs$.showError("policy databases no this field:"+id);
-        return null;
     }
     ,search_policyList_Item:function(USERID,POLICYID,list){
 
@@ -153,13 +127,15 @@ oojs$.com.stock.policy = oojs$.createClass(
                 list_body[elm][inner] = {ELEMENT: list[elm][inner]};
             }
 
-            list_body[elm]['PGROUPID'] = {ELEMENT: self.find_item_policyGID(list[elm]['PGROUPID'])["NAME"]};
-            list_body[elm]['PNAME'] = {ELEMENT: list[elm]['PNAME']};
-            list_body[elm]['DIRTYPE'] = {ELEMENT: self.getDirtype(list[elm]['DIRTYPE'])};
-            list_body[elm]['STARTTIME'] = {ELEMENT: self.valideDate(list[elm]['STARTTIME'])};
-            list_body[elm]['ENDTIME'] = {ELEMENT: self.valideDate(list[elm]['ENDTIME'])};
-            list_body[elm]['STOCKSET'] = {ELEMENT: oojs$.valideString(list[elm]['STOCKSET'])};
-            list_body[elm]['PERCENT'] = {ELEMENT: list[elm]['PERCENT']};
+            list_body[elm]['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(list[elm]['PGROUPID'])["NAME"]};
+            list_body[elm]['PNAME'] = {'ELEMENT': list[elm]['PNAME']};
+            list_body[elm]['DIRTYPE'] = {'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE'])};
+
+            list_body[elm]['POLICYPARAM'] = {'ELEMENT': oojs$.fetch_paramName(list[elm]['POLICYPARAM'])};
+            list_body[elm]['STARTTIME'] = {'ELEMENT': self.valideDate(list[elm]['STARTTIME'])};
+            list_body[elm]['ENDTIME'] = {'ELEMENT': self.valideDate(list[elm]['ENDTIME'])};
+            list_body[elm]['STOCKSET'] = {'ELEMENT': oojs$.valideString(list[elm]['STOCKSET'])};
+            list_body[elm]['PERCENT'] = {'ELEMENT': list[elm]['PERCENT']};
             list[elm]['type'] = list_body[elm]['type'] = type;
             var div = $('<div></div>');
 
@@ -184,6 +160,7 @@ oojs$.com.stock.policy = oojs$.createClass(
 
         oojs$.appendTB_list(panel,list_head,list_body);
     }
+    
     ,policy_btn_chg: function(event){
         var item = event.data;
         policy.appendTB_changeSubscribe(item);
@@ -372,17 +349,23 @@ oojs$.com.stock.policy = oojs$.createClass(
 
 
         for(var elm in item){
-            drawitem_data[elm] = {ELEMENT:item[elm]};
+            drawitem_data[elm] = {'ELEMENT':item[elm]};
         }
 
-        drawitem_data["PGROUPID"] ={ELEMENT:self.find_item_policyGID(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
-        drawitem_data["DIRTYPE"] ={ELEMENT:self.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
+        drawitem_data["PGROUPID"] ={'ELEMENT':preload.getPGroupItem(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
+        drawitem_data["DIRTYPE"] ={'ELEMENT':preload.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
+        
+        var select= $('<select ></select>',{
+            style:"height:25px;width:80px;-webkit-appearance: none;"
+        });
+        oojs$.generateSelect(select,item["POLICYPARAM"]);
 
-        drawitem_data["STARTTIME"] ={ELEMENT:STARTTIME};
-        drawitem_data["ENDTIME"] = {ELEMENT:ENDTIME};
+        drawitem_data["POLICYPARAM"] = {'ELEMENT':select,element:item["POLICYPARAM"]};
+        drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME};
+        drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
-        drawitem_data["PERCENT"] = {ELEMENT:$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
-        drawitem_data["CTRL"] = {ELEMENT:CTRL,COLSPAN:2};
+        drawitem_data["PERCENT"] = {'ELEMENT':$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
+        drawitem_data["CTRL"] = {'ELEMENT':CTRL,COLSPAN:2};
 
 
         $('<input></input>',{'type':"button",value:"提交"}).appendTo(CTRL).click(
@@ -459,6 +442,8 @@ oojs$.com.stock.policy = oojs$.createClass(
         var PERCENT = event.data['PERCENT']['ELEMENT'].val();
         var DIRTYPE = event.data['DIRTYPE']['element'];
         var PGROUPID = event.data['PGROUPID']['element'];
+        event.data['POLICYPARAM']['element']['used'] = event.data['POLICYPARAM']['ELEMENT'].val();
+        var POLICYPARAM =  event.data['POLICYPARAM']['element'];
         var token = event.data['type'];
 
         
@@ -473,10 +458,14 @@ oojs$.com.stock.policy = oojs$.createClass(
                 || elm == "MODTIME"
                 || elm == "PGROUPID"
                 || elm == "DIRTYPE"
+                || elm == "POLICYPARAM"
                 // || elm == "ENDTIME"
 
             ){
                 switch(elm){
+                    case "POLICYPARAM":
+                        sendData[elm] = POLICYPARAM;
+                        break;
                     case "STARTTIME":
                         sendData[elm] = STARTTIME;
                         break;
@@ -517,7 +506,6 @@ oojs$.com.stock.policy = oojs$.createClass(
             oojs$.showError("请输入自选股");
             return;
         }
-
         console.log("update_subscrible",JSON.stringify(sendData));
         policy.update_subscrible(sendData, sendData['type']);
     }

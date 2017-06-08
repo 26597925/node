@@ -108,7 +108,6 @@ oojs$.com.stock.order_period = oojs$.createClass(
             );
         }
     }
-
     ,appendTB_order_period_slct:function () {
         var self = this;
         self.option_append(self.order_select1, self.select_title, preload.getDirtype);
@@ -122,6 +121,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var self = event.data.scope;
         self.detail = event.data.data;
         console.log(JSON.stringify(event.data));
+        shareObj.detailName = 'order_period';
         var p=window.open("detailOrder.html");
     }
     ,order_period_btn_chg:function(event){
@@ -145,8 +145,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         }
         if(String(sendData['FLAG_USER']) == "0"){
            sendData['FLAG_USER'] = "1";
-        }
-        if(String(sendData['FLAG_USER']) == "1"){
+        }else if(String(sendData['FLAG_USER']) == "1"){
             sendData['FLAG_USER'] = "0"
         }
         sendData['ADDTIME']=null;
@@ -226,6 +225,11 @@ oojs$.com.stock.order_period = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             drawitem_data["STOCKSET"]['ELEMENT']);
 
+        var select= $('<select ></select>',{
+            style:"height:25px;width:80px;-webkit-appearance: none;"
+        });
+        oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
+        drawitem_data['POLICYPARAM'] = {'ELEMENT': select, 'element':drawitem_data['POLICYPARAM']['ELEMENT']};
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -348,9 +352,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
         self.order_select1 = $('<select></select>',{
             id:'order_select1'
         });
-        self.order_select1.append(
-            "<option  value='-1'>请选择交易类型</option>"
-        );
+        // self.order_select1.append(
+        //     "<option  value='-1'>请选择交易类型</option>"
+        // );
         // self.option_append(self.order_select1, self.select_title, policy.getDirtype);
         self.order_select1.change(self.handler_dirtype);
         td.append( self.order_select1 );
@@ -361,9 +365,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
         self.order_select2 = $('<select></select>',{
             id:'order_select2'
         });
-        self.order_select2.append(
-            "<option  value='-1'>请选择策略类型</option>"
-        );
+        // self.order_select2.append(
+        //     "<option  value='-1'>请选择策略类型</option>"
+        // );
 
         self.order_select2.prop("disabled", true);
         self.order_select2.change(self.handler_group);
@@ -378,9 +382,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
             id:'order_select3'
         });
 
-        self.order_select3.append(
-            "<option value='-1'>请选择策略名称</option>"
-        );
+        // self.order_select3.append(
+        //     "<option value='-1'>请选择策略名称</option>"
+        // );
 
         self.order_select3.change(null,self.handler_policy);
         self.order_select3.prop("disabled", true);
@@ -522,7 +526,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
         obj[appendObj['PGROUPID']].push({
             "POLICYID":appendObj["POLICYID"]
-            ,"PNAME":appendObj["PNAME"]+(appendObj["USERID"]+""=="0"?"":"(自定义)")
+            ,"PNAME":appendObj["PNAME"]+(appendObj["USERID"]/*+""=="0"?"":"(自定义)"*/)
             ,"USERID":appendObj["USERID"]
         });
 
@@ -534,9 +538,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
         self.order_select3.empty();
         self.order_select2.prop("disabled", false);
         self.order_select3.prop("disabled", true);
-        self.order_select2.append(
-            "<option  value='-1'>请选择策略类型</option>"
-        );
+        // self.order_select2.append(
+        //     "<option  value='-1'>请选择策略类型</option>"
+        // );
 
         var value = -1
         if(event.data != null){
@@ -546,21 +550,21 @@ oojs$.com.stock.order_period = oojs$.createClass(
         }
         
         self.option_append(self.order_select2,self.select_title[value],function(pp){
-            return policy.find_item_policyGID(pp)["NAME"];
+            return preload.getPGroupItem(pp)["NAME"];
         });
 
-        self.order_select3.append(
-            "<option value='-1'>请选择策略名称</option>"
-        );
+        // self.order_select3.append(
+        //     "<option value='-1'>请选择策略名称</option>"
+        // );
     }
 
     ,handler_group: function(event){
         var self = order_period;
         self.order_select3.empty();
         self.order_select3.prop("disabled", false);
-        self.order_select3.append(
-            "<option value='-1'>请选择策略名称</option>"
-        );
+        // self.order_select3.append(
+        //     "<option value='-1'>请选择策略名称</option>"
+        // );
         
         var tempArr = self.select_title[ self.order_select1.val()][self.order_select2.val()];
         
@@ -619,6 +623,14 @@ oojs$.com.stock.order_period = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             item["STOCKSET"]);
 
+        drawitem_data['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]};
+        drawitem_data['DIRTYPE'] = {'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])};
+
+        var select= $('<select ></select>',{
+            style:"height:25px;width:80px;-webkit-appearance: none;"
+        });
+        oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
+        drawitem_data['POLICYPARAM'] = {'ELEMENT': select, 'element':drawitem_data['POLICYPARAM']['ELEMENT']};
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -740,6 +752,11 @@ oojs$.com.stock.order_period = oojs$.createClass(
         if(type == 'modify'){
             policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
         }
+
+        var used = policy_data['POLICYPARAM']['ELEMENT'].val();
+        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['element'];
+        policy_data['POLICYPARAM']['used'] = used;
+
         for(var elm in policy_data){
             if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){
@@ -771,8 +788,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
             return;
         }
         console.log('account_list',JSON.stringify(account_result));
-        
-        
+
         var sentStruct = {
             'ROWID':null
             ,'PGROUPID':null

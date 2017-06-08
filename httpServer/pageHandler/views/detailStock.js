@@ -77,7 +77,6 @@ oojs$.com.stock.order_detail = oojs$.createClass(
                     if(stockDetail.hasOwnProperty(elm) && stockDetail[elm] ){
                         self.detail_item[elm] = stockDetail[elm];
                     }
-                    
                 }
                 self.detailStock = window.opener.order_today.stock;
                 preload.PGROUP = window.opener.preload.PGROUP;

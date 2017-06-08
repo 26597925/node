@@ -415,7 +415,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			,"ACCOUNTID":$('<input type="text" value="" ></input>')
 			,"PASSWORD":$('<input type="text" value=""></input>')
 			,"MAXBUY":$('<input type="text" value="214748" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-            ,"BUYCOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+            ,"BUYCOUNT":$('<input type="text" value="2" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
 			,"BUYAMOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
 			,"PERCENT":$('<input type="text" value="0.5" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
 			,"SPLITCOUNT":$('<input type="text" value="1" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
