@@ -171,7 +171,7 @@ exports.insert_preorder = function(){
             ,self.req.post[i]['TRADEID']//5 TRADEID
             ,self.req.post[i]['POLICYID']//6 POLICYID
             ,self.req.post[i]['PNAME']//6_1 PNAME
-            ,new Buffer(self.req.post['POLICYPARAM']).toString('base64')//7 POLICYPARAM
+            ,new Buffer(JSON.stringify(self.req.post['POLICYPARAM'])).toString('base64')//7 POLICYPARAM
             ,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
             ,self.req.post[i]['STOCKSET']//9 STOCKSET
             ,STARTTIME// 11 STARTTIME
@@ -307,7 +307,7 @@ exports.update_ordertoday = function(){
         PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
 
         sql  = util.format(sql
-            ,new Buffer(self.req.post[0]['POLICYPARAM']).toString('base64')
+            ,new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM'])).toString('base64')
             ,unit_date.string2_(self.req.post[0]['STOCKSET'])
             ,STARTTIME
             ,ENDTIME

@@ -233,6 +233,7 @@ exports.update_subscrible = function(){
     var self = this;
     var result = {'success':true,'data':''};
     var uID = sessions.get_uID(self.req);
+    
     if(self.req.post){
         console.log(path.basename(__filename).replace('.js',''),'update_subscrible ',self.req.post);
 
@@ -245,8 +246,14 @@ exports.update_subscrible = function(){
             if(arguments.length==1){
                 db_type = 'update';
             }
-
-	          self.req.post['POLICYPARAM'] = new Buffer(self.req.post['POLICYPARAM']).toString('base64');
+            if(self.req.post.hasOwnProperty('POLICYPARAM')
+              && self.req.post['POLICYPARAM']
+            ){
+	              self.req.post['POLICYPARAM'] = new Buffer(JSON.stringify(self.req.post['POLICYPARAM'])).toString('base64');
+            }else{
+	              self.req.post['POLICYPARAM'] = '';
+            }
+	          
             console.log("policy update_subscrible:",self.req.post['POLICYPARAM']);
             var STARTTIME = unit_date.objToNumber(self.req.post['STARTTIME']); // (!self.req.post['STARTTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['STARTTIME'];
             var ENDTIME = unit_date.objToNumber(self.req.post['ENDTIME']); //(!self.req.post['ENDTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['ENDTIME'];

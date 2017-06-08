@@ -502,10 +502,10 @@ oojs$.com.stock.policy = oojs$.createClass(
             oojs$.showError("交易比例非法");
             return;
         }
-        if(sendData["STOCKSET"] == "" || sendData["STOCKSET"].length<5){
-            oojs$.showError("请输入自选股");
-            return;
-        }
+        // if(sendData["STOCKSET"] == "" || sendData["STOCKSET"].length<5){
+        //     oojs$.showError("请输入自选股");
+        //     return;
+        // }
         console.log("update_subscrible",JSON.stringify(sendData));
         policy.update_subscrible(sendData, sendData['type']);
     }
