@@ -1049,7 +1049,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                 );
             }
             div2.append(self.SELECT);
-            self.INPUT = $('<input></input>',{type:'text'});
+            self.INPUT = $('<input></input>',{'type':'text'});
             if(!CHECKED){
                 self.INPUT.prop("disabled", true );
             }
@@ -1156,10 +1156,10 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             dirtyep = $(self.SELECT_DIRTYPE).val()
         }
 
-        if($.trim(self.INPUT.val()) == ""){
-            oojs$.showError("请选择交易策略并输入信息");
-            return null;
-        }
+        // if($.trim(self.INPUT.val()) == ""){
+        //     oojs$.showError("请选择交易策略并输入信息");
+        //     return null;
+        // }
 
         if(self.SELECT){
             var one_third_slct = $(self.SELECT).val();
@@ -1171,7 +1171,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                 break;
             case "BUYAMOUNT":
                 self.BUYCOUNT='';
-                self.BUYAMOUNT=self.INPUT.val();;
+                self.BUYAMOUNT=self.INPUT.val();
                 self.PERCENT='';
                 if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse') && Number(self.BUYAMOUNT) > Number(self.CAPITAL.account_muse) ){
                     oojs$.showError("您输入的资金大于可用的资金");

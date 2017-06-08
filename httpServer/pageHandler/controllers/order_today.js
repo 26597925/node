@@ -150,6 +150,7 @@ exports.insert_preorder = function(){
     var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
     var reportServer = [];
     var _POLICYPARAM = '';
+    debugger;
     for( var i = 0; i < self.req.post.length; i++ ){
         if(i!=0){
             sqldata += ",";
@@ -162,7 +163,7 @@ exports.insert_preorder = function(){
         BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
         PERCENT =  unit_date.string2num(self.req.post[i]['PERCENT']);
-
+        
         sqldata += util.format(value,
             ORDERID//1 ORDERID
             ,uID//self.req.post[i]['USERID']//2 USERID
@@ -171,7 +172,7 @@ exports.insert_preorder = function(){
             ,self.req.post[i]['TRADEID']//5 TRADEID
             ,self.req.post[i]['POLICYID']//6 POLICYID
             ,self.req.post[i]['PNAME']//6_1 PNAME
-            ,new Buffer(JSON.stringify(self.req.post['POLICYPARAM'])).toString('base64')//7 POLICYPARAM
+            ,new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM'])).toString('base64')//7 POLICYPARAM
             ,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
             ,self.req.post[i]['STOCKSET']//9 STOCKSET
             ,STARTTIME// 11 STARTTIME
@@ -370,12 +371,12 @@ exports.dynamic = function(){
 
     if(self.req.post){
 
-        if(self.req.post.hasOwnProperty('orderid')
-            && self.req.post.hasOwnProperty('accountid')
-            && self.req.post.hasOwnProperty('tradeid')
-            && self.req.post.hasOwnProperty('userid')
-            && self.req.post.hasOwnProperty('policyid')
-        ){
+        // if(self.req.post.hasOwnProperty('orderid')
+        //     && self.req.post.hasOwnProperty('accountid')
+        //     && self.req.post.hasOwnProperty('tradeid')
+        //     && self.req.post.hasOwnProperty('userid')
+        //     && self.req.post.hasOwnProperty('policyid')
+        // ){
             self.responseDirect(200,"application/json",JSON.stringify(result));
 
             var sendDate = new bean.entity_wss();
@@ -383,9 +384,9 @@ exports.dynamic = function(){
             sendDate.action = 'new_data';
             sendDate.data = {};
             self.root.broadcast(sendDate);
-        }else{
-            result = {'success':false,'data':'','message':path.basename(__filename).replace('.js','')+'操作数据失败'};
-        }
+        // }else{
+        //     result = {'success':false,'data':'','message':path.basename(__filename).replace('.js','')+'操作数据失败'};
+        // }
 
     }
 };

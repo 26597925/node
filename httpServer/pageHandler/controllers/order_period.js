@@ -162,7 +162,7 @@ exports.insert_orderPeriod = function(){
             ,self.req.post[i]['TRADEID']//5 TRADEID
             ,self.req.post[i]['POLICYID']//6 POLICYID
             ,self.req.post[i]['PNAME']//6_1 PNAME
-            ,new Buffer(JSON.stringify(self.req.post['POLICYPARAM'])).toString('base64')//7 POLICYPARAM
+            ,new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM'])).toString('base64')//7 POLICYPARAM
             ,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
             ,self.req.post[i]['STOCKSET']//9 STOCKSET
             ,STARTTIME// 11 STARTTIME
@@ -315,7 +315,7 @@ exports.update_orderPeriod = function(){
             && self.req.post[0]['POLICYPARAM']
             && self.req.post[0]['POLICYPARAM'].hasOwnProperty('used')
         ){
-            _POLICYPARAM = self.req.post['POLICYPARAM']['used'];
+            _POLICYPARAM = self.req.post[0]['POLICYPARAM']['used'];
         }
         reportServer.push(
             {

@@ -270,14 +270,24 @@ oojs$.com.stock.order_today = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             drawitem_data["STOCKSET"]['ELEMENT']);
 
-        drawitem_data['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]};
-        drawitem_data['DIRTYPE'] = {'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])};
+        drawitem_data['PGROUPID'] = {
+            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
+        };
+
+        drawitem_data['DIRTYPE'] = {
+            'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
+            ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
+        };
 
         var select= $('<select ></select>',{
             style:"height:25px;width:80px;-webkit-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
-        drawitem_data['POLICYPARAM'] = {'ELEMENT': select,'element':drawitem_data['POLICYPARAM']['ELEMENT']};
+        drawitem_data['POLICYPARAM'] = {
+            'ELEMENT': select
+            ,'ORIGIN':drawitem_data['POLICYPARAM']['ELEMENT']
+        };
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -520,7 +530,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 {'data':list_body[elm],'scope':self},
                 order_today.order_today_btn_detail
             );
-             if(status == "3"||status == "4"){
+            if(status == "3"||status == "4"){
                 $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
             }else {//if(status == "0"||status == "1")
                 $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
@@ -587,7 +597,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         obj[appendObj['PGROUPID']].push({
             "POLICYID":appendObj["POLICYID"]
-            ,"PNAME":appendObj["PNAME"]+appendObj["USERID"]
+            ,"PNAME":appendObj["PNAME"]
             ,"USERID":appendObj["USERID"]
         });
 
@@ -694,14 +704,23 @@ oojs$.com.stock.order_today = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             item["STOCKSET"]);
 
-        drawitem_data['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]};
-        drawitem_data['DIRTYPE'] = {'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])};
+        drawitem_data['PGROUPID'] = {
+            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
+        };
+        drawitem_data['DIRTYPE'] = {
+            'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
+            ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
+        };
 
         var select= $('<select ></select>',{
             style:"height:25px;width:80px;-webkit-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
-        drawitem_data['POLICYPARAM'] = {'ELEMENT': select, 'element':drawitem_data['POLICYPARAM']['ELEMENT']};
+        drawitem_data['POLICYPARAM'] = {
+            'ELEMENT': select, 
+            'ORIGIN':drawitem_data['POLICYPARAM']['ELEMENT']
+        };
         drawitem_data["STARTTIME"] = {'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -835,12 +854,21 @@ oojs$.com.stock.order_today = oojs$.createClass(
             type = event.data['type']
         }
         console.log("policy_data",JSON.stringify(policy_data));
-        if(type == 'modify'){
-            policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
-        }
+        // if(type == 'modify'){
+        //     policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
+        // }
 
-        var used = policy_data['POLICYPARAM']['ELEMENT'].val();
-        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['element'];
+        policy_data['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
+        policy_data['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
+
+        var used = "";
+        console.log(typeof(policy_data['POLICYPARAM']));
+        if(policy_data['POLICYPARAM'] && policy_data['POLICYPARAM'].hasOwnProperty('ELEMENT')){
+            used = policy_data['POLICYPARAM']['ELEMENT'].val();
+        }else if(policy_data['POLICYPARAM']){
+            used = policy_data['POLICYPARAM'].val();
+        }
+        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['ORIGIN'];
         policy_data['POLICYPARAM']['used'] = used;
 
         for(var elm in policy_data){
@@ -856,7 +884,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         console.log("account_list\n",JSON.stringify(account_list));
         var account_result = []
         for(var i =0; i< account_list.length;i++){
-            
+            console.log(account_list[i]["COMPONENT"].val()['CHECKED'])
             if(account_list[i]["COMPONENT"] && account_list[i]["COMPONENT"].val()['CHECKED']){
                 account_result[i] = {};
 
@@ -865,13 +893,16 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 }
                 if(!account_list[i]["COMPONENT"].val() ){return; }//accountset返回的null的情况
                 for( var elm in  account_list[i]["COMPONENT"].val() ){
-                    account_result[i][elm] = account_list[i]["COMPONENT"][elm];
+                    if(typeof(account_list[i]["COMPONENT"].val()[elm]) == 'object'){
+                        continue
+                    }
+                    account_result[i][elm] = account_list[i]["COMPONENT"].val()[elm];
                 }
             }
         }
 
-        if(account_result.length ==0){
-            //oojs$.showError("请添加账户");
+        if(account_result.length == 0){
+            oojs$.showError("请添加账户");
             return;
         }
         console.log('account_list',JSON.stringify(account_result));
@@ -906,7 +937,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 if(policy_data.hasOwnProperty(elm)){
                     sendData[i][elm] = policy_data[elm];
                 }
-                if(account_result[i].hasOwnProperty(elm)){
+                if(account_result[i] && account_result[i].hasOwnProperty(elm)){
                     if(type == "modify" && elm == 'DIRTYPE'){
                         continue;
                     }

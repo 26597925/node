@@ -229,7 +229,10 @@ oojs$.com.stock.order_period = oojs$.createClass(
             style:"height:25px;width:80px;-webkit-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
-        drawitem_data['POLICYPARAM'] = {'ELEMENT': select, 'element':drawitem_data['POLICYPARAM']['ELEMENT']};
+        drawitem_data['POLICYPARAM'] = {
+            'ELEMENT': select
+            ,'ORIGIN':drawitem_data['POLICYPARAM']['ELEMENT']
+        };
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -266,7 +269,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                     capitals= JSON.parse(result.data);
                 }catch(err){
                     capitals = '';
-                    console.log('order_today',err);
+                    console.log('order_period',err);
                 }
                 if(capitals && capitals.length>0 
                     && capitals[0].hasOwnProperty('status')
@@ -421,6 +424,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var hrefs = null;
         var div = null;
         var stocks = [];
+        var status = '';
         for(var elm = 0; elm < list.length; elm++){
             list_body[elm] = {};
             for(var  inner in  list[elm]){
@@ -449,8 +453,11 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 
                 list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
             }
+
+            status = list[elm]['STATUS'];
+            list_body[elm]['STATUS'] = {'ELEMENT':preload.getExecute(list[elm]['STATUS']),'ORIGIN': status };
             //<a id="sign_up" class="sign_new">Sign up</a>
-            
+            one_third = '';
             if(parseInt(list[elm]['BUYCOUNT'])>0){
                 one_third = parseInt(list[elm]['BUYCOUNT'])+"股";
             }else if(parseInt(list[elm]['BUYAMOUNT'])>0){
@@ -473,7 +480,14 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 {'data':list_body[elm],'scope':self},
                 order_period.order_period_btn_chg
             );
-
+            if(status == "3"||status == "4"){
+                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
+            }else {//if(status == "0"||status == "1")
+                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
+                {'data':list_body[elm],'scope':self},
+                order_period.order_period_btn_chg
+                );
+            }
             btnName = "X";
             if(parseInt(list_body[elm]['FLAG_USER']['ELEMENT']) == 1){
                 btnName = '✓'
@@ -526,7 +540,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
         obj[appendObj['PGROUPID']].push({
             "POLICYID":appendObj["POLICYID"]
-            ,"PNAME":appendObj["PNAME"]+(appendObj["USERID"]/*+""=="0"?"":"(自定义)"*/)
+            ,"PNAME":appendObj["PNAME"]/*+(appendObj["USERID"]+""=="0"?"":"(自定义)")*/
             ,"USERID":appendObj["USERID"]
         });
 
@@ -623,14 +637,23 @@ oojs$.com.stock.order_period = oojs$.createClass(
             STOCKSET['ELEMENT2'],
             item["STOCKSET"]);
 
-        drawitem_data['PGROUPID'] = {'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]};
-        drawitem_data['DIRTYPE'] = {'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])};
+        drawitem_data['PGROUPID'] = {
+            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
+        };
+        drawitem_data['DIRTYPE'] = {
+            'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
+            ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
+        };
 
         var select= $('<select ></select>',{
             style:"height:25px;width:80px;-webkit-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
-        drawitem_data['POLICYPARAM'] = {'ELEMENT': select, 'element':drawitem_data['POLICYPARAM']['ELEMENT']};
+        drawitem_data['POLICYPARAM'] = {
+            'ELEMENT': select
+            , 'ORIGIN':drawitem_data['POLICYPARAM']['ELEMENT']
+        };
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -683,7 +706,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                             capitals= JSON.parse(result.data);
                         }catch(err){
                             capitals = '';
-                            console.log('order_today',err);
+                            console.log('order_period',err);
                         }
 
                         if(capitals){
@@ -749,12 +772,14 @@ oojs$.com.stock.order_period = oojs$.createClass(
             type = event.data['type']
         }
         console.log("policy_data",JSON.stringify(policy_data));
-        if(type == 'modify'){
-            policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
-        }
+        // if(type == 'modify'){
+        //     policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
+        // }
+        policy_data['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
+        policy_data['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
 
         var used = policy_data['POLICYPARAM']['ELEMENT'].val();
-        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['element'];
+        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['ORIGIN'];
         policy_data['POLICYPARAM']['used'] = used;
 
         for(var elm in policy_data){
@@ -818,7 +843,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 if(policy_data.hasOwnProperty(elm)){
                     sendData[i][elm] = policy_data[elm];
                 }
-                if(account_result[i].hasOwnProperty(elm)){
+                if(account_result[i] && account_result[i].hasOwnProperty(elm)){
                     if(type == "modify" && elm == 'DIRTYPE'){
                         continue;
                     }
@@ -827,7 +852,6 @@ oojs$.com.stock.order_period = oojs$.createClass(
             }
         }
 
-        
         console.log("sendData",JSON.stringify(sendData));
         
         if(type == "add"){
