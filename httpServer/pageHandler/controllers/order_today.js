@@ -220,6 +220,7 @@ exports.insert_preorder = function(){
     }
     // console.log( path.basename(__filename), "http_post", JSON.stringify(reportServer));
     http_post(reportServer);
+	  http_post_2(reportServer);
     db.query(sql+sqldata,function(){
         if(arguments.length==1){
             self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -262,6 +263,36 @@ var http_post=function(){
 
     req.write(result);
     req.end();
+};
+
+var http_post_2=function(){
+	var result = JSON.stringify(arguments[0]) ;
+	result = result.replace("\\","");
+	var options = {
+		host:'111.206.211.60',
+		port: 8080,
+		path: '/order/dynamic',
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	};
+	
+	var req = http.request(options, function(res) {
+		console.log('Status: ' + res.statusCode);
+		console.log('Headers: ' + JSON.stringify(res.headers));
+		res.setEncoding('utf8');
+		res.on('data', function (body) {
+			console.log('Body: ' + body);
+		});
+	});
+	
+	req.on('error', function(e) {
+		console.log('problem with request: ' + e.message);
+	});
+	
+	req.write(result);
+	req.end();
 };
 
 exports.update_ordertoday = function(){
@@ -352,6 +383,7 @@ exports.update_ordertoday = function(){
         );
 
         http_post(reportServer);
+	      http_post_2(reportServer);
         db.query(sql, function(){
             if(arguments.length==1){
                 self.responseDirect(200,"text/json",JSON.stringify(result));
