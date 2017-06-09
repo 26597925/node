@@ -82,7 +82,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         });
         oojs$.addEventListener('order_today',self.handler_ordtoday);
     }
-    //action new_data
+    
     ,handler_ordtoday:function(dt){
         /*** action
         client  <-->    server
@@ -489,7 +489,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 list_body[elm][inner] = {'ELEMENT': list[elm][inner]};
             }
             list_body[elm]['PGROUPID'] = {
-                'ELEMENT':String( oojs$.valideString(list[elm]['PGROUPID'])),
+                'ELEMENT':String( preload.getPGroupItem(list[elm]['PGROUPID'])),
                 'ORIGIN':list[elm]['PGROUPID'] 
             };
             // getFrom

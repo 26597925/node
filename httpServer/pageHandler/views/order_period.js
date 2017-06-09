@@ -424,7 +424,6 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var list = null;
         list = this.order_period_list;
 
-       
         var one_third = '';
         var btnName = '';
         var href = null;
