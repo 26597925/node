@@ -131,12 +131,12 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             detail_item['POLICYPARAM'] = {};
             detail_item['POLICYPARAM']['ELEMENT'] =  POLICYPARAM;
         }
-        // if(detail_item.hasOwnProperty('POLICYPARAM') 
-        //     && detail_item['POLICYPARAM']
-        //     && detail_item['POLICYPARAM'].hasOwnProperty('ELEMENT')
-        // ){
-        //     detail_item['POLICYPARAM']['ELEMENT'] = oojs$.fetch_paramName(detail_item['POLICYPARAM']['ELEMENT'])
-        // }
+        if(detail_item.hasOwnProperty('POLICYPARAM') 
+            && detail_item['POLICYPARAM']
+            && detail_item['POLICYPARAM'].hasOwnProperty('ELEMENT')
+        ){
+            detail_item['POLICYPARAM']['ELEMENT'] = oojs$.fetch_paramName(detail_item['POLICYPARAM']['ELEMENT'])
+        }
 //--  
         if(detail_item['STARTTIME'] 
             && !detail_item['STARTTIME'].hasOwnProperty('ELEMENT') 

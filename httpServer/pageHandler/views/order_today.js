@@ -188,7 +188,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         //启动／禁用
         var self = event.data.scope;
         var sendData = event.data.data;
-        // self.appendTB_modify_order(self.detail);
+        
         console.log("switch",JSON.stringify(sendData))
         sendData['DIRTYPE']["ELEMENT"] =  sendData['DIRTYPE']['ORIGIN'];
         sendData['STARTTIME']["ELEMENT"] = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
@@ -281,7 +281,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         };
 
         var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;"
+            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
         drawitem_data['POLICYPARAM'] = {
@@ -486,6 +486,10 @@ oojs$.com.stock.order_today = oojs$.createClass(
             for(var  inner in  list[elm]){
                 list_body[elm][inner] = {'ELEMENT': list[elm][inner]};
             }
+            list_body[elm]['PGROUPID'] = {
+                'ELEMENT':String( oojs$.valideString(list[elm]['PGROUPID'])),
+                'ORIGIN':list[elm]['PGROUPID'] 
+            };
             // getFrom
             list_body[elm]['STOCKSET'] = {
                 'ELEMENT':String( oojs$.valideString(list[elm]['STOCKSET'])),
@@ -714,7 +718,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         };
 
         var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;"
+            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
         drawitem_data['POLICYPARAM'] = {

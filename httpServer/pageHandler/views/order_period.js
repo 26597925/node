@@ -233,7 +233,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
             drawitem_data["STOCKSET"]['ELEMENT']);
 
         var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;"
+            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
         drawitem_data['POLICYPARAM'] = {
@@ -437,11 +437,17 @@ oojs$.com.stock.order_period = oojs$.createClass(
             for(var  inner in  list[elm]){
                 list_body[elm][inner] = {ELEMENT: list[elm][inner]};
             }
+            
+            list_body[elm]['PGROUPID'] = {
+                'ELEMENT':String( oojs$.valideString(list[elm]['PGROUPID'])),
+                'ORIGIN':list[elm]['PGROUPID'] 
+            };
             // getFrom
             list_body[elm]['STOCKSET'] = {
                 'ELEMENT':String( oojs$.valideString(list[elm]['STOCKSET'])),
                 'ORIGIN':list[elm]['STOCKSET'] 
             };
+
             list_body[elm]['DIRTYPE']= {
                 'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE']),
                 'ORIGIN':list[elm]['DIRTYPE']};
@@ -650,7 +656,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         };
 
         var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;"
+            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
         drawitem_data['POLICYPARAM'] = {
