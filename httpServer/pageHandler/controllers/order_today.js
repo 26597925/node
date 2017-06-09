@@ -274,7 +274,8 @@ var http_post_2=function(){
 		path: '/order/dynamic',
 		method: 'POST',
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'Content-Length': result.length
 		}
 	};
 	

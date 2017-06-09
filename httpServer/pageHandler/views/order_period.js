@@ -198,14 +198,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var self = this;
         var drawitem_data = arguments[0];
         console.log('order_period appendTB_modify_order\n',JSON.stringify(drawitem_data));
-        drawitem_data['PGROUPID'] = {
-            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
-            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
-        };
-        // drawitem_data['DIRTYPE'] = {
-        //     'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
-        //     ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
-        // };
+        
 
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
@@ -231,6 +224,19 @@ oojs$.com.stock.order_period = oojs$.createClass(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
             drawitem_data["STOCKSET"]['ELEMENT']);
+        if(drawitem_data['PGROUPID'] && !drawitem_data['PGROUPID'].hasOwnProperty('ELEMENT')){
+            drawitem_data['PGROUPID'] = {
+                'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+                ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
+            };
+        }
+        if(drawitem_data['DIRTYPE'] && !drawitem_data['DIRTYPE'].hasOwnProperty('ELEMENT')){
+            drawitem_data['DIRTYPE'] = {
+                'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
+                ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
+            };
+        }
+        
 
         var select= $('<select ></select>',{
             style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
@@ -438,7 +444,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
             }
 
             list_body[elm]['PGROUPID'] = {
-                'ELEMENT':String( preload.getPGroupItem(list[elm]['PGROUPID'])),
+                'ELEMENT':String( preload.getPGroupItem(list[elm]['PGROUPID'])['NAME']),
                 'ORIGIN':list[elm]['PGROUPID'] 
             };
             // getFrom
