@@ -134,7 +134,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         //启动／禁用
         var self = event.data.scope;
         var sendData = event.data.data;
-        // self.appendTB_modify_order(self.detail);
+        
         console.log("switch",JSON.stringify(sendData))
         sendData['DIRTYPE']["ELEMENT"] =  sendData['DIRTYPE']['ORIGIN'];
         sendData['STARTTIME']["ELEMENT"] = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
@@ -198,8 +198,15 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var self = this;
         var drawitem_data = arguments[0];
         console.log('order_period appendTB_modify_order\n',JSON.stringify(drawitem_data));
-        drawitem_data['PGROUPID']['ORIGIN'] = drawitem_data['PGROUPID']['ELEMENT'];
-        drawitem_data['PGROUPID']['ELEMENT'] = preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+        drawitem_data['PGROUPID'] = {
+            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
+        };
+        // drawitem_data['DIRTYPE'] = {
+        //     'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
+        //     ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
+        // };
+
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
         var start_s = oojs$.Format(new Date(drawitem_data['STARTTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss');
@@ -476,10 +483,6 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 order_period.order_period_btn_detail
             );
 
-            $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
-                {'data':list_body[elm],'scope':self},
-                order_period.order_period_btn_chg
-            );
             if(status == "3"||status == "4"){
                 $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
             }else {//if(status == "0"||status == "1")
@@ -803,6 +806,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 }
                 if(!account_list[i]["COMPONENT"].val() ){return; }//accountset返回的null的情况
                 for( var elm in  account_list[i]["COMPONENT"].val() ){
+                    if(typeof(account_list[i]["COMPONENT"].val()[elm]) == 'object'){
+                        continue
+                    }
                     account_result[i][elm] = account_list[i]["COMPONENT"][elm];
                 }
             }

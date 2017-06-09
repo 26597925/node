@@ -214,7 +214,7 @@ route.map({
     method:'post',
     url:/^\/update_orderPeriod\/?$/i,
     controller:'order_period',
-    action:'update_ordertoday'
+    action:'update_orderPeriod'
 });
 
 route.map({

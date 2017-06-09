@@ -262,7 +262,6 @@ exports.update_orderPeriod = function(){
 
     if(self.req.post){
 
-
         var sql = "UPDATE `tb_order_id_period` set" +
             // USERID
             //PNAME
