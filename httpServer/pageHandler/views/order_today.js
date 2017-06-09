@@ -247,8 +247,10 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var self = this;
         var drawitem_data = arguments[0];
         console.log('appendTB_modify_order\n',JSON.stringify(drawitem_data));
-        drawitem_data['PGROUPID']['ORIGIN'] = drawitem_data['PGROUPID']['ELEMENT'];
-        drawitem_data['PGROUPID']['ELEMENT'] = preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+        drawitem_data['PGROUPID'] = {
+            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
+            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
+        };
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
         start_component.init(STARTTIME,oojs$.toHMSOBJ(drawitem_data['STARTTIME']['ELEMENT']));

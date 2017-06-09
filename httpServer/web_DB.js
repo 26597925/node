@@ -92,7 +92,7 @@ var web_DB_config = function()
                         // callback = null;
                     }
                     
-                    console.log(path.basename(__filename),"error");
+                    console.log(path.basename(__filename),"1 error",err);
                 })
                 .on('fields', function(fields) {
                     // the field packets for the rows to follow 

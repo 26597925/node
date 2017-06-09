@@ -43,7 +43,7 @@ $(document).ready(function(){
         var UCNAME = $.trim($("#UCNAME").val());
         var PHONENUMBER = $.trim($("#PHONENUMBER").val());
         var ADDRESS = $.trim($("#ADDRESS").val());
-        var ZIPCODE = $.trim($("#ZIPCODE").val());
+        //var ZIPCODE = $.trim($("#ZIPCODE").val());
         var EMAIL = $.trim($("#EMAIL").val());
 
         if(!(/^1(3|4|5|7|8)\d{9}$/.test(PHONENUMBER))){ 
@@ -92,18 +92,18 @@ $(document).ready(function(){
             return;
         }
 
-        if(ZIPCODE.length <= 0){
-            $("#message").text("请输入邮编");
-            $("#login").prop('disabled',false);
-            return;
-        }
+        // if(ZIPCODE.length <= 0){
+        //     $("#message").text("请输入邮编");
+        //     $("#login").prop('disabled',false);
+        //     return;
+        // }
 
-        var re= /^[0-9][0-9]{5}$/;
-        if(!re.test(ZIPCODE)){
-            $("#message").text("您输入的邮编不正确");
-            $("#login").prop('disabled',false);
-            return;
-        }
+        // var re= /^[0-9][0-9]{5}$/;
+        // if(!re.test(ZIPCODE)){
+        //     $("#message").text("您输入的邮编不正确");
+        //     $("#login").prop('disabled',false);
+        //     return;
+        // }
 
         var reg = /^(?:[a-z\d]+[_\-\+\.]?)*[a-z\d]+@(?:([a-z\d]+\-?)*[a-z\d]+\.)+([a-z]{2,})+$/;
         if(!reg.test(EMAIL)){
@@ -119,7 +119,7 @@ $(document).ready(function(){
             ,'UCNAME':UCNAME
             ,'PHONENUMBER':PHONENUMBER
             ,'ADDRESS':ADDRESS
-            ,'ZIPCODE':ZIPCODE
+            // ,'ZIPCODE':ZIPCODE
             ,'EMAIL':EMAIL
             ,'VERIFY':verifyCode
         };
@@ -164,7 +164,7 @@ $(document).ready(function(){
         $("#UCNAME").val("");
         $("#PHONENUMBER").val("");
         $("#ADDRESS").val("");
-        $("#ZIPCODE").val("");
+        // $("#ZIPCODE").val("");
         $("#EMAIL").val("");
         $("#message").text("");
     });

@@ -437,9 +437,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
             for(var  inner in  list[elm]){
                 list_body[elm][inner] = {ELEMENT: list[elm][inner]};
             }
-            
+
             list_body[elm]['PGROUPID'] = {
-                'ELEMENT':String( oojs$.valideString(list[elm]['PGROUPID'])),
+                'ELEMENT':String( preload.getPGroupItem(list[elm]['PGROUPID'])),
                 'ORIGIN':list[elm]['PGROUPID'] 
             };
             // getFrom

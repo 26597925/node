@@ -3,6 +3,7 @@ const util = require('util');
 const path = require('path');
 const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
+//const localIP = require(path.join(__dirname,"..","..","..",'localIP'));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
 exports.select_userAccount = function(){
@@ -164,9 +165,10 @@ exports.delete_userAccount = function(){
 
 exports.add_userAccount = function(){
 
-    var self = this;
-    var result = {'success':true,'data':''};
-    if(self.req.post){
+  var self = this;
+  var result = {'success':true,'data':''};
+	
+  if(self.req.post){
         if( self.req.post.hasOwnProperty("TRADEID")
             &&self.req.post.hasOwnProperty("ACCOUNTID")
             &&self.req.post.hasOwnProperty("PASSWORD")
@@ -209,10 +211,10 @@ exports.add_userAccount = function(){
             result = {'success':false,'message':'请求数据参数错误'};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }
-    }else{
+  }else{
         result = {'success':false,'message':'请求数据类型错误'};
         self.responseDirect(200,"text/json",JSON.stringify(result));
-    }
+  }
 
 };
 

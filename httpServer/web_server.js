@@ -6,6 +6,7 @@ const fs = require("fs");
 const ejs = require('ejs');
 const querystring = require("querystring");
 
+const localIP = require(path.join(__dirname,'..','localIP'));
 const bean = require(path.join(__dirname,'..','bean','bean_entity'));
 
 const web_DB_config = require(path.join(__dirname,"web_DB.js"));
@@ -15,6 +16,7 @@ const wsconfig = require(path.join(__dirname,'pageHandler','models','WSSConfig')
 const wssRoute = require(path.join(__dirname,'pageHandler','models','WSSRoute'));
 const descrip = require(path.join(__dirname,'..','bean','des_stock'));
 
+//console.log("localIP",localIP.localIP);
 var self = this;
 self.wss = null;//web socket server
 this.stocks = {'date':new Date(),'data':null};//stock {date,data[{name,code},....]}

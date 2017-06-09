@@ -17,20 +17,17 @@ var add_newUser = function(context){
             &&self.req.post["PHONENUMBER"]
             &&self.req.post["PASSWORD"]
             &&self.req.post["ADDRESS"]
-            &&self.req.post["ZIPCODE"]
-            // &&this.req.post.hasOwnProperty("")
             ){
 
-            //INSERT INTO `tb_user_basic` (`USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `ONLINE`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES ('0', '0', 'test3', '测试3', '15801278254', '111111', 'zvxvc', 'qweqwe', '0', '0', NULL, '0', CURRENT_TIMESTAMP, '0000-00-00 00:00:00.000000', 'sdasdsda');
+            
             
             var sql = "INSERT INTO `tb_user_basic` "
-            +"( `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `ZIPCODE`,`MODTIME`)"
+            +"( `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `MODTIME`)"
             +" VALUES ( '"+self.req.post["UENAME"]+"', '"
                 +self.req.post["UCNAME"]+"', '"
                 +self.req.post["PHONENUMBER"]+"', '"
                 +self.req.post["PASSWORD"]+"', '"
                 +self.req.post["ADDRESS"]+"', '"
-                +self.req.post["ZIPCODE"]+"', '"
                 +unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+"')";
             db.query(sql,function(){
 
@@ -39,7 +36,7 @@ var add_newUser = function(context){
                     db.query(sql2,function(){
                         if(arguments.length==1){
                             updateUserLoginTime(arguments[0][0]["USERID"],self);
-                         }else{
+                        }else{
                             result = {'success':false,'message':'数据存在问题，请联系管理员 code:2'};
                             self.responseDirect(200,"text/json",JSON.stringify(result));
                         }
@@ -160,9 +157,7 @@ exports.login = function(args){
   var usr = args["usr"] || null;
   var psw = args["psw"] || null;
   var verify = args["verify"] || null;
-  // SELECT `USERID`, `GROUPID`, `UENAME`, `UCNAME`, `PHONENUMBER`,
-  //`PASSWORD`, `ADDRESS`, `ZIPCODE`, `TYPEID`, `STATUS`, `MODTIME`,
-  //`ONLINE`, `ADDTIME`, `MODTIME`, `REMARK` FROM `tb_user_basic`
+  
 
   if(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))) != String(verify) ){
 	  result = {'success':false,'message':'校验码验证失败，请重新登录'};
@@ -261,7 +256,7 @@ exports.getUserInfo = function(USERID){
         ", `PHONENUMBER`" +
         ", `PASSWORD`" +
         ", `ADDRESS`" +
-        ", `ZIPCODE`" +
+        // ", `ZIPCODE`" +
         // ", `TYPEID`" +
         // ", `STATUS`" +
         // ", `LASTLOGIN`" +
@@ -296,7 +291,7 @@ exports.updateUserInfo = function(){
     // PHONENUMBER
     // PASSWORD
     // ADDRESS
-    // ZIPCODE
+    
     // // TYPEID
     // // STATUS
     // // LASTLOGIN
@@ -322,9 +317,9 @@ exports.updateUserInfo = function(){
         if( self.req.post.hasOwnProperty('ADDRESS')){
             updates.push('`ADDRESS`="'+self.req.post['ADDRESS']+'"');
         }
-        if( self.req.post.hasOwnProperty('ZIPCODE')){
-            updates.push('`ZIPCODE`="'+self.req.post['ZIPCODE']+'"');
-        }
+        // if( self.req.post.hasOwnProperty('ZIPCODE')){
+        //     updates.push('`ZIPCODE`="'+self.req.post['ZIPCODE']+'"');
+        // }
         if( self.req.post.hasOwnProperty('EMAIL')){
             updates.push('`EMAIL`="'+self.req.post['EMAIL']+'"');
         }
