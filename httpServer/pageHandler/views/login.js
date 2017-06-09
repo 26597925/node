@@ -46,45 +46,58 @@ var loadImage = function () {
 var showTopInfo = function(){
     $("#topinfo").html("<a id='topinfousr' href='/logup#'>注册</a>")
 };
+
+var click_handler = function(){
+
+    $("#message").text("");
+    var user = $.trim($("#username").val());
+    if(user.length <= 0){
+        $("#message").text("请输入用户名");
+        return;         
+    }        
+    if($("#password").val().length <= 0){
+        $("#message").text("请输入密码");
+        return;
+    }
+    
+    var psw =  $("#password").val();
+    var verifyCode = $.trim($("#verifyCode").val());
+   
+    $.ajax({
+        type:"get",
+        url:"/login?usr="+user + "&psw=" + psw+"&verify="+verifyCode,
+        async:false,
+        dataType:"json",
+        success:function(data,textStatus){
+            $("#message").text(data.message);
+            if(data.success){
+                window.location.href = "/main";
+            }else{
+                loadImage2();
+            }
+        },
+        beforeSend: function(xhr){
+            xhr.withCredentials = true;
+        }
+    });
+};
+
 $(document).ready(function(){
 
-    
+    $(document).keypress(function(e) {
+        if( e.keyCode == 13 
+            && $('#verifyCode').is(':focus') 
+            && $.trim($("#username").val())!=''
+            && $.trim($("#password").val())!=''
+        ){
+            click_handler();
+        }
+    });
+
     showTopInfo();
     loadImage2();
 
-    $("#login").click(function(){
-        $("#message").text("");
-        var user = $.trim($("#username").val());
-        if(user.length <= 0){
-            $("#message").text("请输入用户名");
-            return;         
-        }        
-        if($("#password").val().length <= 0){
-            $("#message").text("请输入密码");
-            return;
-        }
-        //var psw =  $().crypt({method:"sha1",source:$("#password").val()});
-        var psw =  $("#password").val();
-        var verifyCode = $.trim($("#verifyCode").val());
-       // window.location.href = "/login?usr=" + user + "&psw=" + psw;
-        $.ajax({
-            type:"get",
-            url:"/login?usr="+user + "&psw=" + psw+"&verify="+verifyCode,
-            async:false,
-            dataType:"json",
-            success:function(data,textStatus){
-                $("#message").text(data.message);
-                if(data.success){
-                    window.location.href = "/main";
-                }else{
-                    loadImage2();
-                }
-            },
-            beforeSend: function(xhr){
-                xhr.withCredentials = true;
-            }
-        });
-    });
+    $("#login").click(click_handler);
 
     $("#findpsw").click(function(){
         window.location.href = "/findpassword";
