@@ -1416,12 +1416,15 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
             data = "";
         }
         data = $.trim(String(data));
+        console.log('data',typeof(data));
         div1.empty();
         div2.empty();
         
         self.data = data;
         
-        var div_ck = $('<div></div>');
+        var div_ck = $('<div></div>',{
+            'width': '590px',
+            'word-wrap': 'break-word'});
         div1.append(div_ck);
 
         self.rangeChk(div_ck);

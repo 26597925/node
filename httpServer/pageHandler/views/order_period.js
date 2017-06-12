@@ -112,14 +112,14 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var self = this;
         self.option_append(self.order_select1, self.select_title, preload.getDirtype);
     }
-    ,detail:null
+    ,detail_period:null
     ,get_detail:function(){
-        return this.detail;
+        return this.detail_period;
     }
     ,order_period_btn_detail:function(event){
         //订单详情
         var self = event.data.scope;
-        self.detail = event.data.data;
+        self.detail_period = $.extend(true,{},event.data.data);
         console.log(JSON.stringify(event.data));
         shareObj.detailName = 'order_period';
         var p=window.open("detailOrder.html");

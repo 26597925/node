@@ -165,14 +165,14 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var self = this;
         self.option_append(self.order_select1, self.select_title, preload.getDirtype);
     }
-    ,detail:null
+    ,detail_today:null
     ,get_detail:function(){
-        return this.detail;
+        return this.detail_today;
     }
     ,order_today_btn_detail:function(event){
         //订单详情
         var self = event.data.scope;
-        self.detail = event.data.data;
+        self.detail_today = $.extend(true,{},event.data.data);
         console.log('order_today_btn_detail',JSON.stringify(event.data));
         shareObj.detailName = 'order_today';
         var p=window.open("detailOrder.html");

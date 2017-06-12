@@ -77,13 +77,13 @@ oojs$.com.stock.order_detail = oojs$.createClass(
         // }
     ]
     ,detail_item:null
+    ,detail_item_deepcp:null
     ,originName:''
     ,getParentParam:function(param){
         console.log("detailstock getParentParam",param);
     }
     ,init:function(){
-        
-        
+
         var self = this;
         self.originName = '';
         if( window.opener.hasOwnProperty('shareObj') 
@@ -106,7 +106,7 @@ oojs$.com.stock.order_detail = oojs$.createClass(
     }
     ,appendTB_item:function(){
         var self = this;
-        var detail_item = self.detail_item ;
+        var detail_item = $.extend(true,{},self.detail_item)
         
         var tb = $('<table></table>', {
             'class':"display dataTable"
@@ -171,6 +171,22 @@ oojs$.com.stock.order_detail = oojs$.createClass(
                 detail_item['ENDTIME']['ELEMENT'] = oojs$.toHMS(detail_item['ENDTIME']['ELEMENT']);
             }else if(self.originName == 'order_period'){
                 detail_item['ENDTIME']['ELEMENT'] = detail_item['ENDTIME']['ELEMENT'];
+            }
+        }
+
+        if(detail_item.hasOwnProperty('STOCKSET')
+            && detail_item['STOCKSET']
+            && detail_item['STOCKSET'].hasOwnProperty('ELEMENT')
+        ){
+            var stock = (detail_item['STOCKSET']['ELEMENT']);
+            var stocks = stock.split(',');
+            detail_item['STOCKSET']['ELEMENT'] = $('<div></div>');
+            for(var i = 0; i < stocks.length; i++){
+                if(i!=0&&i%5==0){
+                    detail_item['STOCKSET']['ELEMENT'].append('<br />');
+                }
+                detail_item['STOCKSET']['ELEMENT'].append(stocks[i]);
+                detail_item['STOCKSET']['ELEMENT'].append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
             }
         }
 //--
