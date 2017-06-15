@@ -1,9 +1,6 @@
 oojs$.ns("com.stock.dictTrade");
 oojs$.com.stock.dictTrade=oojs$.createClass({
-    // CANAME
-    // CANUSAGE
-    // VISIBLE
-    // USERID
+    
     list_benchmark_head: [
         {
             ID:"TRADEID",
@@ -23,19 +20,11 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         }
         ,{
             ID:"BUYCOUNT",
-            NAME:"最大股数"
+            NAME:"单日最大买入股数"
         }
         ,{
             ID:"BUYAMOUNT",
             NAME:"单次最大额度"
-        }
-        ,{
-            ID:"PERCENT",
-            NAME:"买入比例"
-        }
-        ,{
-            ID:"SPLITCOUNT",
-            NAME:"拆分数"
         }
         ,{
             ID:"CTRL",
@@ -54,7 +43,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                 $( "#dictTrade_tabs" ).tabs({ 'selected': 1 });
             }
         }
-        
 	}
 
 	,dictTrade_tab1_click:function(){
@@ -139,7 +127,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		});
 
 	}
-
+    
     ,appendTB_trade_body: function( tb, head, body ){
         var tr = null;
         for(var i = 0; i < head.length; i++){
@@ -147,33 +135,21 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                 continue;
             }
             tr = $('<tr></tr>').appendTo(tb);
-            // if(i%2==0){
-            //     tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
-            // }else{
-            //     tr = $('<tr></tr>',{'class':"odd"}).appendTo(tb);
-            // }
-
+            
             switch (head[i]["ID"]){
                 case "TRADEID":
-
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "ACCOUNTID":
-
-
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "PASSWORD":
-
-
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "MAXBUY":
-
-
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
@@ -184,19 +160,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "BUYAMOUNT":
-
-
-                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
-                    break;
-                case "PERCENT":
-
-
-                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
-                    break;
-                case "SPLITCOUNT":
-
 
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
@@ -258,31 +221,12 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                 case "BUYCOUNT":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
                     if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
-                        oojs$.showError("请输入正确的最大股数数字");
+                        oojs$.showError("请输入正确的单日最大买入股数数字");
                     }
                     break;
                 case "BUYAMOUNT":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
                     if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
-                        oojs$.showError("请输入正确的单次最大额度数字");
-                    }
-                    break;
-                case "PERCENT":
-                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
-                    var test1 = /^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$/.test(Number(sendData[head[i]["ID"]]));
-                    if(!test1){
-                        oojs$.showError("请输入正确的比例");
-					}else{
-                    	if( String(sendData[head[i]["ID"]]).length > 3
-                            && String(sendData[head[i]["ID"]]).length-String(sendData[head[i]["ID"]]).indexOf('.') > 3){
-                            oojs$.showError("请输入正确的比例");
-                        }
-
-					}
-                    break;
-                case "SPLITCOUNT":
-                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
-                    if(!(/^\+?[1-9][0-9]*$/.test(sendData[head[i]["ID"]])) || parseInt(sendData[head[i]["ID"]]) > 10000){
                         oojs$.showError("请输入正确的单次最大额度数字");
                     }
                     break;
@@ -314,13 +258,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         });
 
 	}
-
-	// ,reset_dictTrade_Account : function(){
-	// 	$("#dictTrade_account").val('');
-	// 	$("#dictTrade_pwd").val('');
-	// 	this.dictTrade_selectElement.val(0)
-	// }
-
 
 	, create_dictTrade_Select: function(optID){
 
@@ -360,7 +297,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
         var  head, body;
         head = self.list_benchmark_head;
-		//{"USERID":20000,"TRADEID":3,"ACCOUNTID":"5890000049","CANAME":"xiayangang","PASSWORD":"207623","MAXBUY":1000,"BUYCOUNT":0,"BUYAMOUNT":0,"PERCENT":0.4,"SPLITCOUNT":1}
+		//{"USERID":20000,"TRADEID":3,"ACCOUNTID":"5890000049","CANAME":"xiayangang","PASSWORD":"207623","MAXBUY":1000,"BUYCOUNT":0,"BUYAMOUNT":0}
         body = {
             "TRADEID":self.create_dictTrade_Select(record["TRADEID"]).prop("disabled",true)
             ,"ACCOUNTID":$('<input type="text" value="'+record["ACCOUNTID"]+'" ></input>').prop("disabled",true)
@@ -368,8 +305,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             ,"MAXBUY":$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
             ,"BUYCOUNT":$('<input type="text" value="'+record["BUYCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
             ,"BUYAMOUNT":$('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-            ,"PERCENT":$('<input type="text" value="'+record["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
-            ,"SPLITCOUNT":$('<input type="text" value="'+record["SPLITCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
         };
         var value = parseInt(record["MAXBUY"]);
         var input = $('<input type="text" value="'+record["MAXBUY"]+'" ></input>');
@@ -382,7 +317,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         div.append(input);
         div.append(select);
         div.append(label);
-        body['MAXBUY']=div;//$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+        body['MAXBUY']=div;
         self.appendTB_trade_body ( tb, head, body );
         tr = $('<tr></tr>').appendTo(tb);
         var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
@@ -414,17 +349,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         	"TRADEID":self.create_dictTrade_Select("TRADEID_add")
 			,"ACCOUNTID":$('<input type="text" value="" ></input>')
 			,"PASSWORD":$('<input type="text" value=""></input>')
-			,"MAXBUY":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-            ,"BUYCOUNT":$('<input type="text" value="2" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-			,"BUYAMOUNT":$('<input type="text" value="2147480000" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-			,"PERCENT":$('<input type="text" value="0.5" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')
-			,"SPLITCOUNT":$('<input type="text" value="1" ></input><label style="color: red; font-size: 80%;">(*注：可拆分数为1-10000)</label>')
+			,"MAXBUY":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
+            ,"BUYCOUNT":$('<input type="text" value="2" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
+			,"BUYAMOUNT":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
         };
         var input = $('<input type="text" value="100" >');
         var select = $('<select><select>');
         select.append($('<option  value="0">万元</option>'));
         select.append($('<option  value="1">元</option>'));
-        var label = $('<label style="color: red; font-size: 80%;">(*注：最大值214748万元)</label>');
+        var label = $('<label style="color: red; font-size: 80%;">(*注：最大值9999万元)</label>');
         var div = $('<div></div>');
         div.append(input);
         div.append(select);
@@ -436,7 +369,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
         $('<input></input>',{type:"button",id:"user_account_add",name:"",value:"新增"}).appendTo(td);
 		$('<input></input>',{type:"button",id:"user_account_reset",name:"",value:"重置"}).appendTo(td);
-
 
         $("#user_account_add").click(
             body,
@@ -461,12 +393,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             list_body[elm] = {};
             list_body[elm]['TRADEID'] = {ELEMENT:this.getRecord_dt_selectList(this.dictTrade_list_body[elm]['TRADEID'])};
             list_body[elm]['ACCOUNTID'] = {ELEMENT:this.dictTrade_list_body[elm]['ACCOUNTID']};
-            list_body[elm]['PASSWORD'] = {ELEMENT:this.dictTrade_list_body[elm]['PASSWORD']};
+            list_body[elm]['PASSWORD'] = {ELEMENT:oojs$.changeToStar(this.dictTrade_list_body[elm]['PASSWORD'])};
             list_body[elm]['MAXBUY'] = {ELEMENT:this.dictTrade_list_body[elm]['MAXBUY']};
             list_body[elm]['BUYCOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYCOUNT']};
             list_body[elm]['BUYAMOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYAMOUNT']};
-            list_body[elm]['PERCENT'] = {ELEMENT:this.dictTrade_list_body[elm]['PERCENT']};
-            list_body[elm]['SPLITCOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['SPLITCOUNT']};
             list_body[elm]['CTRL'] = {ELEMENT:$(
             	'<input type="button" name="12" value="删除" ' +
 				'onclick="dictTrade.handler_trd_del('+

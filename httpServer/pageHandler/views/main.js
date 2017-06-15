@@ -121,7 +121,16 @@ var oojs$ = {
 			}
 		}
 	}
-
+    ,changeToStar: function(letter){
+        var size = letter.length;
+        var newLetter = '';
+        if(size>2){
+            newLetter += letter.substr(0,2)+"******"
+        }else{
+            newLetter += '********'
+        }
+        return newLetter;
+    }
     /*****
     * <input id="upload-input" type="file" name="uploads_name" multiple="multiple"></br>
     * <button class="btn btn-lg upload-btn" type="button">Upload File</button>
@@ -1566,7 +1575,7 @@ oojs$.com.stock.preload=oojs$.createClass({
             return self.STOCKS;
         }
     }
-    ,getPGroupItem:function(){
+    ,getPGroupItem:function(){ 
         var self = this;
         for( var i = 0; i < self.PGROUP.length; i++ ){
             if(parseInt(self.PGROUP[i]["ID"]) == parseInt(arguments[0])){
@@ -1610,15 +1619,19 @@ oojs$.com.stock.preload=oojs$.createClass({
     ,getExecute:function(){
         switch (parseInt(arguments[0])){
             case 0 :
-                return "等待中";
+                return "已提交";
             case 1 :
                 return "已读取";
             case 2:
-                return "等待交易";
+                return "已下单";
             case 3:
                 return "部分成交";
             case 4:
                 return "全部完成";
+            case 5:
+                return "网络异常";
+            case 6:
+                return "业务处理失败";
          } 
     }
     ,getFrom:function(){
