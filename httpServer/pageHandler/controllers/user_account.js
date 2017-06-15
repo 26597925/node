@@ -158,9 +158,9 @@ exports.add_userAccount = function(){
               +"&password="+self.req.post["PASSWORD"]+"";
             var url = "http://111.206.209.27:8080/account/gddm?"+param;
             console.log(path.basename(__filename).replace('.js',''),'param',url);
-            http_get(url,function(hresult,url){
+             http_get(url,function(hresult,url){
                 try{
-                  //hresult = '{ "status": 200, "tradeid": 1, "accountid": "303900021793", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
+                    //hresult = '{ "status": 200, "tradeid": 1, "accountid": "30390002179301", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
                     hresult = JSON.parse(hresult);
                     if(hresult['status'] == 200){
                         insert_userAccount(self,hresult);

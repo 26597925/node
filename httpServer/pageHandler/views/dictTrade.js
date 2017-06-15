@@ -1,6 +1,5 @@
 oojs$.ns("com.stock.dictTrade");
 oojs$.com.stock.dictTrade=oojs$.createClass({
-    
     list_benchmark_head: [
         {
             ID:"TRADEID",
@@ -44,14 +43,12 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
         }
 	}
-
 	,dictTrade_tab1_click:function(){
 	    var self = dictTrade;
         dictTrade.load_userAccount(function(){
             self.appendTB_list();
         });
 	}
-
     ,handler_trd_del:function(){
 		var USERID = arguments[0];
     	var ACCOUNTID = arguments[1];
@@ -65,9 +62,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                 return;
             }
         })
-
 	}
-
     ,handler_trd_chg:function(){
         var USERID = arguments[0];
         var ACCOUNTID = arguments[1];
@@ -82,16 +77,27 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
     ,handler_trd_add:function(event){
         dictTrade.sub_userAccount(dictTrade.list_benchmark_head,event.data,"add");
     }
-
     ,handler_trd_mdy:function(event){
         dictTrade.sub_userAccount(dictTrade.list_benchmark_head,event.data,"mdy");
     }
-
 	,handler_trd_reback:function(event){
         dictTrade.appendTB_list();
     }
-
-	, getRecord_dt_list : function(TRADEID,ACCOUNTID){
+    ,select_change:function(event){
+        var self = event.data['scope'];
+        var input = event.data['input'];
+        console.log('select_change:',$(this).val());
+        if($(this).val() == '0'){//万元->元
+            if(Number(input.val())>0){
+                input.val(input.val()/10000)
+            }
+        }else if($(this).val() == '1'){//元-万元
+            if(Number(input.val())>0){
+                input.val(input.val()*10000)
+            }
+        }
+    }
+	,getRecord_dt_list : function(TRADEID,ACCOUNTID){
 		if(this.dictTrade_list_body.length>0){
 			for(var i = 0; i < this.dictTrade_list_body.length; i++){
 				if(this.dictTrade_list_body[i]['TRADEID']==TRADEID && this.dictTrade_list_body[i]['ACCOUNTID']==ACCOUNTID){
@@ -100,8 +106,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			}
 		}
 	}
-
-	, getRecord_dt_selectList : function(TRADEID){
+	,getRecord_dt_selectList : function(TRADEID){
 		if(preload.TRADE.length>0){
 			for(var i =0; i< preload.TRADE.length; i++){
 				if( preload.TRADE[i]["ID"]==TRADEID ){
@@ -110,7 +115,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 			}
 		}
 	}
-
 	,delete_userAccount : function(){
 		console.log('this.delete_userAccount',arguments);
 		var sendData = {
@@ -125,9 +129,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
             }
 		});
-
 	}
-    
     ,appendTB_trade_body: function( tb, head, body ){
         var tr = null;
         for(var i = 0; i < head.length; i++){
@@ -172,11 +174,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         }
         tr = $('<tr></tr>').appendTo(tb);
     }
-
 	,sub_userAccount : function(head,body,type){
         var self = this;
 		var sendData = {};
-
         for(var i = 0; i < head.length; i++){
             if(!body.hasOwnProperty( head[i]["ID"] )){
                 continue;
@@ -302,9 +302,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             "TRADEID":self.create_dictTrade_Select(record["TRADEID"]).prop("disabled",true)
             ,"ACCOUNTID":$('<input type="text" value="'+record["ACCOUNTID"]+'" ></input>').prop("disabled",true)
             ,"PASSWORD":$('<input type="text" value="'+record["PASSWORD"]+'"></input>')
-            ,"MAXBUY":$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-            ,"BUYCOUNT":$('<input type="text" value="'+record["BUYCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
-            ,"BUYAMOUNT":$('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>')
+            ,"MAXBUY":$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值9999)</label>')
+            ,"BUYCOUNT":$('<input type="text" value="'+record["BUYCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
+            ,"BUYAMOUNT":$('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
         };
         var value = parseInt(record["MAXBUY"]);
         var input = $('<input type="text" value="'+record["MAXBUY"]+'" ></input>');
@@ -312,7 +312,11 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         select.append($('<option  value="0">万元</option>'));
         select.append($('<option  value="1">元</option>'));
         select.val(1);
-        var label = $('<label style="color: red; font-size: 80%;">(*注：最大值2147480000)</label>');
+        select.change(
+            {'scope':self,'input':input},
+            self.select_change
+        );
+        var label = $('<label style="color: red; font-size: 80%;">(*注：最大值9999)</label>');
         var div = $('<div></div>');
         div.append(input);
         div.append(select);
@@ -357,6 +361,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         var select = $('<select><select>');
         select.append($('<option  value="0">万元</option>'));
         select.append($('<option  value="1">元</option>'));
+        select.change(
+            {'scope':self,'input':input},
+            self.select_change
+        );
         var label = $('<label style="color: red; font-size: 80%;">(*注：最大值9999万元)</label>');
         var div = $('<div></div>');
         div.append(input);
