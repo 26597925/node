@@ -31,7 +31,9 @@ $('#myimage').off('click.mynamespace');
 $('#myimage').click(function() { return false; }); // Adds another click event
 $('#myimage').unbind('click');
 
-If you want to add a single event and then remove it (without removing any others that might have been added) then you can use event namespacing:
+If you want to add a single event and then remove it 
+(without removing any others that might have been added) 
+then you can use event namespacing:
 
 $('#myimage').bind('click.mynamespace', function() { /* Do stuff */ });
 and to remove just your event:

@@ -83,20 +83,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	,handler_trd_reback:function(event){
         dictTrade.appendTB_list();
     }
-    ,select_change:function(event){
-        var self = event.data['scope'];
-        var input = event.data['input'];
-        console.log('select_change:',$(this).val());
-        if($(this).val() == '0'){//万元->元
-            if(Number(input.val())>0){
-                input.val(input.val()/10000)
-            }
-        }else if($(this).val() == '1'){//元-万元
-            if(Number(input.val())>0){
-                input.val(input.val()*10000)
-            }
-        }
-    }
+    
 	,getRecord_dt_list : function(TRADEID,ACCOUNTID){
 		if(this.dictTrade_list_body.length>0){
 			for(var i = 0; i < this.dictTrade_list_body.length; i++){
@@ -302,26 +289,35 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             "TRADEID":self.create_dictTrade_Select(record["TRADEID"]).prop("disabled",true)
             ,"ACCOUNTID":$('<input type="text" value="'+record["ACCOUNTID"]+'" ></input>').prop("disabled",true)
             ,"PASSWORD":$('<input type="text" value="'+record["PASSWORD"]+'"></input>')
-            ,"MAXBUY":$('<input type="text" value="'+record["MAXBUY"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值9999)</label>')
+            ,"MAXBUY":null
             ,"BUYCOUNT":$('<input type="text" value="'+record["BUYCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
-            ,"BUYAMOUNT":$('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
+            ,"BUYAMOUNT":null
+            // $('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input>
+            //     <label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
         };
+
+        var value2 = parseInt(record["BUYAMOUNT"]);
+        var input2 = $('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input>');
+        var select2 = $('<select><select>');
+        (new oojs$.com.stock.component.RMB()).init(input2,select2,'元');
+        var label2 = $('<label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>');
+        var div2 = $('<div></div>');
+        div2.append(input2);
+        div2.append(select2);
+        div2.append(label2);
+        body['BUYAMOUNT']=div2;
+
         var value = parseInt(record["MAXBUY"]);
         var input = $('<input type="text" value="'+record["MAXBUY"]+'" ></input>');
         var select = $('<select><select>');
-        select.append($('<option  value="0">万元</option>'));
-        select.append($('<option  value="1">元</option>'));
-        select.val(1);
-        select.change(
-            {'scope':self,'input':input},
-            self.select_change
-        );
+        (new oojs$.com.stock.component.RMB()).init(input,select,'元');
         var label = $('<label style="color: red; font-size: 80%;">(*注：最大值9999)</label>');
         var div = $('<div></div>');
         div.append(input);
         div.append(select);
         div.append(label);
         body['MAXBUY']=div;
+
         self.appendTB_trade_body ( tb, head, body );
         tr = $('<tr></tr>').appendTo(tb);
         var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
@@ -333,7 +329,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             body,
             this.handler_trd_reback
         );
-
 	}
 
 	,appendTB_add : function( TRADEID, ACCOUNTID ){
@@ -345,7 +340,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             ,'class':'dataTable cellspacing table'
         }).appendTo($('#dictTrade_tabs_2'));
 
-
         var  head, body;
         head = self.list_benchmark_head;
 
@@ -353,24 +347,32 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         	"TRADEID":self.create_dictTrade_Select("TRADEID_add")
 			,"ACCOUNTID":$('<input type="text" value="" ></input>')
 			,"PASSWORD":$('<input type="text" value=""></input>')
-			,"MAXBUY":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
+			,"MAXBUY":null
             ,"BUYCOUNT":$('<input type="text" value="2" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
 			,"BUYAMOUNT":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
         };
+
+        var input2 = $('<input type="text" value="100" >');
+        var select2 = $('<select><select>');
+        (new oojs$.com.stock.component.RMB()).init(input2,select2,'万元');
+        var label2 = $('<label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>');
+        var div2 = $('<div></div>');
+        div2.append(input2);
+        div2.append(select2);
+        div2.append(label2);
+        body['BUYAMOUNT']=div2;
+
+
         var input = $('<input type="text" value="100" >');
         var select = $('<select><select>');
-        select.append($('<option  value="0">万元</option>'));
-        select.append($('<option  value="1">元</option>'));
-        select.change(
-            {'scope':self,'input':input},
-            self.select_change
-        );
+        (new oojs$.com.stock.component.RMB()).init(input,select,'万元',input2);
         var label = $('<label style="color: red; font-size: 80%;">(*注：最大值9999万元)</label>');
         var div = $('<div></div>');
         div.append(input);
         div.append(select);
         div.append(label);
         body['MAXBUY']=div;
+
         self.appendTB_trade_body ( tb, head, body );
 
 		tr = $('<tr></tr>').appendTo(tb);

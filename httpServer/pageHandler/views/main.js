@@ -1235,6 +1235,15 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                 +self.select_tradetype[i]['name']+"</option>"
             );
         }
+
+        //console.log("main select append_select_tradetype ",self.BUYCOUNT,self.BUYAMOUNT,self.PERCENT,self.select_tradetype);
+        // if(Number(self.BUYCOUNT)>0){
+        //     select.val('BUYCOUNT');
+        // }else if(Number(self.BUYAMOUNT)>0){
+        //     select.val('BUYAMOUNT');
+        // }else if(Number(self.PERCENT)>0){
+        //     select.val('PERCENT');
+        // }
         return select;
     }
     ,destroy:function(){
@@ -1498,6 +1507,63 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         div2.append(input);
         div2.append(button);
 
+    }
+})
+
+/****
+* var rmb = new oojs$.com.stock.component.RMB();
+* rmb.int(input,select,'元');
+*/
+oojs$.ns("com.stock.component.RMB");
+oojs$.com.stock.component.RMB=oojs$.createClass({
+    NAME:"stockset"
+    ,input:null
+    ,select:null
+    ,input2:null
+    ,val:function(){
+        return this.data;
+    }
+    ,init:function(input,select,danWei,input2){
+        var self = this;
+        input.focusout(function(){
+            if(input2!=null){
+                if(parseInt(input2.val())>parseInt(input.val())){
+                    input2.val(input.val())
+                }
+            }
+        });
+        select.append($('<option  value="0">万元</option>'));
+        select.append($('<option  value="1">元</option>'));
+        select.change(
+            {'scope':self,'input':input},
+            self.select_change
+        );
+        if(danWei=='万元'){
+            select.val('0');
+        }else if(danWei=='元'){
+            select.val('1');
+        }else{
+            select.val('1');
+        }
+    }
+    ,select_change:function(event){
+        var self = event.data['scope'];
+        var input = event.data['input'];
+        console.log('select_change:',$(this).val());
+        if($(this).val() == '0'){//万元->元
+            if(Number(input.val())>0){
+                input.val(input.val()/10000)
+            }
+        }else if($(this).val() == '1'){//元-万元
+            if(Number(input.val())>0){
+                input.val(input.val()*10000)
+            }
+        }
+    }
+    ,clear:function(){
+        input = null;
+        select = null;
+        input2 = null;
     }
 })
 
