@@ -356,7 +356,7 @@ oojs$.com.stock.policy = oojs$.createClass(
         drawitem_data["DIRTYPE"] ={'ELEMENT':preload.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
         
         var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;"
+            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         oojs$.generateSelect(select,item["POLICYPARAM"]);
 

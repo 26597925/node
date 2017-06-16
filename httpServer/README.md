@@ -18,7 +18,43 @@
 <p>
 	npm install ccap  <br />
 </p>
+<pre>
+<h2>jQuery ≥ 1.7</h2>
 
+$('#myimage').click(function() { return false; }); // Adds another click event
+$('#myimage').off('click');
+$('#myimage').on('click.mynamespace', function() { /* Do stuff */ });
+$('#myimage').off('click.mynamespace');
+
+<h2>jQuery < 1.7</h2>
+
+$('#myimage').click(function() { return false; }); // Adds another click event
+$('#myimage').unbind('click');
+
+If you want to add a single event and then remove it (without removing any others that might have been added) then you can use event namespacing:
+
+$('#myimage').bind('click.mynamespace', function() { /* Do stuff */ });
+and to remove just your event:
+
+$('#myimage').unbind('click.mynamespace');
+
+</pre>
+<pre>
+<div class="piece-units" title="7/pn/112, Share In Ranges: 0" style="background-color: rgb(170, 0, 0);">
+	*
+</div>
+
+.channel-item .pieces .piece-units {
+    display: inline-block;
+    width: 6px;
+    height: 10px;
+    border-top: solid #fff 1px;
+    border-right: solid #fff 1px;
+    cursor: pointer;
+    margin-top: 20px;
+    color: #fff;
+}
+</pre>
 oojs 
 <pre>
 

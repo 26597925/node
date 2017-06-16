@@ -47,6 +47,9 @@ exports.upload = function(){
                         stock += letter;
                     }else{
                         if(stock.length>0){
+                            if(stock.length>6){
+	                            stock = stock.substr(1,6);
+                            }
                             stocks.push(stock);
                             stock = '';
                         }
