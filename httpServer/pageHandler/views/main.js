@@ -1480,6 +1480,9 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
             console.log(files);
             oojs$.http_upload( 'uploads_name', files,function(result){
                 console.log(JSON.stringify(result));
+                if(result.type == 'too long'){
+                    oojs$.showError('您的股票太长会导致服务器偷懒，所以提取了前128股票!');
+                }
                 if(self.data.length>0){
                     for(var i = 0; i < result.data.length; i++){
                         self.data += ","+result.data[i];
