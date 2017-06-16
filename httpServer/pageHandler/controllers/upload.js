@@ -8,14 +8,31 @@ const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 
+var mkdirFun = function(url){
+	if (!fs.existsSync(url)){
+		fs.mkdirSync(url);
+	}
+};
+
+var parseUrl = function(s_path){
+	var dirs = s_path.split(path.sep);
+	var continueDir = '/';
+	for(var i = 0; i < dirs.length; i++){
+		if(dirs[i].length == 0){continue;}
+		continueDir =  path.join(continueDir,dirs[i]);
+		mkdirFun(continueDir);
+	}
+};
+
 exports.upload = function(){
     var self = this;
     var uID = sessions.get_uID(self.req);
     var result = {'success':true,'message':'登录成功'};
     var form = new formidable.IncomingForm();
     form.multiples = true;
-
-    form.uploadDir = path.join(__dirname, '..','/uploads','/',uID);
+    var _dir = path.join(__dirname, '..','/uploads','/',uID);
+	  parseUrl(_dir);
+    form.uploadDir = _dir;
 
     if (!fs.existsSync(form.uploadDir)){
         fs.mkdirSync(form.uploadDir);
