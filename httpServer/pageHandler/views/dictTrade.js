@@ -212,7 +212,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     }
                     break;
                 case "BUYAMOUNT":
-                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].find( "input" ).val();
                     if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
                         oojs$.showError("请输入正确的单次最大额度数字");
                     }
