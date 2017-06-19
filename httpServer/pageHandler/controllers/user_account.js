@@ -239,7 +239,7 @@ var insert_userAccount = function(context,account_result){
                 account_result['accountid']
                 ,ID
                 ,post["MAXBUY"]
-                ,post["BUYAMOUNT"]
+                ,post["BUYCOUNT"]
                 ,post["BUYAMOUNT"]
                 ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
             );
