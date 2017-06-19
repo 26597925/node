@@ -1277,19 +1277,39 @@ oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
     ,inputs:null
     ,type:''
     ,val:function(){
+        if(this.type == 'tomorrow'){
+            var date = new Date($(this.inputs[0]).val());
+            date.setHours($(this.kids[0]).val());
+            date.setMinutes($(this.kids[1]).val());
+            date.setSeconds($(this.kids[2]).val());
+            return date.toJSON();
+        }
         if(this.type == 'datepicker'){
             var date = new Date($(this.inputs[0]).datepicker('getDate'));
             date.setHours($(this.kids[0]).val());
             date.setMinutes($(this.kids[1]).val());
             date.setSeconds($(this.kids[2]).val());
-
             return date.toJSON();
             //return {'yMd':date.toJSON(),'hh':$(this.kids[0]).val(),'mm':$(this.kids[1]).val(),'ss':$(this.kids[2]).val()};;
         }
         return {hh:$(this.kids[0]).val(),"mm":$(this.kids[1]).val(),"ss":$(this.kids[2]).val()};;
     }
     ,init:function(div, hh_mm_ss, datepicker, date){
-        if(datepicker && datepicker == 'datepicker'){
+        if(datepicker && datepicker == 'tomorrow'){
+            this.type = datepicker;
+            oojs$.generateHMDOption(div,'datepicker');
+            this.inputs = div.find( "input" );
+            
+            var _date = new Date();
+            if(date == null){
+                _date.setDate(_date.getDate()+1);
+            }else{
+                _date = new Date(date);
+            }
+            $(this.inputs[0]).val(oojs$.Format(_date,'yyyy-MM-dd'));
+            $(this.inputs[0]).prop('disabled',true);
+
+        }else if(datepicker && datepicker == 'datepicker'){
             this.type = datepicker;
             oojs$.generateHMDOption(div,datepicker);
             this.inputs = div.find( "input" );
@@ -1300,7 +1320,6 @@ oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
             this.type = '';
             oojs$.generateHMDOption(div);
         }
-        
 
         this.kids = div.find( "select" );
         var hh = parseInt(hh_mm_ss["hh"]);
