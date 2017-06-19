@@ -193,17 +193,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     var input = div.find( "input" );
                     var select = div.find( "select" );
                     console.log('MAXBUY\n',input.val(),select.val());
+                    sendData[head[i]["ID"]] = Number(input.val());
+                    if(select.val() == 0){
+                        sendData[head[i]["ID"]] = Number(sendData[head[i]["ID"]])*10000;
+                    }
                     if( 
-                        !(/^\+?[0-9][0-9]*$/.test( parseInt(input.val()) ) ) 
+                        !(/^\+?[0-9][0-9]*$/.test( Number(input.val()) ) ) 
                     ){
                         oojs$.showError("请输入正确的总额度数字");
                     }
-                    sendData[head[i]["ID"]] = parseInt(input.val());
-                    if(select.val() == 0){
-                        sendData[head[i]["ID"]] = parseInt(sendData[head[i]["ID"]])*10000;
-                    }
-                    
-                	
                     break;
                 case "BUYCOUNT":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
@@ -211,8 +209,17 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                         oojs$.showError("请输入正确的单日最大买入股数数字");
                     }
                     break;
+                
                 case "BUYAMOUNT":
+                var div = body[head[i]["ID"]];
+                    var input = div.find( "input" );
+                    var select = div.find( "select" );
+                    console.log('BUYCOUNT\n',input.val(),select.val());
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].find( "input" ).val();
+                    sendData[head[i]["ID"]] = Number(input.val());
+                    if(select.val() == 0){
+                        sendData[head[i]["ID"]] = Number(sendData[head[i]["ID"]])*10000;
+                    }
                     if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
                         oojs$.showError("请输入正确的单次最大额度数字");
                     }
