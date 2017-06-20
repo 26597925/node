@@ -188,11 +188,13 @@ exports.insert_preorder = function(){
             ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
         );
         if(
-	        self.req.post.hasOwnProperty('POLICYPARAM')
-          && self.req.post['POLICYPARAM']
-          && self.req.post['POLICYPARAM'].hasOwnProperty('used')
+	        self.req.post[i].hasOwnProperty('POLICYPARAM')
+          && self.req.post[i]['POLICYPARAM']
+          && self.req.post[i]['POLICYPARAM'].hasOwnProperty('used')
         ){
-	        _POLICYPARAM = self.req.post['POLICYPARAM']['used'];
+	          _POLICYPARAM = self.req.post[i]['POLICYPARAM']['used'];
+        }else{
+	          _POLICYPARAM = '';
         }
 	      
 	      
