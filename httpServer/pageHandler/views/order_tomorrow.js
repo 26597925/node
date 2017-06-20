@@ -324,8 +324,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                 var capitals;
 
                 try{
-                    //alert("change appendTB_modify_order result.data ")
-                    //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                    // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                     capitals= JSON.parse(result.data);
                 }catch(err){
                     capitals = '';
@@ -685,11 +684,11 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         var STARTTIME = $('<div></div>');
         
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
-        start_component.init(STARTTIME,item["STARTTIME"],'datepicker');
+        start_component.init(STARTTIME,item["STARTTIME"],'tomorrow');
 
         var ENDTIME = $('<div></div>');
         var end_component = new  oojs$.com.stock.component.hh_mm_ss();
-        end_component.init(ENDTIME,item["ENDTIME"],'datepicker');
+        end_component.init(ENDTIME,item["ENDTIME"],'tomorrow');
 
         var stockset = new oojs$.com.stock.component.stockset();
         var STOCKSET = {
@@ -767,8 +766,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                         var capitals;
 
                         try{
-                            //alert("change handler_policy result.data ")
-                            //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                            // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                             capitals= JSON.parse(result.data);
                         }catch(err){
                             capitals = '';

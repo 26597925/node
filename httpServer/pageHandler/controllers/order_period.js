@@ -133,7 +133,7 @@ exports.insert_orderPeriod = function(){
         // ",%s" + // 18 FLAG
         // ",'2017-04-20 01:00:00'" + // 19  ADDTIME
         ",'%s'" + // 20  MODTIME
-        ",2" + //21 FROMID
+        ",1" + //21 FROMID
         ")";
 
 
