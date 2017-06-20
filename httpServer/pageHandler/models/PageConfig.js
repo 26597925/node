@@ -223,7 +223,28 @@ route.map({
     controller:'order_period',
     action:'select_orderPeriod'
 });
+//================================
 
+route.map({
+	method:'post',
+	url:/^\/insert_orderTomorrow\/?$/i,
+	controller:'order_tomorrow',
+	action:'insert_orderPeriod'
+});
+
+route.map({
+	method:'post',
+	url:/^\/update_orderTomorrow\/?$/i,
+	controller:'order_tomorrow',
+	action:'update_orderPeriod'
+});
+
+route.map({
+	method:'post',
+	url:/^\/select_orderTomorrow\/?$/i,
+	controller:'order_tomorrow',
+	action:'select_orderPeriod'
+});
 //================================
 
 route.map({

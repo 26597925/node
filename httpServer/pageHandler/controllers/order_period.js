@@ -35,6 +35,7 @@ exports.select_orderPeriod = function(){
         ' `STATUS`,'+
         ' `FLAG_SYSTEM`,'+
         ' `FLAG_USER`,'+
+	      ' `VISIBLE`,'+
         ' `ADDTIME`,'+
         ' `MODTIME`,'+
         ' `FROMID` '+
@@ -43,7 +44,9 @@ exports.select_orderPeriod = function(){
         ' WHERE' +
         ' `USERID`=%s' +
         ' AND ' +
-        ' `FLAG_SYSTEM` = 1';
+        ' `FLAG_SYSTEM` = 1'+
+	      ' AND ' +
+	      ' `VISIBLE` = 1';
 
     sql = util.format(sql,uID);
     db.query(sql,function(){
@@ -281,6 +284,7 @@ exports.update_orderPeriod = function(){
             //STATUS
             //FLAG_SYSTEM
             " `FLAG_USER`='%s' , " +
+	          " `VISIBLE`='%s' , " +
             //ADDTIME
             " `MODTIME`='%s' " +
             // "," +
@@ -304,6 +308,7 @@ exports.update_orderPeriod = function(){
             ,BUYAMOUNT
             ,PERCENT
             ,self.req.post[0]['FLAG_USER']
+	          ,self.req.post[0]['VISIBLE']
             ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
             ,self.req.post[0]['ROWID']
         );
@@ -316,10 +321,20 @@ exports.update_orderPeriod = function(){
         ){
             _POLICYPARAM = self.req.post[0]['POLICYPARAM']['used'];
         }
+        var operation = '';
+        if(self.req.post[0]['VISIBLE'] == '0'){
+            operation = '0';
+        }else{
+            if(self.req.post[0]['FLAG_USER'] == '0'){
+              operation = '3'
+            }else{
+              operation = '2'
+            }
+        }
         reportServer.push(
             {
                 "orderid":self.req.post[0]['ORDERID']
-                ,"operation":"2"//operation=删除0记录,插入新数据1,修改记录2
+                ,"operation":operation//0删除 1增加 2启用 3禁用
                 ,"accountid":String(self.req.post[0]['ACCOUNTID'])
                 ,"tradeid":String(self.req.post[0]['TRADEID'])
                 ,"userid":String(uID)

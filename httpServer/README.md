@@ -42,6 +42,11 @@ $('#myimage').unbind('click.mynamespace');
 
 </pre>
 <pre>
+	<div  title="7/pn/112, Share In Ranges: 0" style="background-color: rgb(170, 170, 170);width:6px;display: inline-block;height: 10px;margin-top: 20px;">*</div>
+		<div  title="7/pn/112, Share In Ranges: 0" style="background-color: rgb(170, 0, 0);width:6px;display: inline-block;height: 10px;margin-top: 20px;color: #fff;">&nbsp;</div>
+		<div  title="7/pn/112, Share In Ranges: 0" style="background-color: rgb(170, 0, 0);width:6px;display: inline-block;height: 10px;margin-top: 20px;color: #fff;">*</div>
+
+		
 <div class="piece-units" title="7/pn/112, Share In Ranges: 0" style="background-color: rgb(170, 0, 0);">
 	*
 </div>

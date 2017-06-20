@@ -116,6 +116,50 @@ oojs$.com.stock.order_period = oojs$.createClass(
     ,get_detail:function(){
         return this.detail_period;
     }
+    ,order_period_btn_del:function(event){
+        //删除
+        var self = event.data.scope;
+        var sendData = event.data.data;
+        var _sendData = {};
+        var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
+        var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
+        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
+        
+        for(var elm in sendData){
+            _sendData[elm] = sendData[elm]["ELEMENT"];
+        }
+        _sendData['DIRTYPE'] = DIRTYPE;
+        _sendData['STARTTIME'] = STARTTIME;
+        _sendData['ENDTIME'] = ENDTIME;
+        if(String(_sendData['VISIBLE']) == "0"){
+           _sendData['VISIBLE'] = "1";
+        }else if(String(_sendData['VISIBLE']) == "1"){
+            _sendData['VISIBLE'] = "0"
+        }
+        console.log("del",JSON.stringify(_sendData))
+        oojs$.httpPost_json("/update_ordertoday",[_sendData],function(result,textStatus,token){
+            if(result.success){
+                _sendData=null;
+                if(event&&event.data){
+                    if(event&&event.data&&event.data.data){
+                        if(typeof(event.data.data)=='object'){
+                            for(var ine in event.data.data){
+                                event.data.data[ine]=null;
+                                delete event.data.data[ine];
+                            }
+                        }
+                        event.data.data = null;
+                        event.data = null;
+                    }
+                    event.data = null;
+                }
+                $( "#order_today_tabs" ).tabs({ selected: 0 });
+                order_today.order_today_tab1_clk();
+            }else{
+                oojs$.showError(result.message);
+            }
+        });
+    }
     ,order_period_btn_detail:function(event){
         //订单详情
         var self = event.data.scope;
@@ -136,34 +180,40 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var sendData = event.data.data;
         
         console.log("switch",JSON.stringify(sendData))
-        sendData['DIRTYPE']["ELEMENT"] =  sendData['DIRTYPE']['ORIGIN'];
-        sendData['STARTTIME']["ELEMENT"] = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
-        sendData['ENDTIME']["ELEMENT"] = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
+
+        var _sendData = {};
+
+        var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
+        var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
+        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"]);
 
         for(var elm in sendData){
-            sendData[elm] = sendData[elm]["ELEMENT"];
+            _sendData[elm] = sendData[elm]["ELEMENT"];
         }
-        if(String(sendData['FLAG_USER']) == "0"){
-           sendData['FLAG_USER'] = "1";
-        }else if(String(sendData['FLAG_USER']) == "1"){
-            sendData['FLAG_USER'] = "0"
+        _sendData['DIRTYPE'] = DIRTYPE;
+        _sendData['STARTTIME'] = STARTTIME;
+        _sendData['ENDTIME'] = ENDTIME;
+
+        if(String(_sendData['FLAG_USER']) == "0"){
+           _sendData['FLAG_USER'] = "1";
+        }else if(String(_sendData['FLAG_USER']) == "1"){
+            _sendData['FLAG_USER'] = "0"
         }
-        sendData['ADDTIME']=null;
-        sendData['MODTIME']=null;
-        sendData['ONETHIRD']=null;
-        sendData['CTRL']=null;
-        delete sendData['ADDTIME'];
-        delete sendData['MODTIME'];
-        delete sendData['ONETHIRD'];
-        delete sendData['CTRL'];
-        console.log("switch",JSON.stringify(sendData))
+       
+        console.log("switch",JSON.stringify(_sendData))
         oojs$.httpPost_json("/update_orderPeriod",[sendData],function(result,textStatus,token){
                 if(result.success){
-                    // if( type == 1){
-                    //     policy.policy_tab1_click();
-                    // }else if( type == 2){
-                    //     policy.policy_tab2_click();
-                    // }
+                    _sendData=null;
+                    if(event&&event.data&&event.data.data){
+                        if(typeof(event.data.data)=='object'){
+                            for(var ine in event.data.data){
+                                event.data.data[ine]=null;
+                                delete event.data.data[ine];
+                            }
+                            event.data.data = null;
+                        }
+                        event.data = null;
+                    }
                     $( "#order_period_tabs" ).tabs({ selected: 0 });
                     order_period.order_period_tab1_clk();
                 }else{
@@ -277,8 +327,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 var capitals;
 
                 try{
-                    //alert("change appendTB_modify_order result.data ")
-                    //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                    // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                     capitals= JSON.parse(result.data);
                 }catch(err){
                     capitals = '';
@@ -509,7 +558,12 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
             $('<input></input>',{type:"button",value:btnName}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
-                order_period.order_period_btn_switch
+                order_period.order_period_switch
+            );
+
+            $('<input></input>',{type:"button",value:"删除"}).appendTo(div).click(
+                {'data':list_body[elm],'scope':self},
+                order_period.order_period_btn_del
             );
 
             list_body[elm]['CTRL'] = {ELEMENT:div};
@@ -715,8 +769,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                         var capitals;
 
                         try{
-                            //alert("change handler_policy result.data ")
-                            //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                            // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                             capitals= JSON.parse(result.data);
                         }catch(err){
                             capitals = '';
@@ -792,10 +845,18 @@ oojs$.com.stock.order_period = oojs$.createClass(
         policy_data['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
         policy_data['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
 
-        var used = policy_data['POLICYPARAM']['ELEMENT'].val();
+        var used = "";
+        console.log(typeof(policy_data['POLICYPARAM']));
+        if(policy_data['POLICYPARAM'] && policy_data['POLICYPARAM'].hasOwnProperty('ELEMENT')){
+            used = policy_data['POLICYPARAM']['ELEMENT'].val();
+        }else if(policy_data['POLICYPARAM'] && policy_data['POLICYPARAM'].hasOwnProperty('used')){
+            used = policy_data['POLICYPARAM']['used'];
+        }
         policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['ORIGIN'];
         policy_data['POLICYPARAM']['used'] = used;
-
+        if(used == ''){
+            oojs$.showError("used is empty")
+        }
         for(var elm in policy_data){
             if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){

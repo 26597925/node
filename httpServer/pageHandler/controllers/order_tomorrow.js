@@ -5,27 +5,12 @@ const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 const policy = require('./policy.js');
-//const user_account = require('./user_account.js');
-const bean = require(path.join(__dirname,"..","..","..",'bean','bean_entity'));
+const user_account = require('./user_account.js');
 
-exports.select_preorder = function(){
-    var parentAlias = this.alias;
+exports.select_orderPeriod = function(){
     this.alias = path.basename(__filename);
     var self = this;
-
-    var uID;
-    if(parentAlias == 'root'){
-        uID = sessions.get_uID(self.req);
-    }else if(parentAlias == 'order_today.js' || parentAlias == 'market.js'){
-        uID = self.uID;
-    }
-    if(!uID){
-        result = {'success':false,'message':path.basename(__filename).replace('.js','')+'数据错误'};
-        self.responseDirect(200,"text/json",JSON.stringify(result));
-        console.log("error order_today is null");
-        return;
-    }
-
+    var uID = sessions.get_uID(self.req);
 
     var result = {'success':true,'data':''};
     var sql  = 'SELECT' +
@@ -55,13 +40,13 @@ exports.select_preorder = function(){
         ' `MODTIME`,'+
         ' `FROMID` '+
         ' FROM ' +
-        '`view_orderid_today`' +
+        '`view_orderid_tomorow`' +
         ' WHERE' +
         ' `USERID`=%s' +
         ' AND ' +
         ' `FLAG_SYSTEM` = 1'+
-        ' AND ' +
-        ' `VISIBLE` = 1';
+	      ' AND ' +
+	      ' `VISIBLE` = 1';
 
     sql = util.format(sql,uID);
     db.query(sql,function(){
@@ -70,14 +55,12 @@ exports.select_preorder = function(){
 
             for(var i = 0; i < result.data.length; i++){
 	              result.data[i]['POLICYPARAM'] = JSON.parse(new Buffer(result.data[i]['POLICYPARAM'], 'base64').toString('UTF8'))
-                //new Buffer(self.req.post['POLICYPARAM']).toString('base64');
-                result.data[i]['ADDTIME'] = unit_date.Format( new Date(result.data[i]['ADDTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['ADDTIME']);
+	              result.data[i]['ADDTIME'] = unit_date.Format( new Date(result.data[i]['ADDTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['ADDTIME']);
                 result.data[i]['MODTIME'] = unit_date.Format(new Date(result.data[i]['MODTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['MODTIME']);
             }
 
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else if(arguments.length==0){
-
             result = {'success':true,'data':[]};
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
@@ -88,12 +71,20 @@ exports.select_preorder = function(){
 
 };
 
-exports.insert_preorder = function(){
+// exports.select_userPolicyGID = function(){
+//     this.alias = path.basename(__filename);
+//     this.callback = callback_userPolicyGID;
+//     console.log( path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
+//     policy.select_alreadySubscrible.apply(this,arguments[0],"test123_567");
+//
+// };
+
+exports.insert_orderPeriod = function(){
     var  self = this;
     var uID = sessions.get_uID(self.req);
     var result = {'success':true,'data':''};
     console.log( path.basename(__filename), "insert_preorder", JSON.stringify(self.req.post));
-    var sql = "INSERT INTO `view_orderid_today` (" +
+    var sql = "INSERT INTO `view_orderid_tomorow` (" +
         "`ORDERID`" +//1
         ", `USERID`" +//2
         ", `PGROUPID`" +//3
@@ -132,8 +123,8 @@ exports.insert_preorder = function(){
         ",%s" + // 8 DIRTYPE
         ",'%s'" +//9 STOCKSET
         // ",%s" + //10 DEALSTOCK
-        ",%s" + // 11 STARTTIME
-        ",%s" + // 12 ENDTIME
+        ",'%s'" + // 11 STARTTIME
+        ",'%s'" + // 12 ENDTIME
         ",%s" + // 13 ISTEST
         ",%s" + // 14 BUYCOUNT
         ",%s" + // 15 BUYAMOUNT
@@ -152,21 +143,20 @@ exports.insert_preorder = function(){
 
     var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
     var reportServer = [];
-    var _POLICYPARAM = '';
-    debugger;
+	  var _POLICYPARAM = '';
     for( var i = 0; i < self.req.post.length; i++ ){
         if(i!=0){
             sqldata += ",";
         }
 
         ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
-        STARTTIME = unit_date.objToNumber(self.req.post[i]['STARTTIME']);
-        ENDTIME = unit_date.objToNumber(self.req.post[i]['ENDTIME']);
+        STARTTIME = unit_date.Format(new Date(self.req.post[i]['STARTTIME']),"yyyy-MM-dd HH:mm:ss");
+        ENDTIME = unit_date.Format(new Date(self.req.post[i]['ENDTIME']),"yyyy-MM-dd HH:mm:ss");
 
         BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
         PERCENT =  unit_date.string2num(self.req.post[i]['PERCENT']);
-        
+
         sqldata += util.format(value,
             ORDERID//1 ORDERID
             ,uID//self.req.post[i]['USERID']//2 USERID
@@ -187,15 +177,13 @@ exports.insert_preorder = function(){
             // ,self.req.post[i]['FLAG']// 18 FLAG
             ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
         );
-        if(
-	        self.req.post.hasOwnProperty('POLICYPARAM')
-          && self.req.post['POLICYPARAM']
-          && self.req.post['POLICYPARAM'].hasOwnProperty('used')
-        ){
-	        _POLICYPARAM = self.req.post['POLICYPARAM']['used'];
-        }
-	      
-	      
+	      if(
+            self.req.post.hasOwnProperty('POLICYPARAM')
+            && self.req.post['POLICYPARAM']
+            && self.req.post['POLICYPARAM'].hasOwnProperty('used')
+	      ){
+		        _POLICYPARAM = self.req.post['POLICYPARAM']['used'];
+	      }
         reportServer.push(
             {
                 "orderid":String(ORDERID)
@@ -222,11 +210,9 @@ exports.insert_preorder = function(){
 
     }
     // console.log( path.basename(__filename), "http_post", JSON.stringify(reportServer));
-    
+    http_post(reportServer);
     db.query(sql+sqldata,function(){
         if(arguments.length==1){
-	          http_post(reportServer);
-	          http_post_2(reportServer);
             self.responseDirect(200,"text/json",JSON.stringify(result));
         }else{
             result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
@@ -242,7 +228,7 @@ var http_post=function(){
     //result = result.replace("\"","'");
     console.log( path.basename(__filename), "http_post", result);
     var options = {
-        //hostname: '111.206.209.27',
+        hostname: '111.206.209.27',
         host:'111.206.209.27',
         port: 8080,
         path: '/order/dynamic',
@@ -258,6 +244,7 @@ var http_post=function(){
         res.setEncoding('utf8');
         res.on('data', function (body) {
             console.log('Body: ' + body);
+
         });
     });
 
@@ -269,38 +256,7 @@ var http_post=function(){
     req.end();
 };
 
-var http_post_2=function(){
-	var result = JSON.stringify(arguments[0]) ;
-	result = result.replace("\\","");
-	var options = {
-		host:'111.206.211.60',
-		port: 8080,
-		path: '/order/dynamic',
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Content-Length': result.length
-		}
-	};
-	
-	var req = http.request(options, function(res) {
-		console.log('Status: ' + res.statusCode);
-		console.log('Headers: ' + JSON.stringify(res.headers));
-		res.setEncoding('utf8');
-		res.on('data', function (body) {
-			console.log('Body: ' + body);
-		});
-	});
-	
-	req.on('error', function(e) {
-		console.log('problem with request: ' + e.message);
-	});
-	
-	req.write(result);
-	req.end();
-};
-
-exports.update_ordertoday = function(){
+exports.update_orderPeriod = function(){
     //时间  param参数 自选股集合 数量/金额/比例 可以修改
 
     var  self = this;
@@ -309,8 +265,7 @@ exports.update_ordertoday = function(){
 
     if(self.req.post){
 
-
-        var sql = "UPDATE `view_orderid_today` set" +
+        var sql = "UPDATE `view_orderid_tomorow` set" +
             // USERID
             //PNAME
             // "  `PGROUPID`=%s ," +
@@ -320,8 +275,8 @@ exports.update_ordertoday = function(){
             " `POLICYPARAM`='%s' ," +
             // " `DIRTYPE`=%s ," +
             " `STOCKSET`='%s' ," +
-            " `STARTTIME`=%s ," +
-            " `ENDTIME`=%s ," +
+            " `STARTTIME`='%s' ," +
+            " `ENDTIME`='%s' ," +
             // " `ISTEST`=%s ," +
             " `BUYCOUNT`=%s ," +
             " `BUYAMOUNT`=%s ," +
@@ -338,8 +293,8 @@ exports.update_ordertoday = function(){
             "`ROWID`='%s'";
         // ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
         var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
-        STARTTIME = unit_date.objToNumber(self.req.post[0]['STARTTIME']);
-        ENDTIME = unit_date.objToNumber(self.req.post[0]['ENDTIME']);
+        STARTTIME = unit_date.Format(new Date(self.req.post[0]['STARTTIME']),"yyyy-MM-dd HH:mm:ss");
+        ENDTIME = unit_date.Format(new Date(self.req.post[0]['ENDTIME']),"yyyy-MM-dd HH:mm:ss");
         BUYCOUNT = unit_date.string2int(self.req.post[0]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
         PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
@@ -366,16 +321,17 @@ exports.update_ordertoday = function(){
         ){
             _POLICYPARAM = self.req.post[0]['POLICYPARAM']['used'];
         }
+	
 	      var operation = '';
 	      if(self.req.post[0]['VISIBLE'] == '0'){
-		      operation = '0';
-        }else{
-		      if(self.req.post[0]['FLAG_USER'] == '0'){
-			      operation = '3'
-		      }else{
-			      operation = '2'
-          }
-        }
+		        operation = '0';
+	      }else{
+		        if(self.req.post[0]['FLAG_USER'] == '0'){
+			          operation = '3'
+		        }else{
+			          operation = '2'
+		        }
+	      }
         reportServer.push(
             {
                 "orderid":self.req.post[0]['ORDERID']
@@ -399,11 +355,9 @@ exports.update_ordertoday = function(){
             }
         );
 
-        
+        http_post(reportServer);
         db.query(sql, function(){
             if(arguments.length==1){
-	              http_post(reportServer);
-	              http_post_2(reportServer);
                 self.responseDirect(200,"text/json",JSON.stringify(result));
             }else{
                 result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员'};
@@ -411,32 +365,5 @@ exports.update_ordertoday = function(){
             }
         });
     }
-};
 
-
-exports.dynamic = function(){
-    var  self = this;
-    var uID = sessions.get_uID(self.req);
-    var result = {'success':true,'data':''};
-
-    if(self.req.post){
-
-        // if(self.req.post.hasOwnProperty('orderid')
-        //     && self.req.post.hasOwnProperty('accountid')
-        //     && self.req.post.hasOwnProperty('tradeid')
-        //     && self.req.post.hasOwnProperty('userid')
-        //     && self.req.post.hasOwnProperty('policyid')
-        // ){
-            self.responseDirect(200,"application/json",JSON.stringify(result));
-
-            var sendDate = new bean.entity_wss();
-            sendDate.type = bean.WSS_ORDERTODAY;
-            sendDate.action = 'new_data';
-            sendDate.data = {};
-            self.root.broadcast(sendDate);
-        // }else{
-        //     result = {'success':false,'data':'','message':path.basename(__filename).replace('.js','')+'操作数据失败'};
-        // }
-
-    }
 };

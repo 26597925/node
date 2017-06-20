@@ -1777,7 +1777,6 @@ oojs$.com.stock.preload=oojs$.createClass({
 
 var preload = new oojs$.com.stock.preload();
 
-
 <%- jsState %>
 oojs$.addEventListener("ready",function(){
         oojs$.showPanel();
