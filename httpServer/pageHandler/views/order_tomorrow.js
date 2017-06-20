@@ -123,8 +123,9 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
 
         var _sendData = {};
         var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
-        var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
-        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
+        var STARTTIME = sendData['STARTTIME']["ELEMENT"];
+        var ENDTIME = sendData['ENDTIME']["ELEMENT"];
+
         
         for(var elm in sendData){
             _sendData[elm] = sendData[elm]["ELEMENT"];
@@ -138,21 +139,21 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             _sendData['VISIBLE'] = "0"
         }
         console.log("del",JSON.stringify(_sendData))
-        oojs$.httpPost_json("/update_ordertoday",[_sendData],function(result,textStatus,token){
+        oojs$.httpPost_json("/update_orderTomorrow",[_sendData],function(result,textStatus,token){
             if(result.success){
                 _sendData=null;
                 if(event&&event.data&&event.data.data){
                     if(typeof(event.data.data)=='object'){
                         for(var ine in event.data.data){
-                            event.data.data[i]=null;
-                            delete event.data.data[i];
+                            event.data.data[ine]=null;
+                            delete event.data.data[ine];
                         }
                         event.data.data = null;
                     }
                     event.data = null;
                 }
-                $( "#order_today_tabs" ).tabs({ selected: 0 });
-                order_today.order_today_tab1_clk();
+                $( "#order_tomorrow_tabs" ).tabs({ selected: 0 });
+                order_tomorrow.order_tomorrow_tab1_clk();
             }else{
                 oojs$.showError(result.message);
             }
@@ -182,8 +183,9 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         var _sendDate = {};
 
         var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
-        var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
-        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"]);
+        var STARTTIME = sendData['STARTTIME']["ELEMENT"];
+        var ENDTIME = sendData['ENDTIME']["ELEMENT"];
+
 
         for(var elm in sendData){
             _sendData[elm] = sendData[elm]["ELEMENT"];
@@ -531,7 +533,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             }
             list_body[elm]['ONETHIRD'] = {'ELEMENT':one_third};
             list_body[elm]['POLICYID'] = {'ELEMENT':list[elm]['POLICYID']};//{ELEMENT:preload.getPGroupItem(list[elm]['POLICYID'])};
-            list_body[elm]['FROMID'] = {'ELEMENT':preload.getFrom(list[elm]['DIRTYPE'])};
+            list_body[elm]['FROMID'] = {'ELEMENT':preload.getFrom(list[elm]['FROMID'])};
             
 
             var div = $('<div></div>');
@@ -540,14 +542,14 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                 order_tomorrow.order_tomorrow_btn_detail
             );
 
-            if(status == "3"||status == "4"){
-                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
-            }else {//if(status == "0"||status == "1")
+            // if((status == "3"||status == "4")&&stockCount == 1){
+            //     $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
+            // }else {//if(status == "0"||status == "1")
                 $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
                 order_tomorrow.order_tomorrow_btn_chg
                 );
-            }
+            // }
             btnName = "X";
             if(parseInt(list_body[elm]['FLAG_USER']['ELEMENT']) == 1){
                 btnName = '✓'

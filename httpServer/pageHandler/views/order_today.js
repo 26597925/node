@@ -557,6 +557,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE']),
                 'ORIGIN':list[elm]['DIRTYPE']};
 
+            var stockCount = 0;
             if(""+list[elm]['DEALSTOCK']&& (""+list[elm]['DEALSTOCK']).length>5 ){
                 stocks = (list[elm]['DEALSTOCK']).split(",");
                 div = $('<div></div>');
@@ -565,8 +566,10 @@ oojs$.com.stock.order_today = oojs$.createClass(
                         {'item':list_body[elm],'stock':stocks[jj],'scope':self},
                         self.order_today_btn_herf
                     );
+
                     div.append(href)
                     div.append($('<br />'));
+                    stockCount++;
                 }
                 
                 list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
@@ -584,7 +587,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             }
             list_body[elm]['ONETHIRD'] = {'ELEMENT':one_third};
             list_body[elm]['POLICYID'] = {'ELEMENT':list[elm]['POLICYID']};//{ELEMENT:preload.getPGroupItem(list[elm]['POLICYID'])};
-            list_body[elm]['FROMID'] = {'ELEMENT':preload.getFrom(list[elm]['DIRTYPE'])};
+            list_body[elm]['FROMID'] = {'ELEMENT':preload.getFrom(list[elm]['FROMID'])};
             
 
             var div = $('<div></div>');
@@ -592,14 +595,16 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 {'data':list_body[elm],'scope':self},
                 order_today.order_today_btn_detail
             );
-            if(status == "3"||status == "4"){
-                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
-            }else {//if(status == "0"||status == "1")
+
+
+            // if((status == "3"||status == "4")&&stockCount == 1){
+            //     $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
+            // }else {//if(status == "0"||status == "1")
                 $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
                 order_today.order_today_btn_chg
                 );
-            }
+            // }
             
 
             btnName = "X";
