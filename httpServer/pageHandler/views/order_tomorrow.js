@@ -528,8 +528,8 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                 one_third = parseInt(list[elm]['BUYCOUNT'])+"股";
             }else if(parseInt(list[elm]['BUYAMOUNT'])>0){
                 one_third = parseInt(list[elm]['BUYAMOUNT'])+"¥";
-            }else if(parseInt(list[elm]['PERCENT'])>0){
-                one_third = parseInt(list[elm]['PERCENT'])+"％";
+            }else if(Number(list[elm]['PERCENT'])>0){
+                one_third = Number(list[elm]['PERCENT']);//+"％";
             }
             list_body[elm]['ONETHIRD'] = {'ELEMENT':one_third};
             list_body[elm]['POLICYID'] = {'ELEMENT':list[elm]['POLICYID']};//{ELEMENT:preload.getPGroupItem(list[elm]['POLICYID'])};
@@ -908,6 +908,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             ,'BUYAMOUNT':null
             ,'PERCENT':null
             ,'FLAG_USER':null
+            ,'VISIBLE':null
         }
 
         var sendData = [];

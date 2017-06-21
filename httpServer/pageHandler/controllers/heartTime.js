@@ -25,7 +25,7 @@ exports.heartTime = function(){
     var sql = "select `LASTLOGIN` from `tb_user_basic` WHERE `tb_user_basic`.`USERID` = "+USERID+" ";
     db.query(sql,function(){
       console.log(JSON.stringify(arguments));
-      debugger;
+      //debugger;
       if(arguments.length == 1){
 
         if(arguments[0][0]['LASTLOGIN']){
