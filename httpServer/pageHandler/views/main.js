@@ -957,6 +957,9 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,BUYCOUNT:''
     ,BUYAMOUNT:''
     ,PERCENT:''
+    ,BUYCOUNT_tmp:''
+    ,BUYAMOUNT_tmp:''
+    ,PERCENT_tmp:''
     ,ACCOUNT:null
     ,CAPITAL:null
     ,select_tradetype:[
@@ -973,12 +976,15 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.DIRTYPE = DIRTYPE;
         self.ACCOUNTID = ACCOUNTID;
         self.BORROW = BORROW;
-        self.BUYCOUNT = BUYCOUNT;
-        self.BUYAMOUNT = BUYAMOUNT;
-        self.PERCENT = PERCENT;
+        self.BUYCOUNT_tmp = self.BUYCOUNT = BUYCOUNT;
+        self.BUYAMOUNT_tmp = self.BUYAMOUNT = BUYAMOUNT;
+        self.PERCENT_tmp = self.PERCENT = PERCENT;
         self.CHECKED = CHECKED;
         self.ACCOUNT = ACCOUNT;
-        
+
+        self.INPUT = $('<input></input>',{'type':'text'});
+        self.LABEL_UNIT = $('<label></label>');
+
         var checkbox = self.CHECK = $('<input></input>',{
             'type':'checkbox'
 
@@ -1057,13 +1063,14 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.select_change
                 );
             }
+
             div2.append(self.SELECT);
-            self.INPUT = $('<input></input>',{'type':'text'});
+            
             if(!CHECKED){
                 self.INPUT.prop("disabled", true );
             }
             div2.append(self.INPUT);
-            self.LABEL_UNIT = $('<label></label>');
+            
             div2.append(self.LABEL_UNIT);
         }
     }
@@ -1128,7 +1135,12 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.BUYCOUNT='';
                     self.BUYAMOUNT='';
                     self.PERCENT='';
+                    if(Number(self.BUYCOUNT_tmp)>0){
+                        self.INPUT.val(self.BUYCOUNT_tmp);
+                        self.BUYCOUNT=self.BUYCOUNT_tmp;
+                    }
                 }
+
                 break;
             case "BUYAMOUNT":
                 if(self.LABEL_UNIT){
@@ -1136,21 +1148,30 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     self.BUYCOUNT='';
                     self.BUYAMOUNT='';
                     self.PERCENT='';
+                    if(Number(self.BUYAMOUNT_tmp)>0){
+                        self.INPUT.val(self.BUYAMOUNT_tmp)
+                        self.BUYAMOUNT = self.BUYAMOUNT_tmp;
+                    }
                 }
-                if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse')  ){
-                    self.INPUT.val(self.CAPITAL.account_muse);
-                }
+                // if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse')  ){
+                //     self.INPUT.val(self.CAPITAL.account_muse);
+                // }
+                
                 break;
             case "PERCENT":
                 if(self.LABEL_UNIT){
-                    self.LABEL_UNIT.text("％");
+                    self.LABEL_UNIT.text("请输入0-1的数");
                     self.BUYCOUNT='';
                     self.BUYAMOUNT='';
                     self.PERCENT='';
-                    if(self.ACCOUNT!=null){
-                        if( self.ACCOUNT.hasOwnProperty('PERCENT') ){
-                            self.INPUT.val(self.ACCOUNT['PERCENT']);
-                        }
+                    // if(self.ACCOUNT!=null){
+                    //     if( self.ACCOUNT.hasOwnProperty('PERCENT') ){
+                    //         self.INPUT.val(self.ACCOUNT['PERCENT']);
+                    //     }
+                    // }
+                    if(Number(self.PERCENT_tmp)>0){
+                        self.INPUT.val(self.PERCENT_tmp);
+                        self.PERCENT = self.PERCENT_tmp
                     }
                 }
                 break;
@@ -1223,9 +1244,9 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             select.prop( "disabled", true );
         }
 
-        select.append(
-            "<option value='-1'>请选择交易策略</option>"
-        );
+        // select.append(
+        //     "<option value='-1'>请选择交易策略</option>"
+        // );
 
         for(var i = 0; i < self.select_tradetype.length; i++){
             select.append(
@@ -1236,14 +1257,21 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             );
         }
 
-        //console.log("main select append_select_tradetype ",self.BUYCOUNT,self.BUYAMOUNT,self.PERCENT,self.select_tradetype);
-        // if(Number(self.BUYCOUNT)>0){
-        //     select.val('BUYCOUNT');
-        // }else if(Number(self.BUYAMOUNT)>0){
-        //     select.val('BUYAMOUNT');
-        // }else if(Number(self.PERCENT)>0){
-        //     select.val('PERCENT');
-        // }
+        console.log("main select append_select_tradetype ",self.BUYCOUNT,self.BUYAMOUNT,self.PERCENT,self.select_tradetype);
+        
+        if(Number(self.BUYCOUNT_tmp)>0){
+            select.val('BUYCOUNT');
+            self.INPUT.val(Number(self.BUYCOUNT_tmp));
+            self.LABEL_UNIT.text("股");
+        }else if(Number(self.BUYAMOUNT_tmp)>0){
+            select.val('BUYAMOUNT');
+            self.INPUT.val(Number(self.BUYAMOUNT_tmp))
+            self.LABEL_UNIT.text("¥");
+        }else if(Number(self.PERCENT_tmp)>0){
+            select.val('PERCENT');
+            self.INPUT.val(Number(self.PERCENT_tmp))
+            self.LABEL_UNIT.text("请输入0-1的数");
+        }
         return select;
     }
     ,destroy:function(){

@@ -107,7 +107,7 @@ oojs$.com.stock.order_detail = oojs$.createClass(
     ,appendTB_item:function(){
         var self = this;
         var detail_item = $.extend(true,{},self.detail_item)
-        
+        console.log('detail_item',detail_item)
         var tb = $('<table></table>', {
             'class':"display dataTable"
         }).appendTo( $('#detail_panel') );
@@ -190,8 +190,13 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             }
         }
 //--
-        detail_item['DEALSTOCK']['ELEMENT'] = detail_item['DEALSTOCK']['ORIGIN'];
-        console.log('detail_item',detail_item)
+        
+        if(detail_item.hasOwnProperty('DEALSTOCK')
+            &&detail_item['DEALSTOCK']
+            &&detail_item['DEALSTOCK'].hasOwnProperty('ORIGIN')){
+            detail_item['DEALSTOCK']['ELEMENT'] = detail_item['DEALSTOCK']['ORIGIN'];
+        }
+        
         oojs$.appendTB_item_D2(tb,self.list_benchmark_head,detail_item);
     }
 

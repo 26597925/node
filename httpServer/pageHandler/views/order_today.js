@@ -583,7 +583,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             }else if(parseInt(list[elm]['BUYAMOUNT'])>0){
                 one_third = parseInt(list[elm]['BUYAMOUNT'])+"¥";
             }else if(Number(list[elm]['PERCENT'])>0){
-                one_third = Number(list[elm]['PERCENT'])+"％";
+                one_third = Number(list[elm]['PERCENT'])//+"％";
             }
             list_body[elm]['ONETHIRD'] = {'ELEMENT':one_third};
             list_body[elm]['POLICYID'] = {'ELEMENT':list[elm]['POLICYID']};//{ELEMENT:preload.getPGroupItem(list[elm]['POLICYID'])};
@@ -956,22 +956,24 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         console.log("policy_data\n",JSON.stringify(policy_data));
         console.log("account_list\n",JSON.stringify(account_list));
-        var account_result = []
+        var account_result = [];
+        var index = 0;
         for(var i =0; i< account_list.length;i++){
             console.log(account_list[i]["COMPONENT"].val()['CHECKED'])
             if(account_list[i]["COMPONENT"] && account_list[i]["COMPONENT"].val()['CHECKED']){
-                account_result[i] = {};
+                account_result[index] = {};
 
                 for(var elm in account_list[i]["ELEMENT"]){
-                    account_result[i][elm] = account_list[i]["ELEMENT"][elm];
+                    account_result[index][elm] = account_list[i]["ELEMENT"][elm];
                 }
                 if(!account_list[i]["COMPONENT"].val() ){return; }//accountset返回的null的情况
                 for( var elm in  account_list[i]["COMPONENT"].val() ){
                     if(typeof(account_list[i]["COMPONENT"].val()[elm]) == 'object'){
                         continue
                     }
-                    account_result[i][elm] = account_list[i]["COMPONENT"].val()[elm];
+                    account_result[index][elm] = account_list[i]["COMPONENT"].val()[elm];
                 }
+                index++;
             }
         }
 
@@ -999,6 +1001,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,'BUYAMOUNT':null
             ,'PERCENT':null
             ,'FLAG_USER':null
+            ,'VISIBLE':null
         }
 
         var sendData = [];
@@ -1020,11 +1023,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
             }
         }
 
-        console.log("sendData",JSON.stringify(sendData));
+        console.log("today sendData",JSON.stringify(sendData));
         
         if(type == "add"){
             oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
                 if(result.success){
+
                     $( "#order_today_tabs" ).tabs({ selected: 0 });
                     order_today.order_today_tab1_clk();
                 }else{

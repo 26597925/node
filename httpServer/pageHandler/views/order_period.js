@@ -869,22 +869,24 @@ oojs$.com.stock.order_period = oojs$.createClass(
         }
         console.log("policy_data\n",JSON.stringify(policy_data));
         console.log("account_list\n",JSON.stringify(account_list));
-        var account_result = []
+        var account_result = [];
+        var index = 0;
         for(var i =0; i< account_list.length;i++){
             
             if(account_list[i]["COMPONENT"] && account_list[i]["COMPONENT"].val()['CHECKED']){
-                account_result[i] = {};
+                account_result[index] = {};
 
                 for(var elm in account_list[i]["ELEMENT"]){
-                    account_result[i][elm] = account_list[i]["ELEMENT"][elm];
+                    account_result[index][elm] = account_list[i]["ELEMENT"][elm];
                 }
                 if(!account_list[i]["COMPONENT"].val() ){return; }//accountset返回的null的情况
                 for( var elm in  account_list[i]["COMPONENT"].val() ){
                     if(typeof(account_list[i]["COMPONENT"].val()[elm]) == 'object'){
                         continue
                     }
-                    account_result[i][elm] = account_list[i]["COMPONENT"][elm];
+                    account_result[index][elm] = account_list[i]["COMPONENT"][elm];
                 }
+                index++;
             }
         }
 
