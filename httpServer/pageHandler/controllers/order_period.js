@@ -42,7 +42,7 @@ exports.select_orderPeriod = function(){
 	    ' `PRDEND`,'+
       ' `FROMID` '+
       ' FROM ' +
-      '`tb_order_id_period`' +
+      '`view_orderid_period`' +
       ' WHERE' +
       ' `USERID`=%s' +
       ' AND ' +
@@ -114,7 +114,7 @@ exports.insert_orderPeriod = function(){
     var uID = sessions.get_uID(self.req);
     var result = {'success':true,'data':''};
     console.log( path.basename(__filename), "insert_preorder", JSON.stringify(self.req.post));
-    var sql = "INSERT INTO `tb_order_id_period` (" +
+    var sql = "INSERT INTO `view_orderid_period` (" +
       "`ORDERID`" +//1
       ", `USERID`" +//2
       ", `PGROUPID`" +//3
@@ -302,7 +302,7 @@ exports.update_orderPeriod = function(){
   
   if(self.req.post){
     
-    var sql = "UPDATE `tb_order_id_period` set" +
+    var sql = "UPDATE `view_orderid_period` set" +
       // USERID
       //PNAME
       // "  `PGROUPID`=%s ," +
