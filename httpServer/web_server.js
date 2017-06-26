@@ -113,8 +113,13 @@ exports.runPageServer = function( port )
 		var reqData = "";
 		//console.log(JSON.stringify(req.headers));
 		if ("POST" == req.method.toUpperCase()) {
-			if ( (req.headers.hasOwnProperty('content-type') && req.headers['content-type'].indexOf('application/json') != -1)
-			|| req.headers.accept.indexOf('application/json') != -1) {
+			if ( (req.headers.hasOwnProperty('content-type')
+				&& req.headers['content-type']
+				&& req.headers['content-type'].indexOf('application/json') != -1)
+			|| ( req.headers.hasOwnProperty('accept')
+				&& req.headers.accept
+				&& req.headers.accept.indexOf('application/json') != -1 )
+			) {
 
 			if (_bufData.length > 0) {
 				try {

@@ -351,7 +351,7 @@ var oojs$ = {
 
         htmltag.append($('<label>时</label>'));
         select= $('<select ></select>',{
-            style:"height:25px;width:50px;-webkit-appearance: none;"
+            style:"height:25px;width:50px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
 		for(var i = 0; i < 24; i++){
             tmpval = i<=9?("0"+i):i;
@@ -364,7 +364,7 @@ var oojs$ = {
         htmltag.append($('<label>:分</label>'));
 
         select= $('<select ></select>',{
-            style:"height:25px;width:50px;-webkit-appearance: none;"
+            style:"height:25px;width:50px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
 

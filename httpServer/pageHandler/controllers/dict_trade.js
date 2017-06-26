@@ -19,7 +19,7 @@ exports.select_dictTrade = function(){
         // "`VERSION`" +
         // ", " +
         // "`REMARK` " +
-        " FROM `tb_dict_trade` ";
+        " FROM `tb_dict_trade` WHERE STATUS>0";
 
     db.query(sql,function(){
         if(arguments.length==1){

@@ -7,9 +7,6 @@ const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 var stock_load = false;
 
-
-
-
 exports.stocks = function(){
 	var self = this;
 	var uID = sessions.get_uID(self.req);
@@ -123,19 +120,25 @@ var proxy_capitals = function(sendData,callback){
   var req = http.request(options, function(res) {
     console.log('Status: ' + res.statusCode);
     //console.log('Headers: ' + JSON.stringify(res.headers));
-    res.setEncoding('utf8');
-    res.on('data', function (body) {
-      console.log('Body: ' + body);
-      if(callback){
-        callback(body);
-      }
-    });
+    if(res.statusCode == 200){
+	    res.setEncoding('utf8');
+	    res.on('data', function (body) {
+		    console.log('Body: ' + body);
+		    if(callback){
+			    callback(body);
+		    }
+	    });
+    }else{
+	    if(callback){
+		    callback();
+	    }
+    }
   });
 
 
   req.on('error', function(e) {
     console.log('problem with request: ' + e.message);//problem with request: Parse Error
-    if(e.message!='Parse Error'){
+    if(e.message!='Parse Error' ){
       if(callback){
         callback();
       }
