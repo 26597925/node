@@ -214,8 +214,8 @@ exports.insert_orderPeriod = function(){
       , PERCENT // 16 PERCENT
       // ,self.req.post[i]['FLAG']// 18 FLAG
       ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
-      ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20_1  PRDSTART
-      ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20_2  PRDEND
+      ,PRDSTART// 20_1  PRDSTART
+      ,PRDEND// 20_2  PRDEND
     );
 	      
     reportServer.push(
