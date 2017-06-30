@@ -678,9 +678,10 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             USERID = event.data['USERID'];
             POLICYID = event.data['POLICYID'];
         }
-        //------------------------
+        //tomorrow------------------------
 
         var item = policy.search_policyList_Item(USERID,POLICYID,policy.policy_subscribe);
+        var PERCENT = item['PERCENT'];
         var drawitem_data = {};
         for(var elm in item){
             drawitem_data[elm] = {ELEMENT:item[elm]};
@@ -756,7 +757,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                     ,preload.getTradeItem(item_account['TRADEID'])["BORROW"]
                     ,item_account['BUYCOUNT']
                     ,item_account['BUYAMOUNT']
-                    ,item_account['PERCENT']
+                    ,PERCENT//item_account['PERCENT']
                     ,true
                     ,item_account
                 );
