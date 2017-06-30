@@ -727,9 +727,10 @@ var oojs$ = {
                 }
             }else{
                 int_ROWSPAN = parseInt(ROWSPAN);
-                if(int_ROWSPAN<2){
-                    throw "the value of ROWSPAN not allowed"+ROWSPAN;
-                }
+                
+                // if(int_ROWSPAN<2){
+                //     throw "the value of ROWSPAN not allowed"+ROWSPAN;
+                // }
 
                 if(i%2==0){
                     tmpClass = "even";
