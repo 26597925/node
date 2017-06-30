@@ -12,35 +12,35 @@ oojs$.com.stock.user=oojs$.createClass({
     list_benchmark_head: [
         {
             ID:"UENAME",
-            NAME:"用户名"
+            NAME:"用户名:"
         }
         ,{
             ID:"UCNAME",
-            NAME:"中文名"
+            NAME:"中文名:"
         }
         ,{
             ID:"PASSWORD",
-            NAME:"密码"
+            NAME:"密码:"
         }
         ,{
             ID:"PHONENUMBER",
-            NAME:"电话"
+            NAME:"电话:"
         }
         ,{
             ID:"EMAIL",
-            NAME:"邮箱"
+            NAME:"邮箱:"
         }
         ,{
             ID:"ADDRESS",
-            NAME:"地址"
+            NAME:"地址:"
         }
         ,{
             ID:"ZIPCODE",
-            NAME:"邮编"
+            NAME:"邮编:"
         }
         ,{
             ID:"CTRL",
-            NAME:"操作"
+            NAME:"操作:"
         }
     ]//增加修改基准数据
     ,userInfo:[]

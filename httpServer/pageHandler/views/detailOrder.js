@@ -31,10 +31,10 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             ID:'PNAME',
             NAME:"策略名称"
         }
-        ,{
-            ID:'POLICYPARAM',
-            NAME:"子策略类型"
-        }
+        // ,{
+        //     ID:'POLICYPARAM',
+        //     NAME:"子策略类型"
+        // }
         ,{
             'ID':"STOCKSET",
             'NAME':"自选股"

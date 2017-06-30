@@ -166,7 +166,7 @@ exports.insert_preorder = function(){
         BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
         PERCENT =  unit_date.string2num(self.req.post[i]['PERCENT']);
-	      _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM'])).toString('base64');
+	      _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM']['result'])).toString('base64');
         sqldata += util.format(value,
             ORDERID//1 ORDERID
             ,uID//self.req.post[i]['USERID']//2 USERID
@@ -335,7 +335,7 @@ exports.update_ordertoday = function(){
         BUYCOUNT = unit_date.string2int(self.req.post[0]['BUYCOUNT']);
         BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
         PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
-	      var _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM'])).toString('base64');
+	      var _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM']['result'])).toString('base64');
         sql  = util.format(sql
             ,_POLICYPARAM
             ,unit_date.string2_(self.req.post[0]['STOCKSET'])

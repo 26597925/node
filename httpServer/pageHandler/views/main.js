@@ -718,7 +718,7 @@ var oojs$ = {
                 }
                 if(COLSPAN == ""){
                 	//width:100px;
-                    $('<td></td>',{ 'class':"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]+": ");
+                    $('<td></td>',{ 'class':"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]);
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
                 }else if(COLSPAN == "2"){
                     $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
@@ -738,7 +738,7 @@ var oojs$ = {
                 }
 
                 tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
-                $('<td></td>',{ 'rowspan':int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+": ");
+                $('<td></td>',{ 'rowspan':int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+" ");
                 $('<td></td>',{ }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT1"]);
                 for(var j = 0; j < int_ROWSPAN-1; j++)
                 {
@@ -1702,10 +1702,6 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             select.prop( "disabled", true );
         }
 
-        // select.append(
-        //     "<option value='-1'>请选择交易策略</option>"
-        // );
-
         for(var i = 0; i < self.select_tradetype.length; i++){
             select.append(
                 "<option value='"
@@ -1716,8 +1712,11 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         }
 
         console.log("main select append_select_tradetype ",self.BUYCOUNT,self.BUYAMOUNT,self.PERCENT,self.select_tradetype);
-        
-        if(Number(self.BUYCOUNT_tmp)>0){
+        if(Number(self.PERCENT_tmp)>0){
+            select.val('PERCENT');
+            self.INPUT.val(Number(self.PERCENT_tmp))
+            self.LABEL_UNIT.text("请输入0-1的数");
+        }else if(Number(self.BUYCOUNT_tmp)>0){
             select.val('BUYCOUNT');
             self.INPUT.val(Number(self.BUYCOUNT_tmp));
             self.LABEL_UNIT.text("股");
@@ -1725,10 +1724,6 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             select.val('BUYAMOUNT');
             self.INPUT.val(Number(self.BUYAMOUNT_tmp))
             self.LABEL_UNIT.text("¥");
-        }else if(Number(self.PERCENT_tmp)>0){
-            select.val('PERCENT');
-            self.INPUT.val(Number(self.PERCENT_tmp))
-            self.LABEL_UNIT.text("请输入0-1的数");
         }
         return select;
     }

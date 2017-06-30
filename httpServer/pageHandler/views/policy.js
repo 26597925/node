@@ -13,35 +13,35 @@ oojs$.com.stock.policy = oojs$.createClass(
     ,list_benchmark_head: [
         {
             ID:"PGROUPID",
-            NAME:"策略类型"
+            NAME:"策略类型:"
         }
         ,{
             ID:"PNAME",
-            NAME:"策略名称"
+            NAME:"策略名称:"
         }
         ,{
             ID:"DIRTYPE",
-            NAME:"交易类型"
+            NAME:"交易类型:"
         }
         ,{
             ID:"POLICYPARAM",
-            NAME:"子策略类型"
+            NAME:"参数信息:"//use for POLICYPARAM when add new order
         }
         ,{
             ID:"STARTTIME",
-            NAME:"开始时间"
+            NAME:"开始时间:"
         }
         ,{
             ID:"ENDTIME",
-            NAME:"结束时间"
+            NAME:"结束时间:"
         }
         ,{
             ID:"STOCKSET",
-            NAME:"自选股"
+            NAME:"自选股:"
         }
         ,{
             ID:"PERCENT",
-            NAME:"交易比例"
+            NAME:"交易比例:"
         }
         // ,{
         //     ID:"",
@@ -49,7 +49,7 @@ oojs$.com.stock.policy = oojs$.createClass(
         // }
         ,{
             ID:"CTRL",
-            NAME:"操作"
+            NAME:"操作:"
         }
     ]
     ,valideDate:function(){
@@ -112,7 +112,13 @@ oojs$.com.stock.policy = oojs$.createClass(
             panel = $('#policy_tabs_2');
         }
 
-        list_head = self.list_benchmark_head;
+        list_head = [];
+        for(var idx = 0; idx<self.list_benchmark_head.length; idx++){
+            if(self.list_benchmark_head[idx]["ID"]!="POLICYPARAM"){
+                list_head.push(self.list_benchmark_head[idx])
+            }
+        }
+
         list_body = [];
         var list = null;
         if(type == 1){
