@@ -131,7 +131,7 @@ oojs$.com.stock.policy = oojs$.createClass(
             list_body[elm]['PNAME'] = {'ELEMENT': list[elm]['PNAME']};
             list_body[elm]['DIRTYPE'] = {'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE'])};
 
-            list_body[elm]['POLICYPARAM'] = {'ELEMENT': oojs$.fetch_paramName(list[elm]['POLICYPARAM'])};
+            list_body[elm]['POLICYPARAM'] = {'ELEMENT': list[elm]['POLICYPARAM']['title']};
             list_body[elm]['STARTTIME'] = {'ELEMENT': self.valideDate(list[elm]['STARTTIME'])};
             list_body[elm]['ENDTIME'] = {'ELEMENT': self.valideDate(list[elm]['ENDTIME'])};
             list_body[elm]['STOCKSET'] = {'ELEMENT': oojs$.valideString(list[elm]['STOCKSET'])};
@@ -347,7 +347,6 @@ oojs$.com.stock.policy = oojs$.createClass(
         var drawitem_data = null;
         drawitem_data = {};
 
-
         for(var elm in item){
             drawitem_data[elm] = {'ELEMENT':item[elm]};
         }
@@ -355,18 +354,21 @@ oojs$.com.stock.policy = oojs$.createClass(
         drawitem_data["PGROUPID"] ={'ELEMENT':preload.getPGroupItem(item["PGROUPID"])['NAME'],element:item["PGROUPID"]};
         drawitem_data["DIRTYPE"] ={'ELEMENT':preload.getDirtype(item["DIRTYPE"]),element:item["DIRTYPE"]};
         
-        var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
-        });
-        oojs$.generateSelect(select,item["POLICYPARAM"]);
-
-        drawitem_data["POLICYPARAM"] = {'ELEMENT':select,element:item["POLICYPARAM"]};
+        var jsonView = new oojs$.com.stock.JsonView();
+        var divs = jsonView.init( item["POLICYPARAM"] );
+        var JSONVIEW = {};
+        for(var idx = 0; idx<divs.length; idx++){
+            JSONVIEW["ELEMENT"+(idx+1)] = divs[idx];
+        }
+        JSONVIEW["COMPONENT"] = jsonView;
+        JSONVIEW["ROWSPAN"] = divs.length;
+        drawitem_data["POLICYPARAM"] = JSONVIEW;//{'ELEMENT':select,element:item["POLICYPARAM"]};
+        
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
         drawitem_data["PERCENT"] = {'ELEMENT':$('<input type="text" value="'+item["PERCENT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：比例范围0-1，最多保留小数点后两位)</label>')}
         drawitem_data["CTRL"] = {'ELEMENT':CTRL,COLSPAN:2};
-
 
         $('<input></input>',{'type':"button",value:"提交"}).appendTo(CTRL).click(
             drawitem_data,
@@ -442,8 +444,8 @@ oojs$.com.stock.policy = oojs$.createClass(
         var PERCENT = event.data['PERCENT']['ELEMENT'].val();
         var DIRTYPE = event.data['DIRTYPE']['element'];
         var PGROUPID = event.data['PGROUPID']['element'];
-        event.data['POLICYPARAM']['element']['used'] = event.data['POLICYPARAM']['ELEMENT'].val();
-        var POLICYPARAM =  event.data['POLICYPARAM']['element'];
+        console.log("COMPONENT",event.data['POLICYPARAM']['COMPONENT']);
+        var POLICYPARAM =  event.data['POLICYPARAM']['COMPONENT'].val();
         var token = event.data['type'];
 
         
@@ -459,7 +461,6 @@ oojs$.com.stock.policy = oojs$.createClass(
                 || elm == "PGROUPID"
                 || elm == "DIRTYPE"
                 || elm == "POLICYPARAM"
-                // || elm == "ENDTIME"
 
             ){
                 switch(elm){

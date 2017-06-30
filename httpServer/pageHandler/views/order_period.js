@@ -288,16 +288,17 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
             };
         }
-        
 
-        var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
-        });
-        oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
-        drawitem_data['POLICYPARAM'] = {
-            'ELEMENT': select
-            ,'ORIGIN':drawitem_data['POLICYPARAM']['ELEMENT']
-        };
+        var jsonView = new oojs$.com.stock.JsonView();
+        var divs = jsonView.init( drawitem_data["POLICYPARAM"]['ELEMENT'] );
+        var JSONVIEW = {};
+        for(var idx = 0; idx<divs.length; idx++){
+            JSONVIEW["ELEMENT"+(idx+1)] = divs[idx];
+        }
+        JSONVIEW["COMPONENT"] = jsonView;
+        JSONVIEW["ROWSPAN"] = divs.length;
+        drawitem_data["POLICYPARAM"] = JSONVIEW;
+
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -324,12 +325,14 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
         oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
             console.log(JSON.stringify(arguments));
+            
+            // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+            // result.success = true       
+            
             if(result.success){
                 
                 var capitals;
-
                 try{
-                    // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                     capitals= JSON.parse(result.data);
                 }catch(err){
                     capitals = '';
@@ -716,14 +719,16 @@ oojs$.com.stock.order_period = oojs$.createClass(
             ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
         };
 
-        var select= $('<select ></select>',{
-            style:"height:25px;width:80px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
-        });
-        oojs$.generateSelect(select, drawitem_data['POLICYPARAM']['ELEMENT']);
-        drawitem_data['POLICYPARAM'] = {
-            'ELEMENT': select
-            , 'ORIGIN':drawitem_data['POLICYPARAM']['ELEMENT']
-        };
+        var jsonView = new oojs$.com.stock.JsonView();
+        var divs = jsonView.init( item["POLICYPARAM"] );
+        var JSONVIEW = {};
+        for(var idx = 0; idx<divs.length; idx++){
+            JSONVIEW["ELEMENT"+(idx+1)] = divs[idx];
+        }
+        JSONVIEW["COMPONENT"] = jsonView;
+        JSONVIEW["ROWSPAN"] = divs.length;
+        drawitem_data["POLICYPARAM"] = JSONVIEW;
+
         drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
         drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
         drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
@@ -767,11 +772,13 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 console.log("trade_list",JSON.stringify(trade_list));
                 oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                     console.log(JSON.stringify(arguments));
-                    if(result.success ){
+                    
+                    // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
+                    // result.success = true;       
+                    
+                    if(result.success){
                         var capitals;
-
                         try{
-                            // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                             capitals= JSON.parse(result.data);
                         }catch(err){
                             capitals = '';
@@ -841,24 +848,12 @@ oojs$.com.stock.order_period = oojs$.createClass(
             type = event.data['type']
         }
         console.log("policy_data",JSON.stringify(policy_data));
-        // if(type == 'modify'){
-        //     policy_data['DIRTYPE']['ELEMENT'] = policy_data['DIRTYPE']['ORIGIN'];
-        // }
+        
         policy_data['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
         policy_data['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
 
-        var used = "";
-        console.log(typeof(policy_data['POLICYPARAM']));
-        if(policy_data['POLICYPARAM'] && policy_data['POLICYPARAM'].hasOwnProperty('ELEMENT')){
-            used = policy_data['POLICYPARAM']['ELEMENT'].val();
-        }else if(policy_data['POLICYPARAM'] && policy_data['POLICYPARAM'].hasOwnProperty('used')){
-            used = policy_data['POLICYPARAM']['used'];
-        }
-        policy_data['POLICYPARAM']=policy_data['POLICYPARAM']['ORIGIN'];
-        policy_data['POLICYPARAM']['used'] = used;
-        if(used == ''){
-            oojs$.showError("used is empty")
-        }
+        policy_data['POLICYPARAM'] = policy_data['POLICYPARAM']['COMPONENT'].val();
+
         for(var elm in policy_data){
             if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){

@@ -14,9 +14,6 @@
 <script type="text/javascript" src="/public/js/plugins/jqplot.categoryAxisRenderer.min.js"></script>
 <script type="text/javascript" src="/public/js/plugins/jqplot.pointLabels.min.js"></script>
 
-
-
-
 <style type="text/css" media="screen">
 @import "/public/js/plugins/DataTables-1.9.2/media/css/demo_page.css";
 @import "/public/js/plugins/DataTables-1.9.2/media/css/demo_table_jui.css";
@@ -679,8 +676,6 @@ var oojs$ = {
             }
         }
     }
-
-
     /***
      * usage
      * oojs$.appendTB_item_D2(tb,list_head,item)
@@ -690,7 +685,7 @@ var oojs$ = {
      * item: {
 	 * "COL1":{ ELEMENT:"value1" },
 	 * "COL2":{ ELEMENT:"value2" },
-	 * "COL3":{ ELEMENT:"left",ELEMENT1:'right-up',ELEMENT2:'right-down',ROWSPAN:2},//"COL3":{ ELEMENT:"left",ELEMENT1:'right-up'},ELEMENT2:'right-mid',ELEMENT3:'right-down',ROWSPAN:3},
+	 * "COL3":{ ELEMENT:"left",ELEMENT1:'right-up',ELEMENT2:'right-down',ROWSPAN:2},//"COL3":{ ELEMENT1:'right-up',ELEMENT2:'right-mid',ELEMENT3:'right-down',ROWSPAN:3},
      * "COL4":{ ELEMENT:"only one cell",COLSPAN:2}
      * }
      *
@@ -748,7 +743,7 @@ var oojs$ = {
                 for(var j = 0; j < int_ROWSPAN-1; j++)
                 {
                     tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
-                    $('<td></td>',{  }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT2"]);
+                    $('<td></td>',{  }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"+(j+2)]);
                 }
 
             }
@@ -934,7 +929,470 @@ var oojs$ = {
     }
     //,$(':button').prop('disabled', true);
 };
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
+//step 1:
+// fun_policy:function(div,obj_json,fun_plcy){
+//         var tag = null;
+//         switch(obj_json['type']){
+//             case 'label':
+//                 tag = new oojs$.com.stock.Label();
+//                 tag.init(div,obj_json,fun_plcy);
+//                 return tag;
+//             case 'input':
+//                 tag = new oojs$.com.stock.Input();
+//                 tag.init(div,obj_json,fun_plcy);
+//                 return tag ;
+//             case 'select':
+//                 tag = new oojs$.com.stock.Select();
+//                 tag.init(div,obj_json,fun_plcy);
+//                 return tag;
+//             case 'check':
+//                 tag = new oojs$.com.stock.Check();
+//                 tag.init(div,obj_json,fun_plcy);
+//                 return tag;
+//             case 'space':
+//                 tag = new oojs$.com.stock.Space();
+//                 tag.init(div,obj_json,fun_plcy);
+//                 return tag;
+//             default :
+//                 return null;
+//         }
+//     }
+//step 2:
+//fun_policy(div,jsonData,fun_policy);
+//
+//jsonData {"type":"label","value":"请输入最大值","suf":{  ...}}
+//jsonData {"type":"input","id":"input_id","value":"","suf":{  ...}}
+//jsonData {"type":"check","id":"check_id","key":["ck1","ck2","ck3","ck4"],"value":["多选1","多选2","多选3","多选4"],"default":[0,1,0,1]}
+//jsonData {"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"default":"k2","suf":[{...},{...}}
+//
+oojs$.ns("com.stock.JsonView");
+oojs$.com.stock.JsonView = oojs$.createClass(
+{
+    frame_jsonView:null
+    ,jsonData:null
+    ,tags:null
+    ,init:function( jsonData ){
+        //jsonData : {view:jsonData,title:str,result:[{'id':,value:}]}
+        var self = this;
+        self.jsonData = jsonData;
+        self.draw_jsonView();
+        return self.frame_jsonView;
+    }
 
+    ,fun_policy:function(div,obj_json,result,fun_plcy){
+        var tag = null;
+        switch(obj_json['type']){
+            case 'label':
+                tag = new oojs$.com.stock.Label();
+                tag.init(div,obj_json,result,fun_plcy);
+                return tag;
+            case 'input':
+                tag = new oojs$.com.stock.Input();
+                tag.init(div,obj_json,result,fun_plcy);
+                return tag ;
+            case 'select':
+                tag = new oojs$.com.stock.Select();
+                tag.init(div,obj_json,result,fun_plcy);
+                return tag;
+            case 'check':
+                tag = new oojs$.com.stock.Check();
+                tag.init(div,obj_json,result,fun_plcy);
+                return tag;
+            case 'space':
+                tag = new oojs$.com.stock.Space();
+                tag.init(div,obj_json,result,fun_plcy);
+                return tag;
+            default :
+                return null;
+        }
+    }
+
+    ,draw_jsonView:function(){
+        var self = this;
+        
+        if(self.frame_jsonView!=null
+            && $.isArray(self.frame_jsonView)
+        ){
+            for(var idx=0; idx < self.frame_jsonView.length; idx++){
+                self.frame_jsonView[idx].empty();
+            }
+            self.frame_jsonView = null;
+        }
+
+        self.tags = [];
+        self.frame_jsonView = [];
+
+        if(self.jsonData.view!=null){
+            for(var id = 0; id < self.jsonData.view.length; id++){
+                if(self.jsonData.view[id] == null){continue;}
+                self.frame_jsonView[id] = $('<div></div>',{});
+                var root = self.fun_policy(self.frame_jsonView[id],self.jsonData.view[id],self.jsonData.result,self.fun_policy);
+                self.tags.push(root);
+            }
+        }
+    }
+
+    ,val:function(){
+        var self = this;
+        var result = [];
+        for(var idx = 0; idx < self.tags.length; idx++){
+            self.tags[idx].val(result);
+        }
+        
+        self.jsonData.result = result;
+        return self.jsonData;
+    }
+
+    ,clear:function(){
+    }
+})
+
+
+oojs$.ns("com.stock.Space");
+oojs$.com.stock.Space = oojs$.createClass(
+{
+    type:"space"
+    ,suf:null
+    ,init:function(div, obj_json, result, fun_policy){
+        var self = this;
+        if(obj_json!=null ){
+            $("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>").appendTo(div);
+            if(
+                obj_json.hasOwnProperty('suf')
+                && obj_json['suf']
+            ){
+                self.div = $('<div></div>',{style:"display:inline"});
+                div.append(self.div);
+                if(fun_policy!=null){
+                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy);
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        if( self.suf != null ){
+            return self.suf.val(arr);
+        }else{
+            return null;
+        }
+    }
+});
+
+
+oojs$.ns("com.stock.Label");
+oojs$.com.stock.Label = oojs$.createClass(
+{
+    type:"label"
+    ,suf:null
+    ,div:null
+    ,init:function(div, obj_json, result, fun_policy){
+        var self = this;
+        
+        if(obj_json!=null ){
+            if(
+                obj_json.hasOwnProperty('value')
+                && obj_json['value']
+            ){
+                $('<label></label>').text(obj_json['value']).appendTo(div);
+            }
+            
+            if(
+                obj_json.hasOwnProperty('suf')
+                && obj_json['suf']
+            ){
+                self.div = $('<div></div>',{style:"display:inline"});
+                div.append(self.div);
+                if(fun_policy!=null){
+                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy);
+                }
+            }
+        }
+    }
+
+    ,val:function(arr){
+        var self = this;
+        if( self.suf != null ){
+            self.suf.val(arr);
+        }
+    }
+});
+
+
+oojs$.ns("com.stock.Input");
+oojs$.com.stock.Input = oojs$.createClass(
+{
+    type:'input'
+    ,id:''
+    ,value:''
+    ,div:null
+    ,suf:null
+    ,tag_input:null
+    ,init:function(div, obj_json, result, fun_policy){
+        var self = this;
+        if(obj_json!=null ){
+            self.obj_json = obj_json;
+            if(
+                obj_json.hasOwnProperty('id')
+                && obj_json['id']
+                
+            ){
+                self.id = obj_json['id'];
+                self.value = obj_json['value'];
+                self.tag_input = $('<input></input>',
+                {
+                    'type':'text'
+                })
+                .appendTo(div);
+
+                for(var idx = 0; idx < result.length; idx++){
+                    if(result[idx]['id'] == self.id){
+                        self.tag_input
+                        .val(result[idx]['value']);
+                    }
+                }
+                
+                if(
+                    obj_json.hasOwnProperty('suf')
+                    && obj_json['suf']
+                ){
+                    self.div = $('<div></div>',{style:"display:inline"});
+                    div.append(self.div);
+                    if(fun_policy!=null){
+                        self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy);
+                    }
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        
+        arr.push(
+            {
+                "id":self.id
+                ,"value":self.tag_input.val()
+            }
+        );
+
+        if( self.suf != null ){
+            self.suf.val(arr);
+        };
+    }
+});
+
+oojs$.ns("com.stock.Select");
+oojs$.com.stock.Select = oojs$.createClass(
+{
+    type:"select"
+    ,id:null
+    ,key:null
+    ,value:null
+    ,default:null
+    ,div_parent:null
+    ,div_self:null
+    ,suf:null
+    ,obj_json:null
+    ,fun_policy:null
+    ,tag_select:null
+    ,init:function(div, obj_json, result, fun_policy){
+        var self = this;
+        self.fun_policy = fun_policy;
+        self.div_parent = div;
+        if(obj_json!=null ){
+            self.obj_json = obj_json;
+            if(
+                obj_json.hasOwnProperty('id')
+                && obj_json['id']
+                && obj_json.hasOwnProperty('key')
+                && obj_json['key']
+                && obj_json.hasOwnProperty('value')
+                && obj_json['value']
+            ){
+                self.id = obj_json['id'];
+                self.key = obj_json['key'];
+                self.value = obj_json['value'];
+                if(self.key.length!=self.value.length  ){
+                    oojs$.showError("jsonview length not match!");
+                    return;
+                }else
+                {
+                    self.tag_select = $('<select ></select>',{
+                        style:"height:25px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+                    }).appendTo(div).change(
+                    {'scope':self},
+                    self.select_change
+                    );
+
+                    for(var id = 0; id < self.value.length; id++){
+                        $('<option value="'+self.key[id]+'">'+self.value[id]+'</option>').appendTo(self.tag_select);
+                    }
+
+                    for(var idx = 0; idx < result.length; idx++){
+                        if(result[idx]['id'] == self.id){
+                            self.default = result[idx]['value'];
+                            self.hand_suf();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        
+        arr.push({
+            "id":self.id,
+            "value":self.default
+        });
+
+        if( self.suf != null ){
+            self.suf.val(arr);
+        }
+    }
+    ,select_change:function(event){
+        var self = event.data['scope'];
+        var div = event.data['div'];
+        console.log($(this).val());
+        self.default = $(this).val();
+        self.hand_suf();
+    }
+    ,hand_suf:function(){
+        var self = this;
+
+        if(self.div_self!=null){
+            self.div_self.empty();
+        }else{
+            self.div_self = $('<div></div>',{style:"display:inline"});
+        }
+
+        self.suf = null;
+
+        if(
+            self.default!=null
+        ){
+            self.tag_select.val(self.default);
+            if(
+                self.obj_json.hasOwnProperty('suf')
+                && self.obj_json['suf']
+            ){
+                if(self.fun_policy!=null){
+                    for(var id_suf = 0; id_suf < self.value.length; id_suf++){
+                        if(self.default == self.key[id_suf]){
+                            if(self.obj_json['suf'][id_suf]!=null){
+                                
+                                self.div_parent.append(self.div_self);
+                                self.suf = self.fun_policy(self.div_self, self.obj_json['suf'][id_suf], result, self.fun_policy);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+
+oojs$.ns("com.stock.Check");
+oojs$.com.stock.Check = oojs$.createClass(
+{
+    type:"check"
+    ,id:null
+    ,key:null
+    ,value:null
+    ,default:null
+    ,suf:null
+    ,div:null
+    ,checks:null
+    ,result:null
+    ,init:function(div, obj_json, result, fun_policy){
+        var self = this;
+        self.div_parent = div;
+        if(obj_json!=null ){
+            if(
+                obj_json.hasOwnProperty('id')
+                && obj_json['id']
+                && obj_json.hasOwnProperty('key')
+                && obj_json['key']
+                && obj_json.hasOwnProperty('value')
+                && obj_json['value']
+            ){
+                
+                self.id = obj_json['id'];
+                self.key = obj_json['key'];
+                self.value = obj_json['value'];
+
+                if(self.key.length!=self.value.length  ){
+                    oojs$.showError("jsonview_check length not match!");
+                    return;
+                }else{
+                    div.prop('style','display:inline-block');
+                    var table = $('<table></table>',{}).appendTo(div);
+                    if(self.checks == null){self.checks=[]}
+                    for(var id_ck = 0; id_ck < self.value.length; id_ck++){
+                        
+                        var tr = $('<tr></tr>').appendTo(table);
+                        var td = $('<td></td>',{style:'padding:0;font-family:Microsoft YaHei, Verdana, Geneva, sans-serif;font-size: 10px;'}).appendTo(tr);
+
+                        var check = $('<input></input>',{
+                            'type':'checkbox'
+                            ,'name':self.key[id_ck]
+                        })
+                        .appendTo(td)
+                        .change(
+                            {'scope':self},
+                            self.check_change
+                        );
+                        self.checks.push(check)
+                        $('<label></label>').text(self.value[id_ck])
+                        .appendTo(td);
+                    }
+                    self.result = {}
+                    for(var id = 0; id < self.checks.length; id++)
+                    {
+                        self.result[self.checks[id].prop('name')] = self.checks[id].is(':checked')
+                    }
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        var obj = {};
+        arr.push({
+            "id":self.id
+            ,"value":self.result
+        });
+
+        if( self.suf != null ){
+            obj.suf = self.suf.val(arr);
+            return obj;
+        }else{
+            return obj;
+        }
+
+    }
+
+    ,check_change:function(event){
+        var self = event.data.scope;
+        var div = event.data['div'];
+        self.result = {}
+        for(var id = 0; id < self.checks.length; id++)
+        {
+            self.result[self.checks[id].prop('name')] = self.checks[id].is(':checked')
+        }
+    }
+});
+
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 /**
 * var accountset = new oojs$.com.stock.component.accountset();
 * accountset.init( div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT);
@@ -1292,7 +1750,11 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         delete self.append_select_tradetype;
     }
 })
-
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 /**
 * var hh_mm_ss = new oojs$.com.stock.component.hh_mm_ss();
 * hh_mm_ss.init(div,{ hh:0, mm:1, ss:2 }[,'datepicker'])
@@ -1359,6 +1821,11 @@ oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
     }
     
 })
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 /****
 * var stockset = new oojs$.com.stock.component.stockset();
 * stockset.appendCK_stockset(div1, div2,'value');
@@ -1559,7 +2026,11 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
 
     }
 })
-
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 /****
 * var rmb = new oojs$.com.stock.component.RMB();
 * rmb.int(input,select,'元');
@@ -1616,7 +2087,11 @@ oojs$.com.stock.component.RMB=oojs$.createClass({
         input2 = null;
     }
 })
-
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 oojs$.ns("com.stock.regular");
 oojs$.com.stock.regular=oojs$.createClass({
     NAME:'grep'
