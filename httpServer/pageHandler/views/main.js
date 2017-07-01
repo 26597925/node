@@ -1358,11 +1358,6 @@ oojs$.com.stock.Check = oojs$.createClass(
                         $('<label></label>').text(self.value[id_ck])
                         .appendTo(td);
                     }
-                    self.result = {}
-                    for(var id = 0; id < self.checks.length; id++)
-                    {
-                        self.result[self.checks[id].prop('name')] = self.checks[id].is(':checked')
-                    }
                 }
             }
         }
@@ -1372,7 +1367,7 @@ oojs$.com.stock.Check = oojs$.createClass(
         var obj = {};
         arr.push({
             "id":self.id
-            ,"value":self.result
+            ,"value":self.default
         });
 
         if( self.suf != null ){
@@ -1387,10 +1382,12 @@ oojs$.com.stock.Check = oojs$.createClass(
     ,check_change:function(event){
         var self = event.data.scope;
         var div = event.data['div'];
-        self.result = {}
+        // self.result = {}
+        self.default = [];
         for(var id = 0; id < self.checks.length; id++)
         {
-            self.result[self.checks[id].prop('name')] = self.checks[id].is(':checked')
+            self.default.push(self.checks[id].is(':checked')?1:0)
+            // self.result[self.checks[id].prop('name')] = self.checks[id].is(':checked')
         }
     }
 });
