@@ -964,8 +964,8 @@ var oojs$ = {
 //
 //jsonData {"type":"label","value":"请输入最大值","suf":{  ...}}
 //jsonData {"type":"input","id":"input_id","value":"","suf":{  ...}}
-//jsonData {"type":"check","id":"check_id","key":["ck1","ck2","ck3","ck4"],"value":["多选1","多选2","多选3","多选4"],"default":[0,1,0,1]}
-//jsonData {"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"default":"k2","suf":[{...},{...}}
+//jsonData {"type":"check","id":"check_id","key":["ck1","ck2","ck3","ck4"],"value":["多选1","多选2","多选3","多选4"]}
+//jsonData {"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"suf":[{...},{...}}
 //
 oojs$.ns("com.stock.JsonView");
 oojs$.com.stock.JsonView = oojs$.createClass(
@@ -1330,11 +1330,16 @@ oojs$.com.stock.Check = oojs$.createClass(
                     div.prop('style','display:inline-block');
                     var table = $('<table></table>',{}).appendTo(div);
                     if(self.checks == null){self.checks=[]}
+                    for(var idx = 0; idx < result.length; idx++){
+                        if(result[idx]['id'] == self.id){
+                            self.default = result[idx]['value'];
+                        }
+                    }
                     for(var id_ck = 0; id_ck < self.value.length; id_ck++){
                         
                         var tr = $('<tr></tr>').appendTo(table);
                         var td = $('<td></td>',{style:'padding:0;font-family:Microsoft YaHei, Verdana, Geneva, sans-serif;font-size: 10px;'}).appendTo(tr);
-
+                        self.default
                         var check = $('<input></input>',{
                             'type':'checkbox'
                             ,'name':self.key[id_ck]
@@ -1344,6 +1349,11 @@ oojs$.com.stock.Check = oojs$.createClass(
                             {'scope':self},
                             self.check_change
                         );
+                        if(self.default[id_ck]) {
+                            check.prop("checked",true)
+                        }else{
+                            check.prop("checked",false)
+                        }
                         self.checks.push(check)
                         $('<label></label>').text(self.value[id_ck])
                         .appendTo(td);
