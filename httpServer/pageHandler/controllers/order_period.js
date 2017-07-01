@@ -177,7 +177,7 @@ exports.insert_orderPeriod = function(){
 
     var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT,PRDSTART,PRDEND;
     var reportServer = [];
-	  var _POLICYPARAM = '';
+	  var _POLICYPARAM = '',_POLICYPARAM_RESULT = '';
 	  var hh,mm,ss;
     for( var i = 0; i < self.req.post.length; i++ ){
       if(i!=0){
@@ -200,8 +200,9 @@ exports.insert_orderPeriod = function(){
       BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
       BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
       PERCENT =  unit_date.string2num(self.req.post[i]['PERCENT']);
-      _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM']['result'])).toString('base64');
-      sqldata += util.format(value,
+      _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM'])).toString('base64');
+	    _POLICYPARAM_RESULT = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM']['result'])).toString('base64');
+	    sqldata += util.format(value,
         ORDERID//1 ORDERID
         ,uID//self.req.post[i]['USERID']//2 USERID
         ,self.req.post[i]['PGROUPID']//3 PGROUPID
@@ -349,8 +350,9 @@ exports.update_orderPeriod = function(){
     BUYCOUNT = unit_date.string2int(self.req.post[0]['BUYCOUNT']);
     BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
     PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
-    var _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM']['result'])).toString('base64');
-    sql  = util.format(sql
+	  var _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM'])).toString('base64');
+	  var _POLICYPARAM_RESULT = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM']['result'])).toString('base64');
+	  sql  = util.format(sql
       ,_POLICYPARAM
       ,unit_date.string2_(self.req.post[0]['STOCKSET'])
       ,STARTTIME
@@ -384,7 +386,7 @@ exports.update_orderPeriod = function(){
         ,"tradeid":String(self.req.post[0]['TRADEID'])
         ,"userid":String(uID)
         ,"policyid":String(self.req.post[0]['POLICYID'])
-        ,"policyparam":String(_POLICYPARAM)
+        ,"policyparam":String(_POLICYPARAM_RESULT)
         ,"dirtype":String(self.req.post[0]['DIRTYPE'])
         ,"istest":String(self.req.post[0]['ISTEST'])
         ,"starttime":String(STARTTIME)
