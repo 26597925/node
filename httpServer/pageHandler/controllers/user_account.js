@@ -156,7 +156,7 @@ exports.add_userAccount = function(){
             var param = "tradeid="+self.req.post["TRADEID"]
               +"&accountid="+self.req.post["ACCOUNTID"]
               +"&password="+self.req.post["PASSWORD"]+"";
-            var url = "http://111.206.209.27:8080/account/gddm?"+param;
+            var url = "http://47.94.158.173:8080/account/gddm?"+param;
             console.log(path.basename(__filename).replace('.js',''),'param',url);
              http_get(url,function(hresult,url){
                 try{

@@ -108,7 +108,7 @@ var proxy_capitals = function(sendData,callback){
   var result = JSON.stringify(sendData) ;
   console.log( path.basename(__filename), "http_post",JSON.stringify( result) ) ;
   var options = {
-    host:'111.206.209.27',
+    host:'47.94.158.173',
     port: 8080,
     path: '/account/detail?',
     method: 'POST',

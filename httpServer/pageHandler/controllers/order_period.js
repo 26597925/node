@@ -267,8 +267,8 @@ var http_post=function(){
     //result = result.replace("\"","'");
     console.log( path.basename(__filename), "http_post", result);
     var options = {
-        hostname: '111.206.209.27',
-        host:'111.206.209.27',
+        hostname: '47.94.158.173',
+        host:'47.94.158.173',
         port: 8080,
         path: '/order/dynamic',
         method: 'POST',
