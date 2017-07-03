@@ -35,7 +35,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	,init:function(){
         var self = this;
 		$( "#dictTrade_tabs" ).tabs();
-        this.appendTB_add();
+
+        //this.appendTB_add({data:{scope:this}});
+        $("#dictTrade_tabs_a2").click({"scope":self},this.appendTB_add)
+
         $("#dictTrade").click(this.dictTrade_tab1_click);
         if(oojs$.getPanelID() == 0){
             if(self.dictTrade_list_body.length == 0){
@@ -238,11 +241,12 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
         oojs$.httpPost_json(url,sendData,function(result,textStatus,token){
             if(result.success){
-            for(var i in body){
-                body[i] = null;
-                delete body[i];
-            }
-            body = null;
+                for(var i in body){
+                    body[i] = null;
+                    delete body[i];
+                }
+                body = null;
+                $("#dictTrade_tabs_2").empty();
                 dictTrade.dictTrade_tab1_click();
                 $( "#dictTrade_tabs" ).tabs({ 'selected': 0 });
             }else{
@@ -338,8 +342,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         );
 	}
 
-	,appendTB_add : function( TRADEID, ACCOUNTID ){
-		var self = this;
+	,appendTB_add : function(event){
+		var self = event.data.scope;
         $("#dictTrade_tabs_2").empty();
 
         var tb = $('<table></table>', {
@@ -389,12 +393,12 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
         $("#user_account_add").click(
             body,
-			this.handler_trd_add
+			self.handler_trd_add
         );
 
         $("#user_account_reset").click(
             body,
-			this.handler_trd_reset
+			self.handler_trd_reset
         );
 	}
 

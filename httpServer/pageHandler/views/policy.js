@@ -137,7 +137,7 @@ oojs$.com.stock.policy = oojs$.createClass(
             list_body[elm]['PNAME'] = {'ELEMENT': list[elm]['PNAME']};
             list_body[elm]['DIRTYPE'] = {'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE'])};
 
-            list_body[elm]['POLICYPARAM'] = {'ELEMENT': list[elm]['POLICYPARAM']['title']};
+            // list_body[elm]['POLICYPARAM'] = {'ELEMENT': list[elm]['POLICYPARAM']['title']};
             list_body[elm]['STARTTIME'] = {'ELEMENT': self.valideDate(list[elm]['STARTTIME'])};
             list_body[elm]['ENDTIME'] = {'ELEMENT': self.valideDate(list[elm]['ENDTIME'])};
             list_body[elm]['STOCKSET'] = {'ELEMENT': oojs$.valideString(list[elm]['STOCKSET'])};

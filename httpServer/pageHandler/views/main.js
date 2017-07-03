@@ -962,10 +962,10 @@ var oojs$ = {
 //step 2:
 //fun_policy(div,jsonData,fun_policy);
 //
-//jsonData {"type":"label","value":"请输入最大值","suf":{  ...}}
-//jsonData {"type":"input","id":"input_id","value":"","suf":{  ...}}
-//jsonData {"type":"check","id":"check_id","key":["ck1","ck2","ck3","ck4"],"value":["多选1","多选2","多选3","多选4"]}
-//jsonData {"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"suf":[{...},{...}}
+//jsonData {"view":[{"type":"label","value":"请输入最大值","suf":{  ...}}],"result":[{"id":"check_id","value":[0,1,0]}]}
+//jsonData {"view":[{"type":"input","id":"input_id","value":"","suf":{  ...}},"result":[{"id":"check_id","value":[0,1,0]}]}
+//jsonData {"view":[{"type":"check","id":"check_id","key":["ck_1","ck_2","ck_3"],"value":["近期涨停","昨日一封","昨日烂板"]}],"title":"","result":[{"id":"check_id","value":[0,1,0]}]}
+//jsonData {"view":[{"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"suf":[{...},{...}}],"result":[{"id":"check_id","value":[0,1,0]}]}
 //
 oojs$.ns("com.stock.JsonView");
 oojs$.com.stock.JsonView = oojs$.createClass(
@@ -974,7 +974,7 @@ oojs$.com.stock.JsonView = oojs$.createClass(
     ,jsonData:null
     ,tags:null
     ,init:function( jsonData ){
-        //jsonData : {view:jsonData,title:str,result:[{'id':,value:}]}
+        //jsonData : {view:jsonData,result:[{'id':,value:}]}
         var self = this;
         self.jsonData = jsonData;
         self.draw_jsonView();
