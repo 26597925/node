@@ -844,44 +844,49 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         if(event.data.hasOwnProperty("type")){
             type = event.data['type']
         }
-        console.log("policy_data",JSON.stringify(policy_data));
-        
-        policy_data['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
-        policy_data['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
 
-        policy_data['POLICYPARAM'] = policy_data['POLICYPARAM']['COMPONENT'].val();
+        var policy_data_new = {};
+        console.log("policy_data",JSON.stringify(policy_data));
 
         for(var elm in policy_data){
             if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){
-                policy_data[elm] = policy_data[elm]['COMPONENT'].val();
+                policy_data_new[elm] = policy_data[elm]['COMPONENT'].val();
             }else if(policy_data[elm] && policy_data[elm].hasOwnProperty('ELEMENT')){
-                policy_data[elm] = policy_data[elm]['ELEMENT'];
+                policy_data_new[elm] = policy_data[elm]['ELEMENT'];
             }
         }
-        console.log("policy_data\n",JSON.stringify(policy_data));
+        
+        policy_data_new['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
+        policy_data_new['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
+        policy_data_new['POLICYPARAM'] = policy_data['POLICYPARAM']['COMPONENT'].val();
+
+        
+        console.log("policy_data\n",JSON.stringify(policy_data_new));
         console.log("account_list\n",JSON.stringify(account_list));
         var account_result = [];
         var index = 0;
+        var COMPONENT_ACCOUNTSET = null;
         for(var i =0; i< account_list.length;i++){
             
             if(account_list[i]["COMPONENT"] && account_list[i]["COMPONENT"].val()['CHECKED']){
                 account_result[index] = {};
-
+                COMPONENT_ACCOUNTSET = account_list[i]["COMPONENT"].val();
+                if(COMPONENT_ACCOUNTSET==null ){ return; }//accountset返回的null的情况
                 for(var elm in account_list[i]["ELEMENT"]){
                     account_result[index][elm] = account_list[i]["ELEMENT"][elm];
                 }
-                if(!account_list[i]["COMPONENT"].val() ){return; }//accountset返回的null的情况
-                for( var elm in  account_list[i]["COMPONENT"].val() ){
-                    if(typeof(account_list[i]["COMPONENT"].val()[elm]) == 'object'){
+                
+                for( var elm in  COMPONENT_ACCOUNTSET ){
+                    if(typeof(COMPONENT_ACCOUNTSET[elm]) == 'object'){
                         continue
                     }
-                    account_result[index][elm] = account_list[i]["COMPONENT"][elm];
+                    account_result[index][elm] = COMPONENT_ACCOUNTSET[elm];
                 }
                 index++;
             }
         }
-
+        if(COMPONENT_ACCOUNTSET==null ){ return; }
         if(account_result.length ==0){
             oojs$.showError("请添加账户");
             return;
@@ -915,8 +920,8 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             for(var elm in sentStruct){
                 //policy_data
                 //account_result
-                if(policy_data.hasOwnProperty(elm)){
-                    sendData[i][elm] = policy_data[elm];
+                if(policy_data_new.hasOwnProperty(elm)){
+                    sendData[i][elm] = policy_data_new[elm];
                 }
                 if(account_result[i] && account_result[i].hasOwnProperty(elm)){
                     if(type == "modify" && elm == 'DIRTYPE'){

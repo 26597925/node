@@ -375,7 +375,7 @@ var oojs$ = {
         htmltag.append($('<label>:秒</label>'));
 
         select= $('<select></select>',{
-            style:"height:25px;width:50px;-webkit-appearance: none;"
+            style:"height:25px;width:50px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
             tmpval = i<=9?("0"+i):i;
@@ -1593,7 +1593,11 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         switch(self.SELECT.val()){
             case "BUYCOUNT":
                 if(self.LABEL_UNIT){
-                    self.LABEL_UNIT.text("股");
+                    if(self.DIRTYPE == 0){
+                        self.LABEL_UNIT.text("股(请输入100的倍数)");
+                    }else{
+                        self.LABEL_UNIT.text("股");
+                    }
                     self.BUYCOUNT='';
                     self.BUYAMOUNT='';
                     self.PERCENT='';
@@ -1642,10 +1646,10 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,val:function(){
         var self = this;
         var checked = $(self.CHECK).is(':checked');
-        var dirtyep = self.NEWDIRTYPE;
+        var dirtype = self.NEWDIRTYPE;
         
         if( self.SELECT_DIRTYPE ){
-            dirtyep = $(self.SELECT_DIRTYPE).val()
+            dirtype = $(self.SELECT_DIRTYPE).val()
         }
 
         // if($.trim(self.INPUT.val()) == ""){
@@ -1653,42 +1657,48 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         //     return null;
         // }
 
-        if(self.SELECT){
+        if(self.SELECT && checked){
             var one_third_slct = $(self.SELECT).val();
             switch(one_third_slct){
                 case "BUYCOUNT":
-                self.BUYCOUNT = self.INPUT.val();
-                self.BUYAMOUNT='';
-                self.PERCENT='';
-                break;
-            case "BUYAMOUNT":
-                self.BUYCOUNT='';
-                self.BUYAMOUNT=self.INPUT.val();
-                self.PERCENT='';
-                if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse') && Number(self.BUYAMOUNT) > Number(self.CAPITAL.account_muse) ){
-                    oojs$.showError("您输入的资金大于可用的资金");
-                    return null;
-                }
-                break;
-            case "PERCENT":
-                self.BUYCOUNT='';
-                self.BUYAMOUNT='';
-                self.PERCENT=self.INPUT.val();
-                if(!regular.checkFloat(self.PERCENT)){
-                    oojs$.showError("您输入的比例非法");
-                    return null;
-                }
-                if(Number(self.PERCENT)>1){
-                    oojs$.showError("您输入的比例超出范围已经大于1");
-                    return null;
-                }
-                break;
+                    self.BUYCOUNT = self.INPUT.val();
+                    self.BUYAMOUNT='';
+                    self.PERCENT='';
+                    if(self.DIRTYPE == 0){
+                        if(parseInt(self.BUYCOUNT)%100!=0||parseInt(self.BUYCOUNT)==0){
+                            oojs$.showError("您输入的股数不是100的倍数");
+                            return null;
+                        }
+                    }
+                    break;
+                case "BUYAMOUNT":
+                    self.BUYCOUNT='';
+                    self.BUYAMOUNT=self.INPUT.val();
+                    self.PERCENT='';
+                    if( self.CAPITAL && self.CAPITAL.hasOwnProperty('account_muse') && Number(self.BUYAMOUNT) > Number(self.CAPITAL.account_muse) ){
+                        oojs$.showError("您输入的资金大于可用的资金");
+                        return null;
+                    }
+                    break;
+                case "PERCENT":
+                    self.BUYCOUNT='';
+                    self.BUYAMOUNT='';
+                    self.PERCENT=self.INPUT.val();
+                    if(!regular.checkFloat(self.PERCENT)){
+                        oojs$.showError("您输入的比例非法");
+                        return null;
+                    }
+                    if(Number(self.PERCENT)>1){
+                        oojs$.showError("您输入的比例超出范围已经大于1");
+                        return null;
+                    }
+                    break;
             }
         }
         return {
             'CHECKED':checked
             ,'ACCOUNTID':self.ACCOUNTID
-            ,'DIRTYPE':dirtyep
+            ,'DIRTYPE':dirtype
             ,'BORROW':self.BORROW
             ,'BUYCOUNT':self.BUYCOUNT
             ,'BUYAMOUNT':self.BUYAMOUNT
@@ -1723,7 +1733,12 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         }else if(Number(self.BUYCOUNT_tmp)>0){
             select.val('BUYCOUNT');
             self.INPUT.val(Number(self.BUYCOUNT_tmp));
-            self.LABEL_UNIT.text("股");
+            if(self.DIRTYPE == 0){
+                self.LABEL_UNIT.text("股(请输入100的倍数)");
+            }else{
+                self.LABEL_UNIT.text("股");
+            }
+            
         }else if(Number(self.BUYAMOUNT_tmp)>0){
             select.val('BUYAMOUNT');
             self.INPUT.val(Number(self.BUYAMOUNT_tmp))

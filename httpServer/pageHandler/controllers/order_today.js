@@ -250,7 +250,7 @@ var http_post=function(){
         console.log('Headers: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (body) {
-            console.log('Body: ' + body);
+            console.log('Body: ' , body);
         });
     });
 
@@ -265,6 +265,7 @@ var http_post=function(){
 var http_post_2=function(){
 	var result = JSON.stringify(arguments[0]) ;
 	result = result.replace("\\","");
+	console.log("http_post_2",result);
 	var options = {
 		host:'111.206.211.60',
 		port: 8080,
@@ -281,7 +282,7 @@ var http_post_2=function(){
 		console.log('Headers: ' + JSON.stringify(res.headers));
 		res.setEncoding('utf8');
 		res.on('data', function (body) {
-			console.log('Body: ' + body);
+			console.log('Body: ', body);
 		});
 	});
 	
