@@ -113,10 +113,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	    };
 	    var self = this;
 	    oojs$.httpPost_json("/delete_userAccount",sendData,function(result,textStatus,token){
-            if(result.success){
-
+            if(result 
+                &&result.hasOwnProperty('success')
+                &&result.success){
                 dictTrade.dictTrade_tab1_click();
-
             }
 		});
 	}
@@ -240,7 +240,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 		}
 
         oojs$.httpPost_json(url,sendData,function(result,textStatus,token){
-            if(result.success){
+            if(result
+                && result.hasOwnProperty('success')
+                &&result.success){
                 for(var i in body){
                     body[i] = null;
                     delete body[i];

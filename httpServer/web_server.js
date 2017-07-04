@@ -123,7 +123,6 @@ exports.runPageServer = function( port )
 
 			if (_bufData.length > 0) {
 				try {
-
           _bufData = _bufData.replace(/\\n/g,"");
           _bufData = _bufData.replace(/\\/g, "");
 				  reqData = JSON.parse(_bufData);

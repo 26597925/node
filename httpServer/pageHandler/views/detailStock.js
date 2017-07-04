@@ -102,8 +102,10 @@ oojs$.com.stock.order_detail = oojs$.createClass(
         
         
         oojs$.httpPost_json("/select_tradeDetail",sendData,function(result,textStatus,token){
-            self.detailStock = result.data;
-            self.appendTB_item();
+            if(result&&result.hasOwnProperty('data')){
+                self.detailStock = result.data;
+                self.appendTB_item();
+            }
         });
         
     }

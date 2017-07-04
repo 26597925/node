@@ -139,7 +139,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
         }
         console.log("del",JSON.stringify(_sendData))
         oojs$.httpPost_json("/update_orderPeriod",[_sendData],function(result,textStatus,token){
-            if(result.success){
+            if(result 
+                && result.hasOwnProperty('success')
+                &&result.success){
                 _sendData=null;
                 if(event&&event.data){
                     if(event&&event.data&&event.data.data){
@@ -204,7 +206,10 @@ oojs$.com.stock.order_period = oojs$.createClass(
        
         console.log("switch",JSON.stringify(_sendData))
         oojs$.httpPost_json("/update_orderPeriod",[sendData],function(result,textStatus,token){
-                if(result.success){
+                if(
+                    result
+                    &&result.hasOwnProperty('success')
+                    &&result.success){
                     _sendData=null;
                     if(event&&event.data&&event.data.data){
                         if(typeof(event.data.data)=='object'){
@@ -329,7 +334,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
             // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
             // result.success = true       
             
-            if(result.success){
+            // if(result
+            //         &&result.hasOwnProperty('success')
+            //         &&result.success){
                 
                 var capitals;
                 try{
@@ -341,14 +348,15 @@ oojs$.com.stock.order_period = oojs$.createClass(
                 if(capitals && capitals.length>0 
                     && capitals[0].hasOwnProperty('status')
                     && capitals[0]['status'] == 200){
-                    accountOBJ["COMPONENT"].addCapital(capitals[0])
-                    self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
-                }else{
-                    oojs$.showError('您的资金验证出了问题!');
+                    accountOBJ["COMPONENT"].addCapital(capitals[0]);
                 }
-            }else{
-                oojs$.showError('您的资金验证出了问题!');
-            }
+                // else{
+                //     oojs$.showError('您的资金验证出了问题!');
+                // }
+                self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
+            // }else{
+            //     oojs$.showError('您的资金验证出了问题!');
+            // }
         });
         
     }
@@ -581,7 +589,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
         var sendData = {};
 
         oojs$.httpPost_json("/select_orderPeriod",sendData,function(result,textStatus,token){
-            if(result.success){
+            if(result
+                    &&result.hasOwnProperty('success')
+                    &&result.success){
                 self.order_period_list = [];
                 self.order_period_list = result.data;
                 self.appendTB_order_period();
@@ -777,7 +787,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
                     // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                     // result.success = true;       
                     
-                    if(result.success){
+                    // if(result
+                    // &&result.hasOwnProperty('success')
+                    // &&result.success){
                         var capitals;
                         try{
                             capitals= JSON.parse(result.data);
@@ -792,8 +804,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
                                     var item_capital = capitals[elm];
                                     if(String(trade_list[i]["ELEMENT"]['ACCOUNTID']) == String(item_capital.accountid) ){
                                         if(String(item_capital.status) != "200"){
-                                            oojs$.showError("您的账号："+item_capital.accountid+"资金验证存在问题");
-                                            return;
+                                            // oojs$.showError("您的账号："+item_capital.accountid+"资金验证存在问题");
+                                            // return;
+                                            continue;
                                         }
                                         trade_list[i]["COMPONENT"].addCapital(item_capital);
                                     }
@@ -801,11 +814,12 @@ oojs$.com.stock.order_period = oojs$.createClass(
                             }
                             self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
                         }else{
-                            oojs$.showError("您的资金验证存在问题  code 3");
+                            // oojs$.showError("您的资金验证存在问题  code 3");
+                            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
                         }
-                    }else{
-                        oojs$.showError("您的资金验证存在问题  code 2");
-                    }
+                    // }else{
+                    //     oojs$.showError("您的资金验证存在问题  code 2");
+                    // }
                 });
             }else{
                 oojs$.showError("您还没有添加账号 code 1");
@@ -899,6 +913,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
         var sentStruct = {
             'ROWID':null
+            ,'ORDERID':null
             ,'PGROUPID':null
             ,'ACCOUNTID':null
             ,'TRADEID':null
@@ -940,7 +955,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
         
         if(type == "add"){
             oojs$.httpPost_json("/insert_orderPeriod",sendData,function(result,textStatus,token){
-                if(result.success){
+                if(result
+                    &&result.hasOwnProperty('success')
+                    &&result.success){
                     $( "#order_period_tabs" ).tabs({ selected: 0 });
                     order_period.order_period_tab1_clk();
                 }else{
@@ -949,7 +966,9 @@ oojs$.com.stock.order_period = oojs$.createClass(
             });
         }else if(type == "modify"){
             oojs$.httpPost_json("/update_orderPeriod",sendData,function(result,textStatus,token){
-                if(result.success){
+                if(result
+                    &&result.hasOwnProperty('success')
+                    &&result.success){
                     
                     $( "#order_period_tabs" ).tabs({ selected: 0 });
                     order_period.order_period_tab1_clk();

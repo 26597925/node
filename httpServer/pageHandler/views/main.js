@@ -190,38 +190,83 @@ var oojs$ = {
     }
     
 	,httpPost_json: function( send_url, send_jsonObj, callback, token ){
-        $.ajax({
-            type:"post",
-            url:send_url,
-            async:false,
-            dataType:"json",
-            data:JSON.stringify(send_jsonObj),
-            success:function(result, textStatus){
-				if(callback){
-                    callback(result, textStatus, token);
-                }
-            },
-            beforeSend: function(xhr){
-                xhr.withCredentials = true;
+        var req = new XMLHttpRequest();
+        var method =  "POST" ;
+        req.open(method,send_url);
+        // req.setRequestHeader('User-Agent','XMLHTTP/1.0');
+        req.setRequestHeader('Content-type','application/json');
+        
+        req.onreadystatechange = function () {
+            if (req.readyState != 4) return;
+            if (req.status != 200 && req.status != 304) {
+                callback();
+                return;
             }
-        });
+            // console.log(this.response);
+            // console.log(this.responseText);
+            callback(JSON.parse(this.responseText));
+        }
+        
+        if (req.readyState == 4) return;
+        req.send(JSON.stringify(send_jsonObj));
+
+    //     $.ajax({
+    //         type:"post",
+    //         url:send_url,
+    //         async:false,
+    //         dataType:"json",
+    //         data:JSON.stringify(send_jsonObj),
+    //         success:function(result, textStatus){
+				// if(callback){
+    //                 callback(result, textStatus, token);
+    //             }
+    //         },
+    //         beforeSend: function(xhr){
+    //             xhr.withCredentials = true;
+    //             xhr.onreadystatechange=function () { 
+    //                 console.log("onreadystatechange",arguments) 
+    //             };
+    //             // xhr.error=function(){
+    //             //     console.log("err",arguments)
+    //             // }
+    //         }
+    //     });
 	}
 
 	,httpGet: function(send_url, callback, token){
-        $.ajax({
-            type:"get",
-            url:send_url,
-            async:false,
-            dataType:"json",
-            success:function(result, textStatus){
-                if(callback){
-                    callback(result, textStatus, token);
-                }
-            },
-            beforeSend: function(xhr){
-                xhr.withCredentials = true;
+        var req = new XMLHttpRequest();
+        var method =  "GET" ;
+        req.open(method,send_url);
+        // req.setRequestHeader('User-Agent','XMLHTTP/1.0');
+        
+        req.setRequestHeader('Content-type','application/json');
+        
+
+        req.onreadystatechange = function () {
+            if (req.readyState != 4) return;
+            if (req.status != 200 && req.status != 304) {
+                callback();
+                return;
             }
-        });
+            callback(JSON.parse(this.responseText));
+        }
+        
+        if (req.readyState == 4) return;
+        req.send();
+        // $.ajax({
+        //     type:"get",
+        //     url:send_url,
+        //     async:false,
+        //     dataType:"json",
+        //     success:function(result, textStatus){
+        //         if(callback){
+        //             callback(result, textStatus, token);
+        //         }
+        //     },
+        //     beforeSend: function(xhr){
+        //         xhr.withCredentials = true;
+        //     }
+        // });
 	}
 
 	,Format: function(_date,fmt) { // author: meizz

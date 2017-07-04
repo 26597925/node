@@ -520,7 +520,9 @@ oojs$.com.stock.policy = oojs$.createClass(
     ,update_subscrible:function(sendData, type){
 
         oojs$.httpPost_json("/update_subscrible",sendData,function(result,textStatus,token){
-            if(result.success){
+            if(result
+                    &&result.hasOwnProperty('success')
+                    &&result.success){
                 console.log( "subscrible success!",type );
                 if( type == 1){
                     policy.policy_tab1_click();
