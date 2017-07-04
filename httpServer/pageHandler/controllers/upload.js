@@ -56,7 +56,7 @@ exports.upload = function(){
             var letter = 0;
 
             for(var i = 0; i < lines.length; i++){
-                if(i>128){result.type = "too long";break;}
+                if(i>128000){result.type = "too long";break;}
                 for(var j = 0; j < lines[i].length; j++){
                     if(j == 0){stock = '';}
                     letter = parseInt(lines[i][j]);
