@@ -97,6 +97,8 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             self.detail_item= window.opener.order_today.get_detail();
         }else if(self.originName == 'order_period'){
             self.detail_item= window.opener.order_period.get_detail();
+        }else if(self.originName == 'order_tomorrow'){
+            self.detail_item= window.opener.order_period.get_detail();
         }
 
         preload.PGROUP = window.opener.preload.PGROUP;
@@ -122,6 +124,7 @@ oojs$.com.stock.order_detail = oojs$.createClass(
         if(detail_item.hasOwnProperty('PGROUPID') 
             && detail_item['PGROUPID'] 
             && detail_item['PGROUPID'].hasOwnProperty('ELEMENT')
+            && !detail_item['PGROUPID'].hasOwnProperty('ORIGIN')
         ){
             detail_item['PGROUPID']['ELEMENT'] = preload.getPGroupItem(detail_item['PGROUPID']['ELEMENT'])['NAME'];    
         }
@@ -196,6 +199,12 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             &&detail_item['DEALSTOCK'].hasOwnProperty('ORIGIN')){
             detail_item['DEALSTOCK']['ELEMENT'] = detail_item['DEALSTOCK']['ORIGIN'];
         }
+
+        // if(detail_item.hasOwnProperty('DIRTYPE')
+        //     &&detail_item['DIRTYPE']
+        //     &&detail_item['DIRTYPE'].hasOwnProperty('ELEMENT')){
+        //     detail_item['DIRTYPE'] = detail_item['DIRTYPE']['ELEMENT'];//= detail_item['DEALSTOCK']['ORIGIN'];
+        // }
         
         oojs$.appendTB_item_D2(tb,self.list_benchmark_head,detail_item);
     }
