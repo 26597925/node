@@ -14,6 +14,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             NAME:"券商密码"
         }
         ,{
+            ID:"TXPASSWD",
+            NAME:"通信密码"
+        }
+        ,{
             ID:"MAXBUY",
             NAME:"总额度"
         }
@@ -32,14 +36,29 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
     ]//增加修改基准数据
 	,dictTrade_list_body: []//券商列表数据
     ,is_load_tradelist:false
+    ,select_trade:null
+    ,select_trade_noEvent:null
+    ,isInit:false
+    ,tb_select_add:null
+    ,tb_data_add:null
+    ,tb_select_mdy:null
+    ,tb_data_mdy:null
 	,init:function(){
         var self = this;
 		$( "#dictTrade_tabs" ).tabs();
 
         //this.appendTB_add({data:{scope:this}});
-        $("#dictTrade_tabs_a2").click({"scope":self},this.appendTB_add)
+        console.log("init appendTB_add");
+        if(self.isInit==false){
+            self.isInit = true;
+            $("#dictTrade_tabs_a2").click(
+                {"scope":self,"type":"init"}
+                ,this.appendTB_add
+            )
 
-        $("#dictTrade").click(this.dictTrade_tab1_click);
+            $("#dictTrade").click(this.dictTrade_tab1_click);
+        }
+        
         if(oojs$.getPanelID() == 0){
             if(self.dictTrade_list_body.length == 0){
                 $( "#dictTrade_tabs" ).tabs({ 'selected': 1 });
@@ -75,7 +94,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	}
     ,handler_trd_reset:function(event){
         event.data = null;
-        dictTrade.appendTB_add();
+        console.log("handler_trd_reset appendTB_add");
+        dictTrade.appendTB_add({"data":{"scope":dictTrade,"type":"reset"}});
     }
     ,handler_trd_add:function(event){
         dictTrade.sub_userAccount(dictTrade.list_benchmark_head,event.data,"add");
@@ -129,10 +149,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             tr = $('<tr></tr>').appendTo(tb);
             
             switch (head[i]["ID"]){
-                case "TRADEID":
-                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
-                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
-                    break;
+                // case "TRADEID":
+                //     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                //     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                //     break;
                 case "ACCOUNTID":
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
@@ -141,18 +161,19 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
+                case "TXPASSWD":
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
+                    $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
+                    break;
                 case "MAXBUY":
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "BUYCOUNT":
-
-
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
                 case "BUYAMOUNT":
-
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).text(head[i]["NAME"]+":");
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(body[ head[i]["ID"] ]);
                     break;
@@ -177,18 +198,30 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
                     if(String(sendData['TRADEID'])=="-1"){
                         oojs$.showError("请选择所属券商");
+                        return;
 					}
                     break;
                 case "ACCOUNTID":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
                     if( String(sendData[head[i]["ID"]]).trim().length<3 ){
                         oojs$.showError("请输入正确的券商帐号");
+                        return;
                     }
+                    
                     break;
                 case "PASSWORD":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
                     if(String(sendData[head[i]["ID"]]).trim().length<3){
                         oojs$.showError("请输入正确的密码");
+                        return;
+                    }
+                    
+                    break;
+                case "TXPASSWD":
+                    sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+                    if(String(sendData[head[i]["ID"]]).trim().length<2){
+                        oojs$.showError("请输入正确的通信密码");
+                        return;
                     }
                     break;
                 case "MAXBUY":
@@ -204,12 +237,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                         !(/^\+?[0-9][0-9]*$/.test( Number(input.val()) ) ) 
                     ){
                         oojs$.showError("请输入正确的总额度数字");
+                        return;
                     }
+                    
                     break;
                 case "BUYCOUNT":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
                     if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
                         oojs$.showError("请输入正确的单日最大买入股数数字");
+                        return;
                     }
                     break;
                 
@@ -225,13 +261,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     }
                     if(!(/^\+?[0-9][0-9]*$/.test(sendData[head[i]["ID"]]))){
                         oojs$.showError("请输入正确的单次最大额度数字");
+                        return;
                     }
                     break;
             }
         }
-
-        
-
+        if(!sendData.hasOwnProperty("TXPASSWD")){
+            sendData['TXPASSWD']='';
+        }
+        console.log("sendData:",JSON.stringify(sendData));
 		var url = "";
 		if(type == "add"){
             url="/add_userAccount";
@@ -248,7 +286,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     delete body[i];
                 }
                 body = null;
-                $("#dictTrade_tabs_2").empty();
                 dictTrade.dictTrade_tab1_click();
                 $( "#dictTrade_tabs" ).tabs({ 'selected': 0 });
             }else{
@@ -259,38 +296,90 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	}
 
-	, create_dictTrade_Select: function(optID){
+	,create_dictTrade_Select: function(){
+        var self = this;
+        if(self.select_trade == null){
+    		self.select_trade = $('<select></select>',{});
 
-		var select_trade = $('<select></select>',{
+    		self.select_trade.append("<option value='-1'>请选择券商</option>");
 
-        });
+            for(var sId = 0; sId < preload.TRADE.length; sId++)
+            {
 
-		select_trade.append("<option value='-1'>请选择券商</option>");
+                self.select_trade.append("<option value='"
+                    +preload.TRADE[sId]["ID"]+"'>"+preload.TRADE[sId]["NAME"]+"</option>");
+            }
 
-        for(var sId = 0; sId < preload.TRADE.length; sId++)
-        {
-
-            select_trade.append("<option value='"
-                +preload.TRADE[sId]["ID"]+"'>"+preload.TRADE[sId]["NAME"]+"</option>");
+            self.select_trade.change(
+                {'scope':self},
+                self.select_change
+            );
         }
-
-        if(optID!=null){
-            select_trade.val(optID);
-		}
-
-		return select_trade;
+		return self.select_trade;
 
 	}
 
-	, appendTB_modify : function( TRADEID, ACCOUNTID ){
+    ,create_dictTrade_Select_noEvent: function(){
+        var self = this;
+        if(self.select_trade_noEvent == null){
+            self.select_trade_noEvent = $('<select></select>',{});
+
+            self.select_trade_noEvent.append("<option value='-1'>请选择券商</option>");
+
+            for(var sId = 0; sId < preload.TRADE.length; sId++)
+            {
+
+                self.select_trade_noEvent.append("<option value='"
+                    +preload.TRADE[sId]["ID"]+"'>"+preload.TRADE[sId]["NAME"]+"</option>");
+            }
+
+           
+        }
+       
+        return self.select_trade_noEvent;
+
+    }
+
+	,appendTB_modify : function( TRADEID, ACCOUNTID ){
 
 		var self = this;
 		var record =  this.getRecord_dt_list(TRADEID,ACCOUNTID);
 
-		console.log("appendTB_modify",JSON.stringify(record));
+        if(self.select_trade_noEvent == null){
+            self.create_dictTrade_Select_noEvent();
+        }
+        self.select_trade_noEvent.val(record["TRADEID"]);
+        self.select_trade_noEvent.prop("disabled",true);
 
+		console.log("appendTB_modify",JSON.stringify(record));
+        var item_TRADE = self.fetch_item_TRADE(record["TRADEID"]);
+        var TXPASSWD=null;
+        
+        if(item_TRADE && item_TRADE['STATUS'] == "2"){
+            TXPASSWD = $('<input type="text" value="'+record["TRADEID"]+'" ></input>');
+        }
         $("#dictTrade_tabs_1").empty();
-        var tb = $('<table></table>', {
+
+        if(self.tb_select_mdy==null){
+            self.tb_select_mdy=$('<table></table>', {
+                'style':"margin:0 auto;"
+                ,'class':'dataTable cellspacing table'
+            });
+
+            var tr = $('<tr></tr>').appendTo(self.tb_select_mdy);
+            var td =$('<td></td>',{colspan:"2",align:"center",valign:"bottom" }).appendTo(tr);//
+            td.append("所属券商:");
+            self.select_trade_noEvent.appendTo(td);
+        }
+
+        self.tb_select_mdy.appendTo($("#dictTrade_tabs_1"));
+
+
+        if(self.tb_data_mdy!=null){
+            self.tb_data_mdy.empty();
+        }
+
+        self.tb_data_mdy = $('<table></table>', {
             'style':"margin:0 auto;"
             ,'class':'dataTable cellspacing table'
         }).appendTo($('#dictTrade_tabs_1'));
@@ -298,8 +387,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         var  head, body;
         head = self.list_benchmark_head;
 		//{"USERID":20000,"TRADEID":3,"ACCOUNTID":"5890000049","CANAME":"xiayangang","PASSWORD":"207623","MAXBUY":1000,"BUYCOUNT":0,"BUYAMOUNT":0}
+        
         body = {
-            "TRADEID":self.create_dictTrade_Select(record["TRADEID"]).prop("disabled",true)
+            "TRADEID":self.select_trade_noEvent
             ,"ACCOUNTID":$('<input type="text" value="'+record["ACCOUNTID"]+'" ></input>').prop("disabled",true)
             ,"PASSWORD":$('<input type="text" value="'+record["PASSWORD"]+'"></input>')
             ,"MAXBUY":null
@@ -308,6 +398,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             // $('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input>
             //     <label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
         };
+
+        if(TXPASSWD!=null){
+            body['TXPASSWD'] = $('<input type="text" value=""></input>');
+        }
 
         var value2 = parseInt(record["BUYAMOUNT"]);
         var input2 = $('<input type="text" value="'+record["BUYAMOUNT"]+'" ></input>');
@@ -331,8 +425,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         div.append(label);
         body['MAXBUY']=div;
 
-        self.appendTB_trade_body ( tb, head, body );
-        tr = $('<tr></tr>').appendTo(tb);
+        self.appendTB_trade_body ( self.tb_data_mdy, head, body );
+        tr = $('<tr></tr>').appendTo( self.tb_data_mdy);
         var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
         $('<input></input>',{type:"button", name:"",value:"提交"}).appendTo(td).click(
             body,
@@ -346,9 +440,42 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 
 	,appendTB_add : function(event){
 		var self = event.data.scope;
-        $("#dictTrade_tabs_2").empty();
+        console.log("appendTB_add",event.data)
+        // $("#dictTrade_tabs_2").empty();
 
-        var tb = $('<table></table>', {
+        if(self.tb_select_add==null){
+            self.tb_select_add=$('<table></table>', {
+                'style':"margin:0 auto;"
+                ,'class':'dataTable cellspacing table'
+            });
+
+            var tr = $('<tr></tr>').appendTo(self.tb_select_add);
+            var td =$('<td></td>',{colspan:"2",align:"center",valign:"bottom" }).appendTo(tr);//
+            td.append("所属券商:");
+            // var td =$('<td></td>',{ }).appendTo(tr);
+            self.create_dictTrade_Select()
+            self.select_trade.appendTo(td);
+            self.tb_select_add.appendTo($("#dictTrade_tabs_2"));
+        }
+
+        if(event.data.type == "init"){
+            self.select_trade.val("-1");
+        }
+
+        var TXPASSWD=null;
+        if( event.data.hasOwnProperty("select_item")){
+            if(event.data['select_item']['STATUS'] == "2"){
+                TXPASSWD = $('<input type="text" value="" ></input>');
+            }
+        }
+
+        
+
+        if(self.tb_data_add!=null){
+            self.tb_data_add.empty();
+        }
+
+        self.tb_data_add = $('<table></table>', {
             'style':"margin:0 auto;"
             ,'class':'dataTable cellspacing table'
         }).appendTo($('#dictTrade_tabs_2'));
@@ -357,14 +484,18 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         head = self.list_benchmark_head;
 
         body = {
-        	"TRADEID":self.create_dictTrade_Select("TRADEID_add")
-			,"ACCOUNTID":$('<input type="text" value="" ></input>')
-			,"PASSWORD":$('<input type="text" value=""></input>')
-			,"MAXBUY":null
+            "TRADEID":self.select_trade
+            ,"ACCOUNTID":$('<input type="text" value="" ></input>')
+            ,"PASSWORD":$('<input type="text" value=""></input>')
+            ,"MAXBUY":null
             ,"BUYCOUNT":$('<input type="text" value="2" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
-			,"BUYAMOUNT":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
+            ,"BUYAMOUNT":$('<input type="text" value="100" ></input><label style="color: red; font-size: 80%;">(*注：最大值不超过总额度)</label>')
         };
 
+        if(TXPASSWD!=null){
+            body['TXPASSWD'] = $('<input type="text" value=""></input>');
+        }
+        
         var input2 = $('<input type="text" value="100" >');
         var select2 = $('<select><select>');
         (new oojs$.com.stock.component.RMB()).init(input2,select2,'万元');
@@ -374,7 +505,6 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         div2.append(select2);
         div2.append(label2);
         body['BUYAMOUNT']=div2;
-
 
         var input = $('<input type="text" value="100" >');
         var select = $('<select><select>');
@@ -386,9 +516,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         div.append(label);
         body['MAXBUY']=div;
 
-        self.appendTB_trade_body ( tb, head, body );
+        self.appendTB_trade_body ( self.tb_data_add, head, body );
 
-		tr = $('<tr></tr>').appendTo(tb);
+		tr = $('<tr></tr>').appendTo(self.tb_data_add);
 		var td =$('<td></td>',{ colspan:"2",align:"center",valign:"bottom"}).appendTo(tr);
         $('<input></input>',{type:"button",id:"user_account_add",name:"",value:"新增"}).appendTo(td);
 		$('<input></input>',{type:"button",id:"user_account_reset",name:"",value:"重置"}).appendTo(td);
@@ -440,7 +570,27 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         oojs$.appendTB_list(panel,list_head,list_body);
 
 	}
-
+    ,select_change: function(event){
+        //dictTrade_select
+        var self = event.data.scope;
+        var item_TRADE = null
+        
+        item_TRADE = self.fetch_item_TRADE($(this).val());
+        if(item_TRADE){
+            self.appendTB_add({"data":{"scope":self,"select_item":item_TRADE,"type":"change"}})
+        }
+    }
+    ,fetch_item_TRADE:function(ID){
+        var item_TRADE = null
+        for(var idx=0; idx < preload.TRADE.length; idx++){
+            if(preload.TRADE[idx]["ID"] == ID){
+                item_TRADE = preload.TRADE[idx];
+                return item_TRADE;
+                break;
+            }
+        }
+        return null;
+    }
 	,load_userAccount: function(callback,token){
 		var self = this;
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){

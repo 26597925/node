@@ -18,6 +18,7 @@ exports.select_userAccount = function(){
     " `tb_capital_conf`.`ACCOUNTID`," +
     " `CANAME`," +
     " `PASSWORD`," +
+		" `TXPASSWD`," +
     " `MAXBUY`," +
     " `BUYCOUNT`," +
     " `BUYAMOUNT`" +
@@ -58,6 +59,7 @@ exports.modify_userAccount = function(){
     if( self.req.post.hasOwnProperty("TRADEID")
       &&self.req.post.hasOwnProperty("ACCOUNTID")
       &&self.req.post.hasOwnProperty("PASSWORD")
+	    &&self.req.post.hasOwnProperty("TXPASSWD")
     ){
       console.log(path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(self.req.post));
       
@@ -80,6 +82,7 @@ exports.modify_userAccount = function(){
       if(this.alias == "add"){
         sql2= "UPDATE `tb_user_account` SET " +
           " `PASSWORD` = '%s', " +
+	        " `TXPASSWD` = '%s', " +
           " `VISIBLE` = '1'" +
           " WHERE " +
           " `TRADEID` = %s " +
@@ -87,18 +90,22 @@ exports.modify_userAccount = function(){
           " `ACCOUNTID` = '%s'";
         sql2 = util.format(sql2,
           self.req.post["PASSWORD"]
+	        ,self.req.post["TXPASSWD"]
           ,self.req.post["TRADEID"]
           ,self.req.post["ACCOUNTID"]
         );
       }else{
         sql2= "UPDATE `tb_user_account` SET " +
-          " `PASSWORD` = '%s'" +
+          " `PASSWORD` = '%s', " +
+	        " `TXPASSWD` = '%s' " +
+          // ", " +
           " WHERE " +
           " `TRADEID` = %s " +
           " AND " +
           " `ACCOUNTID` = '%s'";
         sql2 = util.format(sql2,
           self.req.post["PASSWORD"]
+	        ,self.req.post["TXPASSWD"]
           ,self.req.post["TRADEID"]
           ,self.req.post["ACCOUNTID"]
         );
@@ -160,6 +167,7 @@ exports.add_userAccount = function(){
     if( self.req.post.hasOwnProperty("TRADEID")
       &&self.req.post.hasOwnProperty("ACCOUNTID")
       &&self.req.post.hasOwnProperty("PASSWORD")
+	    &&self.req.post.hasOwnProperty("TXPASSWD")
       &&self.req.post.hasOwnProperty("MAXBUY")
       &&self.req.post.hasOwnProperty("BUYCOUNT")
       &&self.req.post.hasOwnProperty("BUYAMOUNT")
@@ -168,12 +176,15 @@ exports.add_userAccount = function(){
       
       var param = "tradeid="+self.req.post["TRADEID"]
         +"&accountid="+self.req.post["ACCOUNTID"]
-        +"&password="+self.req.post["PASSWORD"]+"";
+        +"&password="+self.req.post["PASSWORD"]
+        +"&txpasswd="+self.req.post["TXPASSWORD"]+"";
+     
       var url = "http://47.94.158.173:8080/account/gddm?"+param;
       console.log(path.basename(__filename).replace('.js',''),'param',url);
       http_get(url,function(hresult,url){
         try{
-          // hresult = '{ "status": 200, "tradeid": 1, "accountid": "123456789", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
+          // hresult = '{ "status": 200, "tradeid": 1, "accountid": "'+Math.floor(Math.random()*1000000000)+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
+          // hresult = '{ "status": 200, "tradeid": '+self.req.post.hasOwnProperty("TRADEID")+', "accountid": "'+self.req.post["ACCOUNTID"]+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
           hresult = JSON.parse(hresult);
           if(hresult['status'] == 200){
             insert_userAccount(self,hresult);
@@ -213,19 +224,37 @@ var insert_userAccount = function(context,account_result){
   db.query(sql,function(){
     if(arguments.length == 0){
       var sql1 = "INSERT INTO `tb_user_account` (" +
-        "`USERID`, `TRADEID`, `ACCOUNTID`, " +
-        "`PASSWORD`, `CANAME`, `EXCHGID_SH`, " +
-        "`EXCHGID_SZ`, `MODTIME`" +
+        "`USERID`, " +//1
+        "`TRADEID`, " +//2
+        "`ACCOUNTID`, " +//3
+        "`PASSWORD`, " +//4
+	      "`TXPASSWD`, " +//5
+        "`CANAME`, " +//6
+        "`EXCHGID_SH`, " +//7
+        "`EXCHGID_SZ`, " +//8
+        "`MODTIME`" +//9
         ") VALUES (" +
-        "%s,%s,'%s'," +
-        "'%s','%s','%s'," +
-        "'%s','%s'" +
+        "%s" +//1
+        ",%s" +//2
+        ",'%s'" +//3
+        ",'%s'" +//4
+        ",'%s'" +//5
+        ",'%s'" +//6
+        ",'%s'" +//7
+        ",'%s'" +//8
+	      ",'%s'" +//9
         ")";
 
       sql1 = util.format(sql1,
-        ID, account_result['tradeid'], account_result['accountid']
-        ,post["PASSWORD"], account_result['account_name'], account_result['shanghai_code']
-        ,account_result['shenzhen_code'], unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
+        ID
+        , account_result['tradeid']
+        , account_result['accountid']
+        ,post["PASSWORD"]
+	      ,post["TXPASSWD"]
+        , account_result['account_name']
+        , account_result['shanghai_code']
+        ,account_result['shenzhen_code']
+        , unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
       );
 
       // INSERT INTO `tb_capital_conf` (`ACCOUNTID`, `USERID`, `MAXBUY`, `BUYCOUNT`, `BUYAMOUNT`, `PERCENT`, `SPLITCOUNT`, `ADDTIME`, `MODTIME`, `REMARK`) VALUES
