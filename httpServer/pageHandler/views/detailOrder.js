@@ -98,7 +98,7 @@ oojs$.com.stock.order_detail = oojs$.createClass(
         }else if(self.originName == 'order_period'){
             self.detail_item= window.opener.order_period.get_detail();
         }else if(self.originName == 'order_tomorrow'){
-            self.detail_item= window.opener.order_period.get_detail();
+            self.detail_item= window.opener.order_tomorrow.get_detail();
         }
 
         preload.PGROUP = window.opener.preload.PGROUP;
