@@ -182,7 +182,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         
         console.log("switch",JSON.stringify(sendData))
 
-        var _sendDate = {};
+        var _sendData = {};
 
         var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
         var STARTTIME = sendData['STARTTIME']["ELEMENT"];
@@ -203,7 +203,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         }
        
         console.log("switch",JSON.stringify(_sendData))
-        oojs$.httpPost_json("/update_orderTomorrow",[sendData],function(result,textStatus,token){
+        oojs$.httpPost_json("/update_orderTomorrow",[_sendData],function(result,textStatus,token){
                 if(result
                     &&result.hasOwnProperty('success')
                     &&result.success){
@@ -498,7 +498,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         for(var elm = 0; elm < list.length; elm++){
             list_body[elm] = {};
             for(var  inner in  list[elm]){
-                list_body[elm][inner] = {ELEMENT: list[elm][inner]};
+                list_body[elm][inner] = {'ELEMENT': list[elm][inner]};
             }
 
             list_body[elm]['PGROUPID'] = {

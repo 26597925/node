@@ -205,7 +205,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         }
        
         console.log("switch",JSON.stringify(_sendData))
-        oojs$.httpPost_json("/update_orderPeriod",[sendData],function(result,textStatus,token){
+        oojs$.httpPost_json("/update_orderPeriod",[_sendData],function(result,textStatus,token){
                 if(
                     result
                     &&result.hasOwnProperty('success')
@@ -502,7 +502,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
         for(var elm = 0; elm < list.length; elm++){
             list_body[elm] = {};
             for(var  inner in  list[elm]){
-                list_body[elm][inner] = {ELEMENT: list[elm][inner]};
+                list_body[elm][inner] = {'ELEMENT': list[elm][inner]};
             }
 
             list_body[elm]['PGROUPID'] = {
@@ -571,7 +571,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
             $('<input></input>',{type:"button",value:btnName}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
-                order_period.order_period_switch
+                order_period.order_period_btn_switch
             );
 
             $('<input></input>',{type:"button",value:"删除"}).appendTo(div).click(

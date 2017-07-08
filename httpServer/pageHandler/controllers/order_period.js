@@ -288,6 +288,7 @@ var http_post=function(){
 
 exports.update_orderPeriod = function(){
   //时间  param参数 自选股集合 数量/金额/比例 可以修改
+  debugger;
   var  self = this;
   var uID = sessions.get_uID(self.req);
   var result = {'success':true,'data':''};
@@ -341,7 +342,11 @@ exports.update_orderPeriod = function(){
     BUYCOUNT = unit_date.string2int(self.req.post[0]['BUYCOUNT']);
     BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
     PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
+	  
+	  console.log("_POLICYPARAM",JSON.stringify(self.req.post[0]['POLICYPARAM']));
 	  var _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM'])).toString('base64');
+	  console.log("_POLICYPARAM",_POLICYPARAM);
+	  
 	  var _POLICYPARAM_RESULT = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM']['result'])).toString('base64');
 	  sql  = util.format(sql
       ,_POLICYPARAM
