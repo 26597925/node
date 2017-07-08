@@ -572,7 +572,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
             $('<input></input>',{type:"button",value:btnName}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
                 order_period.order_period_switch
-            ).prop("disabled",true);;
+            );
 
             $('<input></input>',{type:"button",value:"删除"}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
