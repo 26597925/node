@@ -1,28 +1,19 @@
 const util = require('util');
 const mysql = require('mysql');
 const path = require('path');
+
+const cfg_httpserver = require(path.join(__dirname,'..','Config_HttpServer'));
+console.log("db",cfg_httpserver.db);
+
 var web_DB_config = function()
 {
-    //"115.182.51.49","root","OGNkNGUyZmM3ZWE","winners",3306
-
    
-	this.databasesName = "winners";
     this.selectTB = false;
     this.connection = null;
     this.pool = null;
     
+    this.dbcfg = cfg_httpserver.db;
     
-    this.dbcfg =
-    {
-        connectionLimit:                20,
-        host:                           '127.0.0.1',
-        port:                           3306,
-        user:                           "root",
-        password:                       "OGNkNGUyZmM3ZWE",//"root",
-        database:                       this.databasesName,
-        insecureAuth:                   true,
-        connectTimeout:                 2*60*1000
-    };
     //========================================>
     this.mysql_connection = function(){
         console.log(path.basename(__filename),"connection");

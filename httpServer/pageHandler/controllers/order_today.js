@@ -7,6 +7,7 @@ const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_dat
 const policy = require('./policy.js');
 //const user_account = require('./user_account.js');
 const bean = require(path.join(__dirname,"..","..","..",'bean','bean_entity'));
+const cfg_httpserver = require(path.join(__dirname, "..", "..", "..", "Config_HttpServer.js"));
 
 exports.select_preorder = function(){
     var parentAlias = this.alias;
@@ -234,18 +235,8 @@ var http_post=function(){
     result = result.replace("\\","");
     //result = result.replace("\"","'");
     console.log( path.basename(__filename), "http_post", result);
-    var options = {
-        //hostname: '47.94.158.173',
-        host:'47.94.158.173',
-        port: 8080,
-        path: '/order/dynamic',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
-
-    var req = http.request(options, function(res) {
+    
+    var req = http.request(cfg_httpserver.order, function(res) {
         console.log('Status: ' + res.statusCode);
         console.log('Headers: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
@@ -267,15 +258,16 @@ var http_post_2=function(){
 	result = result.replace("\\","");
 	console.log("http_post_2",result);
 	var options = {
-		host:'111.206.211.60',
-		port: 8080,
-		path: '/order/dynamic',
-		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 			'Content-Length': result.length
 		}
 	};
+	
+	for(var param in cfg_httpserver.order_hongfu){
+		options[param] = cfg_httpserver.order_hongfu[param];
+  }
+	
 	
 	var req = http.request(options, function(res) {
 		console.log('Status: ' + res.statusCode);

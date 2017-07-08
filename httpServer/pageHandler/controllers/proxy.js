@@ -5,6 +5,8 @@ const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 //const localIP = require(path.join(__dirname,"..","..","..",'localIP'));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
+const cfg_httpserver = require(path.join(__dirname, "..", "..", "..", "Config_HttpServer.js"));
+
 var stock_load = false;
 
 exports.stocks = function(){
@@ -79,7 +81,8 @@ exports.capital = function(){
 
 var proxy_stock = function(callback){
   stock_load = true;
-  var url = 'http://111.206.211.60/code.json';
+  var url = cfg_httpserver.stockServer.url;
+  console.log("proxy proxy_stock",url);
   http.get(url,function(res){
     // console.log("content-type",res.headers['content-type'] );
     var result="";
@@ -107,17 +110,8 @@ var proxy_stock = function(callback){
 var proxy_capitals = function(sendData,callback){
   var result = JSON.stringify(sendData) ;
   console.log( path.basename(__filename), "http_post",JSON.stringify( result) ) ;
-  var options = {
-    host:'47.94.158.173',
-    port: 8080,
-    path: '/account/detail?',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
-
-  var req = http.request(options, function(res) {
+  
+  var req = http.request(cfg_httpserver.capitals, function(res) {
     console.log('Status: ' + res.statusCode);
     //console.log('Headers: ' + JSON.stringify(res.headers));
     if(res.statusCode == 200){

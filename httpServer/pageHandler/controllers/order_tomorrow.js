@@ -6,6 +6,7 @@ const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 const policy = require('./policy.js');
 const user_account = require('./user_account.js');
+const cfg_httpserver = require(path.join(__dirname, "..", "..", "..", "Config_HttpServer.js"));
 
 exports.select_orderPeriod = function(){
   this.alias = path.basename(__filename);
@@ -257,22 +258,11 @@ exports.insert_orderPeriod = function(){
 
 var http_post=function(){
   var result = JSON.stringify(arguments[0]) ;
-  console.log( path.basename(__filename), "http_post", result);
   result = result.replace("\\","");
   //result = result.replace("\"","'");
   console.log( path.basename(__filename), "http_post", result);
-  var options = {
-    hostname: '47.94.158.173',
-    host:'47.94.158.173',
-    port: 8080,
-    path: '/order/dynamic',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
   
-  var req = http.request(options, function(res) {
+  var req = http.request(cfg_httpserver.order, function(res) {
     console.log('Status: ' + res.statusCode);
     console.log('Headers: ' + JSON.stringify(res.headers));
     res.setEncoding('utf8');

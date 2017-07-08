@@ -5,6 +5,7 @@ const sessions = require(path.join(__dirname,"sessions.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 //const localIP = require(path.join(__dirname,"..","..","..",'localIP'));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
+const cfg_httpserver = require(path.join(__dirname, "..", "..", "..", "Config_HttpServer.js"));
 
 exports.select_userAccount = function(){
 	var self = this;
@@ -177,9 +178,9 @@ exports.add_userAccount = function(){
       var param = "tradeid="+self.req.post["TRADEID"]
         +"&accountid="+self.req.post["ACCOUNTID"]
         +"&password="+self.req.post["PASSWORD"]
-        +"&txpasswd="+self.req.post["TXPASSWORD"]+"";
+        +"&txpasswd="+(self.req.post["TXPASSWORD"]?self.req.post["TXPASSWORD"]:"")+"";
      
-      var url = "http://47.94.158.173:8080/account/gddm?"+param;
+      var url = cfg_httpserver.account.url+param;
       console.log(path.basename(__filename).replace('.js',''),'param',url);
       http_get(url,function(hresult,url){
         try{
