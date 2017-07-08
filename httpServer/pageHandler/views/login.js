@@ -44,7 +44,7 @@ var loadImage = function () {
     xhr.send();
 }
 var showTopInfo = function(){
-    $("#topinfo").html("<a id='topinfousr' href='/logup#'>注册</a>")
+    $("#topinfo").html("<a id='topinfousr' href='/logup#'>注册</a>");
 };
 
 var click_handler = function(){

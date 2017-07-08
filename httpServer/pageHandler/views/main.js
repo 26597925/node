@@ -1894,7 +1894,9 @@ oojs$.ns("com.stock.component.stockset");
 oojs$.com.stock.component.stockset=oojs$.createClass({
     NAME:"stockset"
     ,data:''
+    ,input:null
     ,val:function(){
+        console.log("检查当前的值是否合法")
         return this.data;
     }
     ,delCKBtnFun: function(event){
@@ -2025,12 +2027,17 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
             self.delCKBtnFun
         );
 
-        var input = $('<input></input>',{}).text("");
+        var input = self.input = $('<input></input>',{}).text("");
         var stocks = preload.getStock();
         if(stocks!=null){
 
             $(input).autocomplete({
               source: stocks
+              ,
+                change: function( event, ui ) {
+                    console.log("autocomplete",event,ui)
+                }
+
             });
         }
 
@@ -2041,12 +2048,12 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
             self.addCKBtnFun
         );
 
-        var input = $('<input  type="file" name="uploads" multiple="multiple" style="display: none;" />');//
+        var input_up = $('<input  type="file" name="uploads" multiple="multiple" style="display: none;" />');//
         var button = $('<input type="button" value="上传文件"></input>');
         button.click(function (){
-            input.click();
+            input_up.click();
          });
-        input.change(function(){
+        input_up.change(function(){
             var files = $(this).get(0).files;
             $(':input').prop('disabled', true);
             // $(':a').prop('disabled', true);
@@ -2054,7 +2061,7 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
             oojs$.http_upload( 'uploads_name', files,function(result){
                 console.log(JSON.stringify(result));
                 if(result.type == 'too long'){
-                    oojs$.showError('您的股票太长会导致服务器偷懒，所以提取了前128股票!');
+                    oojs$.showError('您的股票太长会导致服务器偷懒，所以提取了前1000股票!');
                 }
                 if(self.data.length>0){
                     for(var i = 0; i < result.data.length; i++){
@@ -2080,7 +2087,7 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         });
 
         div2.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-        div2.append(input);
+        div2.append(input_up);
         div2.append(button);
 
     }
@@ -2186,7 +2193,8 @@ oojs$.com.stock.preload=oojs$.createClass({
     ,PGROUP:[]
     // ,POLICY:[]
     ,TRADE:[]
-    ,STATUS:{'TRADE':0,'PGROUP':0}
+    ,EXECUTE:[]
+    ,STATUS:{'TRADE':0,'PGROUP':0,'EXECUTE':0}
     ,STOCKS:null
     ,isLoadStock:false
     ,getStock:function(callback){
@@ -2267,22 +2275,30 @@ oojs$.com.stock.preload=oojs$.createClass({
         }
     }
     ,getExecute:function(){
-        switch (parseInt(arguments[0])){
-            case 0 :
-                return "已提交";
-            case 1 :
-                return "已读取";
-            case 2:
-                return "已下单";
-            case 3:
-                return "部分成交";
-            case 4:
-                return "全部完成";
-            case 5:
-                return "网络异常";
-            case 6:
-                return "业务处理失败";
-         } 
+        var self = this;
+        var id = arguments[0];
+        for(var idx = 0; idx <  self.EXECUTE.length;idx++){
+            if(String(self.EXECUTE[idx]['STATUS']) == String(id)){
+                return self.EXECUTE[idx]['NAME'];
+            }
+        }
+        return id+"-未定义"
+        // switch (parseInt(arguments[0])){
+        //     case 0 :
+        //         return "已提交";
+        //     case 1 :
+        //         return "已读取";
+        //     case 2:
+        //         return "已下单";
+        //     case 3:
+        //         return "部分成交";
+        //     case 4:
+        //         return "全部完成";
+        //     case 5:
+        //         return "网络异常";
+        //     case 6:
+        //         return "业务处理失败";
+        //  } 
     }
     ,getFrom:function(){
         switch (parseInt(arguments[0])){
@@ -2320,6 +2336,17 @@ oojs$.com.stock.preload=oojs$.createClass({
                 oojs$.showError(result.message);
             }
         },'TRADE');
+
+        oojs$.httpPost_json( "/select_status",[],function(result,textStatus,token){
+            if(result.success){
+                self.EXECUTE = [];
+                self.EXECUTE = result.data;
+                self.STATUS.EXECUTE = 1;
+                self.checkAllload();
+            }else{
+                oojs$.showError(result.message);
+            }
+        },'EXECUTE');
 
         oojs$.httpGet("/select_policyGID",function(result,textStatus,token){
 

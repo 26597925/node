@@ -107,6 +107,12 @@ route.map({
     action:'select_dictTrade'
 });
 
+route.map({
+	method:'post',
+	url:/^\/select_status\/?$/i,
+	controller:'status',
+	action:'select_status'
+});
 
 route.map({
     method:'get',

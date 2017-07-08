@@ -568,7 +568,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             $('<input></input>',{type:"button",value:btnName}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
                 order_tomorrow.order_tomorrow_btn_switch
-            );
+            ).prop("disabled",true);
 
             $('<input></input>',{type:"button",value:"删除"}).appendTo(div).click(
                 {'data':list_body[elm],'scope':self},
