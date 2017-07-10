@@ -12,7 +12,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             NAME:"交易类型"
         }
         ,{
-            ID:'POLICYID',
+            ID:'PNAME',
             NAME:"策略名称"
         }
         // ,{
@@ -23,14 +23,14 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             'ID':"ONETHIRD",
             'NAME':"金额／数量" //三选一
         }
-        ,{
-            'ID':"STATUS",
-            'NAME':"状态"
-        }
-        ,{
-            'ID':'DEALSTOCK',
-            'NAME':"执行情况"//stockid
-        }
+        // ,{
+        //     'ID':"STATUS",
+        //     'NAME':"状态"
+        // }
+        // ,{
+        //     'ID':'DEALSTOCK',
+        //     'NAME':"执行情况"//stockid
+        // }
         ,{
             'ID':'ADDTIME',
             'NAME':"提交时间"
