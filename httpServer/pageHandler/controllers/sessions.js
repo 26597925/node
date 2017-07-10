@@ -3,14 +3,14 @@ const util = require('util');
 const unit_date = require(path.join(__dirname, "..", "..", "..","js_unit","unit_date.js"));
 
 exports.createSID = function () {
-    var now = new Date();
+	var now = new Date();
 
-    var yMd = unit_date.Format(now,"yyyyMMdd")
-        ,HH = unit_date.Format(now,"HH")
-        ,mm = unit_date.Format(now,"mm")
-        ,ss = unit_date.Format(now,"ss");
+	var yMd = unit_date.Format(now,"yyyyMMdd")
+		,HH = unit_date.Format(now,"HH")
+		,mm = unit_date.Format(now,"mm")
+		,ss = unit_date.Format(now,"ss");
 
-    var sID = util.format("%s_%s_%s"
+	var sID = util.format("%s_%s_%s"
 		, yMd
 		, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss))
 		, (unit_date.getID(10)) );
@@ -21,25 +21,25 @@ exports.updateSID = function(sID){
 	//20170428_42053_587;
 	var ids = sID.split("_");
 	var lastID = ids[ids.length-1];
-    var now = new Date();
-    var yMd = unit_date.Format(now,"yyyyMMdd")
-        ,HH = unit_date.Format(now,"HH")
-        ,mm = unit_date.Format(now,"mm")
-        ,ss = unit_date.Format(now,"ss");
-    return util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)),lastID);
+	var now = new Date();
+	var yMd = unit_date.Format(now,"yyyyMMdd")
+		,HH = unit_date.Format(now,"HH")
+		,mm = unit_date.Format(now,"mm")
+		,ss = unit_date.Format(now,"ss");
+	return util.format("%s_%s_%s", yMd, (parseInt(HH*60*60)+parseInt(mm*60)+parseInt(ss)),lastID);
 };
 
 exports.parseCookies = function(cookies){
-    var obj = {};
-    if(cookies){
-        var data = cookies.split(';');
-        for(var kv in data)
-        {
-          var k = data[kv].split('=');
-          obj[k[0].trim()] = (k[1] == undefined ? '' : k[1].trim());
-        };
-    }
-    return obj;
+	var obj = {};
+	if(cookies){
+		var data = cookies.split(';');
+		for(var kv in data)
+		{
+			var k = data[kv].split('=');
+			obj[k[0].trim()] = (k[1] == undefined ? '' : k[1].trim());
+		};
+	}
+	return obj;
 };
 
 var invertParseCookies = function(obj){
@@ -98,22 +98,22 @@ exports.invertDate = function(sID){
 };
 
 exports.invertTimestamp = function(sID){
-    var sID_Obj = this.invertDate(sID);
+	var sID_Obj = this.invertDate(sID);
+	
+	if(sID_Obj!=null){
+		var ymd = sID_Obj['yMd'].toString().substr(0,4)+"-"+sID_Obj['yMd'].toString().substr(4,2)+"-"+sID_Obj['yMd'].toString().substr(6,2);
+		var hms = sID_Obj['HH']+":"+sID_Obj['mm']+":"+sID_Obj['ss'];
+		// console.log(path.basename(__filename).replace('.js',''),ymd,hms);
+		return new Date(ymd+" "+hms).getTime();
 
-    if(sID_Obj!=null){
-        var ymd = sID_Obj['yMd'].toString().substr(0,4)+"-"+sID_Obj['yMd'].toString().substr(4,2)+"-"+sID_Obj['yMd'].toString().substr(6,2);
-        var hms = sID_Obj['HH']+":"+sID_Obj['mm']+":"+sID_Obj['ss'];
-        // console.log(path.basename(__filename).replace('.js',''),ymd,hms);
-        return new Date(ymd+" "+hms).getTime();
-
-    }else{
-        return 0;
-    }
+	}else{
+		return 0;
+	}
 
 };
 
 exports.destory = function(req,res){
-    req.headers.cookie = '';
+	req.headers.cookie = '';
 };
 
 exports.get_uID = function(req){

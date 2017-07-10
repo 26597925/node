@@ -677,13 +677,12 @@ oojs$.com.stock.order_today = oojs$.createClass(
         if( !obj.hasOwnProperty( appendObj['PGROUPID'] ) ){
             obj[appendObj['PGROUPID']]  = [];
         }
-
+        
         obj[appendObj['PGROUPID']].push({
             "POLICYID":appendObj["POLICYID"]
             ,"PNAME":appendObj["PNAME"]
             ,"USERID":appendObj["USERID"]
         });
-
     }
 
     ,handler_dirtype: function(event){
@@ -710,6 +709,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         // self.order_select3.append(
         //     "<option value='-1'>请选择策略名称</option>"
         // );
+        self.handler_group();
     }
 
     ,handler_group: function(event){
@@ -726,15 +726,22 @@ oojs$.com.stock.order_today = oojs$.createClass(
         //     value = self.order_select2.val();
         // }
         var tempArr = self.select_title[ self.order_select1.val()][self.order_select2.val()];
-        
+        var event ={};
+        event.data = {};
         for( var i = 0; i < tempArr.length; i++ ){
+            if(i==0){
+                event.data['USERID'] = tempArr[i]['USERID'];
+                event.data['POLICYID'] =  tempArr[i]['POLICYID'];
+            }
+            
             self.order_select3.append(
                 "<option value='"
                 +tempArr[i]['USERID']+"_"+tempArr[i]['POLICYID']
                 +"'>"+tempArr[i]["PNAME"]+"</option>"
             );
         }
-
+        
+        self.handler_policy(event);
     }
     ,handler_policy: function(event){
         // console.log("order_today >>>>>>>>>>",

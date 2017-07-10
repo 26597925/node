@@ -646,9 +646,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
             return preload.getPGroupItem(pp)["NAME"];
         });
 
-        // self.order_select3.append(
-        //     "<option value='-1'>请选择策略名称</option>"
-        // );
+        self.handler_group();
     }
 
     ,handler_group: function(event){
@@ -660,15 +658,21 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         // );
         
         var tempArr = self.select_title[ self.order_select1.val()][self.order_select2.val()];
-        
+        var event ={};
+        event.data = {};
         for( var i = 0; i < tempArr.length; i++ ){
+            if(i==0){
+                event.data['USERID'] = tempArr[i]['USERID'];
+                event.data['POLICYID'] =  tempArr[i]['POLICYID'];
+            }
             self.order_select3.append(
                 "<option value='"
                 +tempArr[i]['USERID']+"_"+tempArr[i]['POLICYID']
                 +"'>"+tempArr[i]["PNAME"]+"</option>"
             );
         }
-
+        
+        self.handler_policy(event);
     }
     ,handler_policy: function(event){
         // console.log(">>>>>>>>>>",
