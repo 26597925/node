@@ -947,23 +947,15 @@ var oojs$ = {
 -->
 <script type="text/javascript">
 
-//
 oojs$.ns("com.stock.Space");
 oojs$.com.stock.Space = oojs$.createClass(
 {
     type:"space"
     ,suf:null
-    ,"div":null
     ,init:function(div, obj_json, fun_policy){
         var self = this;
         if(obj_json!=null ){
-            if(
-                obj_json.hasOwnProperty('value')
-                && obj_json['value']
-            ){
-                $("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>").text(obj_json['value']).appendTo(div);
-            }
-            
+            $("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>").appendTo(div);
             if(
                 obj_json.hasOwnProperty('suf')
                 && obj_json['suf']
@@ -978,7 +970,11 @@ oojs$.com.stock.Space = oojs$.createClass(
     }
     ,val:function(){
         var self = this;
-
+        if( self.suf != null ){
+            return self.suf.val();
+        }else{
+            return null;
+        }
     }
 });
 
@@ -1120,7 +1116,7 @@ oojs$.com.stock.Select = oojs$.createClass(
                 }else
                 {
                     self.tag_select = $('<select ></select>',{
-                        style:"height:25px;width:100px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+                        style:"height:25px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
                     }).appendTo(div).change(
                     {'scope':self},
                     self.select_change
@@ -1278,6 +1274,11 @@ oojs$.com.stock.Check = oojs$.createClass(
     }
 });
 
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 
 //--------------------------------------------------------------------------------
 oojs$.ns("com.stock.JsonView");
@@ -1313,6 +1314,10 @@ oojs$.com.stock.JsonView = oojs$.createClass(
                 tag = new oojs$.com.stock.Check();
                 tag.init(div,obj_json,fun_plcy);
                 return tag;
+            case 'space':
+                tag = new oojs$.com.stock.Space();
+                tag.init(div,obj_json,fun_plcy);
+                return tag;
             default :
                 return null;
         }
@@ -1338,6 +1343,77 @@ oojs$.com.stock.JsonView = oojs$.createClass(
         }
         self.frame_jsonView.empty();
         var tags = [];
+        /****
+        self.jsonData = [  
+           {  
+              "type":"label",
+              "value":"请输入最大值",
+              "suf":{  
+                 "type":"space",
+                 "suf":{  
+                    "type":"input",
+                    "id":"input_id",
+                    "value":"",
+                    "suf":{  
+                       "type":"label",
+                       "value":"输入值1",
+                       "suf":{  
+                          "type":"check",
+                          "id":"check_id",
+                          "key":[  
+                             "ck1",
+                             "ck2",
+                             "ck3",
+                             "ck4"
+                          ],
+                          "value":[  
+                             "多选1",
+                             "多选2",
+                             "多选3",
+                             "多选4"
+                          ],
+                          "default":[  
+                             0,
+                             1,
+                             0,
+                             1
+                          ]
+                       }
+                    }
+                 }
+              }
+           },
+           {  
+              "type":"label",
+              "value":"请选择",
+              "suf":{  
+                 "type":"select",
+                 "id":"select_id",
+                 "key":[  
+                    "abc",
+                    "bcd"
+                 ],
+                 "value":[  
+                    "请输入最大值",
+                    "请输入最小值"
+                 ],
+                 "default":"abc",
+                 "suf":[  
+                    {  
+                       "type":"label",
+                       "value":"下一个用例",
+                       "suf":{  
+                          "type":"input",
+                          "id":"input_id2",
+                          "value":""
+                       }
+                    },
+                    null
+                 ]
+              }
+           }
+        ]
+        /****/
         if(self.jsonData!=null){
             for(var id = 0; id < self.jsonData.length; id++){
                 if(self.jsonData[id] == null){continue;}
@@ -1377,9 +1453,10 @@ oojs$.com.stock.JsonView = oojs$.createClass(
         var self = event.data.scope;
         var textarea = event.data.textarea;
         console.log(textarea.val())
-        self.jsonData = JSON.parse(textarea.val());
-
-        self.draw_jsonView();
+        if($.trim(textarea.val())!=''){
+            self.jsonData = JSON.parse(textarea.val());
+            self.draw_jsonView();
+        }
 
     }
 });
