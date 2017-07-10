@@ -82,8 +82,8 @@ exports.select_orderPeriod = function(){
           result.data[i]['ENDTIME'] = unit_date.Format(date,"yyyy-MM-dd HH:mm:ss");
         }
         result.data[i]['POLICYPARAM'] = JSON.parse(new Buffer(result.data[i]['POLICYPARAM'], 'base64').toString('UTF8'))
-        result.data[i]['ADDTIME'] = unit_date.Format( new Date(result.data[i]['ADDTIME']),"MM-dd HH:mm:ss");//unit_date.toHMS(result.data[i]['ADDTIME']);
-        result.data[i]['MODTIME'] = unit_date.Format(new Date(result.data[i]['MODTIME']),"MM-dd HH:mm:ss");//unit_date.toHMS(result.data[i]['MODTIME']);
+        result.data[i]['ADDTIME'] = unit_date.Format( new Date(result.data[i]['ADDTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['ADDTIME']);
+        result.data[i]['MODTIME'] = unit_date.Format(new Date(result.data[i]['MODTIME']),"HH:mm:ss");//unit_date.toHMS(result.data[i]['MODTIME']);
       }
 
       self.responseDirect(200,"text/json",JSON.stringify(result));
