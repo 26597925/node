@@ -393,7 +393,7 @@ var oojs$ = {
 
         htmltag.append($('<label>时</label>'));
         select= $('<select ></select>',{
-            style:"height:25px;width:50px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+            style:"height:25px;width:50px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
 		for(var i = 0; i < 24; i++){
             tmpval = i<=9?("0"+i):i;
@@ -406,7 +406,7 @@ var oojs$ = {
         htmltag.append($('<label>:分</label>'));
 
         select= $('<select ></select>',{
-            style:"height:25px;width:50px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+            style:"height:25px;width:50px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
 
@@ -420,7 +420,7 @@ var oojs$ = {
         htmltag.append($('<label>:秒</label>'));
 
         select= $('<select></select>',{
-            style:"height:25px;width:50px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+            style:"height:25px;width:50px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
         for(var i = 0; i < 60; i++){
             tmpval = i<=9?("0"+i):i;
@@ -1265,7 +1265,7 @@ oojs$.com.stock.Select = oojs$.createClass(
                 }else
                 {
                     self.tag_select = $('<select ></select>',{
-                        style:"height:25px;-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+                        style:"height:25px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
                     }).appendTo(div).change(
                     {'scope':self},
                     self.select_change
@@ -1701,7 +1701,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         //     oojs$.showError("请选择交易策略并输入信息");
         //     return null;
         // }
-
+        
         if(self.SELECT && checked){
             var one_third_slct = $(self.SELECT).val();
             switch(one_third_slct){
@@ -1740,6 +1740,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                     break;
             }
         }
+
         return {
             'CHECKED':checked
             ,'ACCOUNTID':self.ACCOUNTID
@@ -1925,7 +1926,7 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         event.data['input'].val('');
         inputval = $.trim(inputval);
         if(inputval.length < 3){
-            oojs$.showError("输入的数据有误");
+            oojs$.showError("输入的数据有误 code 001");
             return;
         }
         
@@ -1939,7 +1940,7 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
                 
             }
             if(!instock){
-                oojs$.showError("输入的股票数据有误");
+                oojs$.showError("输入的股票数据有误 code 002" );
                 return;
             }
         }
@@ -2032,12 +2033,19 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         if(stocks!=null){
 
             $(input).autocomplete({
-              source: stocks
-              ,
-                change: function( event, ui ) {
-                    console.log("autocomplete",event,ui)
+                source: stocks
+                // ,change: function( event, ui ) {
+                //     console.log("autocomplete change",ui);
+                // }
+                // ,focus: function( event, ui ) {console.log("autocomplete change",ui);}
+                // ,open: function( event, ui ) {}
+                ,select: function( event, ui ) {
+                    input.val(ui.item.value);
+                    var tmp_event = {};
+                    tmp_event.data = {"div1":div1,"div2":div2,"div_ck":div_ck,"input":input,'data':data,'scope':self};
+                    self.addCKBtnFun(tmp_event);
                 }
-
+                // ,response: function( event, ui ) {console.log("autocomplete response",ui);}
             });
         }
 

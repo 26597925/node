@@ -706,9 +706,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
             return preload.getPGroupItem(pp)["NAME"];
         });
 
-        // self.order_select3.append(
-        //     "<option value='-1'>请选择策略名称</option>"
-        // );
         self.handler_group();
     }
 
@@ -740,7 +737,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 +"'>"+tempArr[i]["PNAME"]+"</option>"
             );
         }
-        
+
         self.handler_policy(event);
     }
     ,handler_policy: function(event){
@@ -968,15 +965,19 @@ oojs$.com.stock.order_today = oojs$.createClass(
         console.log("account_list\n",JSON.stringify(account_list));
         var account_result = [];
         var index = 0;
-        var COMPONENT_ACCOUNTSET = null
+        var COMPONENT_ACCOUNTSET = null;
         for(var i =0; i< account_list.length;i++){
-            
+            if(account_list[i]["COMPONENT"]){
+                COMPONENT_ACCOUNTSET = account_list[i]["COMPONENT"].val();
+                if(COMPONENT_ACCOUNTSET==null ){
+                    return ; 
+                }//accountset返回的null的情况
+            }
             if(account_list[i]["COMPONENT"] 
                 && account_list[i]["COMPONENT"].val() 
                 && account_list[i]["COMPONENT"].val()['CHECKED']){
                 account_result[index] = {};
-                COMPONENT_ACCOUNTSET = account_list[i]["COMPONENT"].val();
-                if(COMPONENT_ACCOUNTSET==null ){ return; }//accountset返回的null的情况
+                
                 for(var elm in account_list[i]["ELEMENT"]){
                     account_result[index][elm] = account_list[i]["ELEMENT"][elm];
                 }
@@ -990,7 +991,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 index++;
             }
         }
-        if(COMPONENT_ACCOUNTSET==null ){ return; }
+        
         if(account_result.length == 0){
             oojs$.showError("请添加账户");
             return;

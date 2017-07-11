@@ -671,7 +671,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                 +"'>"+tempArr[i]["PNAME"]+"</option>"
             );
         }
-        
+
         self.handler_policy(event);
     }
     ,handler_policy: function(event){
@@ -884,11 +884,14 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
         var index = 0;
         var COMPONENT_ACCOUNTSET = null;
         for(var i =0; i< account_list.length;i++){
-            
+            if(account_list[i]["COMPONENT"]){
+                COMPONENT_ACCOUNTSET = account_list[i]["COMPONENT"].val();
+                if(COMPONENT_ACCOUNTSET==null ){
+                    return ; 
+                }//accountset返回的null的情况
+            }
             if(account_list[i]["COMPONENT"] && account_list[i]["COMPONENT"].val()['CHECKED']){
                 account_result[index] = {};
-                COMPONENT_ACCOUNTSET = account_list[i]["COMPONENT"].val();
-                if(COMPONENT_ACCOUNTSET==null ){ return; }//accountset返回的null的情况
                 for(var elm in account_list[i]["ELEMENT"]){
                     account_result[index][elm] = account_list[i]["ELEMENT"][elm];
                 }
@@ -902,7 +905,7 @@ oojs$.com.stock.order_tomorrow = oojs$.createClass(
                 index++;
             }
         }
-        if(COMPONENT_ACCOUNTSET==null ){ return; }
+        
         if(account_result.length ==0){
             oojs$.showError("请添加账户");
             return;
