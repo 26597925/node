@@ -1018,36 +1018,38 @@ oojs$.com.stock.JsonView = oojs$.createClass(
     frame_jsonView:null
     ,jsonData:null
     ,tags:null
-    ,init:function( jsonData ){
+    ,enable:null
+    ,init:function( jsonData ,enable){
         //jsonData : {view:jsonData,result:[{'id':,value:}]}
         var self = this;
         self.jsonData = jsonData;
+        self.enable = enable;
         self.draw_jsonView();
         return self.frame_jsonView;
     }
 
-    ,fun_policy:function(div,obj_json,result,fun_plcy){
+    ,fun_policy:function(div,obj_json,result,fun_plcy,enable){
         var tag = null;
         switch(obj_json['type']){
             case 'label':
                 tag = new oojs$.com.stock.Label();
-                tag.init(div,obj_json,result,fun_plcy);
+                tag.init(div,obj_json,result,fun_plcy,enable);
                 return tag;
             case 'input':
                 tag = new oojs$.com.stock.Input();
-                tag.init(div,obj_json,result,fun_plcy);
+                tag.init(div,obj_json,result,fun_plcy,enable);
                 return tag ;
             case 'select':
                 tag = new oojs$.com.stock.Select();
-                tag.init(div,obj_json,result,fun_plcy);
+                tag.init(div,obj_json,result,fun_plcy,enable);
                 return tag;
             case 'check':
                 tag = new oojs$.com.stock.Check();
-                tag.init(div,obj_json,result,fun_plcy);
+                tag.init(div,obj_json,result,fun_plcy,enable);
                 return tag;
             case 'space':
                 tag = new oojs$.com.stock.Space();
-                tag.init(div,obj_json,result,fun_plcy);
+                tag.init(div,obj_json,result,fun_plcy,enable);
                 return tag;
             default :
                 return null;
@@ -1073,7 +1075,7 @@ oojs$.com.stock.JsonView = oojs$.createClass(
             for(var id = 0; id < self.jsonData.view.length; id++){
                 if(self.jsonData.view[id] == null){continue;}
                 self.frame_jsonView[id] = $('<div></div>',{});
-                var root = self.fun_policy(self.frame_jsonView[id],self.jsonData.view[id],self.jsonData.result,self.fun_policy);
+                var root = self.fun_policy(self.frame_jsonView[id],self.jsonData.view[id],self.jsonData.result,self.fun_policy,self.enable);
                 self.tags.push(root);
             }
         }
@@ -1100,7 +1102,7 @@ oojs$.com.stock.Space = oojs$.createClass(
 {
     type:"space"
     ,suf:null
-    ,init:function(div, obj_json, result, fun_policy){
+    ,init:function(div, obj_json, result, fun_policy,enable){
         var self = this;
         if(obj_json!=null ){
             $("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>").appendTo(div);
@@ -1111,7 +1113,7 @@ oojs$.com.stock.Space = oojs$.createClass(
                 self.div = $('<div></div>',{style:"display:inline"});
                 div.append(self.div);
                 if(fun_policy!=null){
-                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy);
+                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy, enable);
                 }
             }
         }
@@ -1133,7 +1135,7 @@ oojs$.com.stock.Label = oojs$.createClass(
     type:"label"
     ,suf:null
     ,div:null
-    ,init:function(div, obj_json, result, fun_policy){
+    ,init:function(div, obj_json, result, fun_policy,enable){
         var self = this;
         
         if(obj_json!=null ){
@@ -1151,7 +1153,7 @@ oojs$.com.stock.Label = oojs$.createClass(
                 self.div = $('<div></div>',{style:"display:inline"});
                 div.append(self.div);
                 if(fun_policy!=null){
-                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy);
+                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy, enable);
                 }
             }
         }
@@ -1175,7 +1177,7 @@ oojs$.com.stock.Input = oojs$.createClass(
     ,div:null
     ,suf:null
     ,tag_input:null
-    ,init:function(div, obj_json, result, fun_policy){
+    ,init:function(div, obj_json, result, fun_policy,enable){
         var self = this;
         if(obj_json!=null ){
             self.obj_json = obj_json;
@@ -1192,6 +1194,10 @@ oojs$.com.stock.Input = oojs$.createClass(
                 })
                 .appendTo(div);
 
+                if(enable!=null&&enable==0){
+                    self.tag_input.prop("disabled",true);
+                }
+
                 for(var idx = 0; idx < result.length; idx++){
                     if(result[idx]['id'] == self.id){
                         self.tag_input
@@ -1206,7 +1212,7 @@ oojs$.com.stock.Input = oojs$.createClass(
                     self.div = $('<div></div>',{style:"display:inline"});
                     div.append(self.div);
                     if(fun_policy!=null){
-                        self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy);
+                        self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy, enable);
                     }
                 }
             }
@@ -1239,13 +1245,15 @@ oojs$.com.stock.Select = oojs$.createClass(
     ,div_parent:null
     ,div_self:null
     ,suf:null
+    ,enable:null
     ,obj_json:null
     ,fun_policy:null
     ,tag_select:null
-    ,init:function(div, obj_json, result, fun_policy){
+    ,init:function(div, obj_json, result, fun_policy, enable){
         var self = this;
         self.fun_policy = fun_policy;
         self.div_parent = div;
+        self.enable = enable;
         if(obj_json!=null ){
             self.obj_json = obj_json;
             if(
@@ -1271,6 +1279,9 @@ oojs$.com.stock.Select = oojs$.createClass(
                     self.select_change
                     );
 
+                    if(enable!=null&&enable==0){
+                        self.tag_select.prop("disabled",true);
+                    }
                     for(var id = 0; id < self.value.length; id++){
                         $('<option value="'+self.key[id]+'">'+self.value[id]+'</option>').appendTo(self.tag_select);
                     }
@@ -1329,7 +1340,7 @@ oojs$.com.stock.Select = oojs$.createClass(
                             if(self.obj_json['suf'][id_suf]!=null){
                                 
                                 self.div_parent.append(self.div_self);
-                                self.suf = self.fun_policy(self.div_self, self.obj_json['suf'][id_suf], result, self.fun_policy);
+                                self.suf = self.fun_policy(self.div_self, self.obj_json['suf'][id_suf], result, self.fun_policy, self.enable);
                             }
                         }
                     }
@@ -1351,7 +1362,7 @@ oojs$.com.stock.Check = oojs$.createClass(
     ,div:null
     ,checks:null
     ,result:null
-    ,init:function(div, obj_json, result, fun_policy){
+    ,init:function(div, obj_json, result, fun_policy,enable){
         var self = this;
         self.div_parent = div;
         if(obj_json!=null ){
@@ -1398,6 +1409,9 @@ oojs$.com.stock.Check = oojs$.createClass(
                             check.prop("checked",true)
                         }else{
                             check.prop("checked",false)
+                        }
+                        if(enable!=null&& enable==0){
+                             check.prop("disabled",true);
                         }
                         self.checks.push(check)
                         $('<label></label>').text(self.value[id_ck])

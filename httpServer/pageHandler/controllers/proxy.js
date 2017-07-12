@@ -81,10 +81,10 @@ exports.capital = function(){
 
 var proxy_stock = function(callback){
   stock_load = true;
-  var url = cfg_httpserver.stockServer.url;
-  console.log("proxy proxy_stock",url);
+  var url = cfg_httpserver.stockServer.url+"?rdm="+Math.ceil(Math.random()*10000);
+  console.log(unit_date.getTime(),"proxy proxy_stock",url);
   http.get(url,function(res){
-    // console.log("content-type",res.headers['content-type'] );
+    // console.log(unit_date.getTime(),"content-type",res.headers['content-type'] );
     var result="";
     res.setEncoding("utf8");
     res.on("data",function(chunk){
@@ -101,7 +101,7 @@ var proxy_stock = function(callback){
       callback(null);
     }
     stock_load = false;
-    console.log("error>>>",err);
+    console.log(unit_date.getTime(),"error>>>",err);
   })
 };
 
@@ -109,15 +109,26 @@ var proxy_stock = function(callback){
 
 var proxy_capitals = function(sendData,callback){
   var result = JSON.stringify(sendData) ;
-  console.log( path.basename(__filename), "http_post",JSON.stringify( result) ) ;
-  
-  var req = http.request(cfg_httpserver.capitals, function(res) {
-    console.log('Status: ' + res.statusCode);
-    //console.log('Headers: ' + JSON.stringify(res.headers));
+  console.log(unit_date.getTime(), path.basename(__filename), "http_post",JSON.stringify( result) ) ;
+	
+	var options = {};
+	
+	for(var elm in cfg_httpserver.capitals){
+		options[elm] = cfg_httpserver.capitals[elm];
+	}
+	
+	options.path = options.path+"?rdm="+Math.ceil(Math.random()*10000);
+	
+	console.log(unit_date.getTime(), path.basename(__filename), "http_post", options);
+	
+	var req = http.request(options, function(res) {
+  // var req = http.request(cfg_httpserver.capitals, function(res) {
+    console.log(unit_date.getTime(),'Status: ' + res.statusCode);
+    //console.log(unit_date.getTime(),'Headers: ' + JSON.stringify(res.headers));
     if(res.statusCode == 200){
 	    res.setEncoding('utf8');
 	    res.on('data', function (body) {
-		    console.log('Body: ' + body);
+		    console.log(unit_date.getTime(),'Body: ' + body);
 		    if(callback){
 			    callback(body);
 		    }
@@ -131,7 +142,7 @@ var proxy_capitals = function(sendData,callback){
 
 
   req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);//problem with request: Parse Error
+    console.log(unit_date.getTime(),'problem with request: ' + e.message);//problem with request: Parse Error
     if(e.message!='Parse Error' ){
       if(callback){
         callback();

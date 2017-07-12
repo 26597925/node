@@ -3,7 +3,8 @@ const mysql = require('mysql');
 const path = require('path');
 
 const cfg_httpserver = require(path.join(__dirname,'..','Config_HttpServer'));
-console.log("db",cfg_httpserver.db);
+const unit_date = require(path.join(__dirname,"..","js_unit","unit_date.js"));
+console.log(unit_date.getTime(),"db",cfg_httpserver.db);
 
 var web_DB_config = function()
 {
@@ -16,14 +17,14 @@ var web_DB_config = function()
     
     //========================================>
     this.mysql_connection = function(){
-        console.log(path.basename(__filename),"connection");
+        console.log(unit_date.getTime(),path.basename(__filename),"connection");
         this.connection = mysql.createConnection(this.dbcfg);
         this.connection.connect();
 
 
         // connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
         //     if (error) throw error;
-        //     console.log('The solution is: ', results[0].solution);
+        //     console.log(unit_date.getTime(),'The solution is: ', results[0].solution);
         // });
         // return this.connection;
     };
@@ -46,20 +47,20 @@ var web_DB_config = function()
             this.pool  = mysql.createPool(this.dbcfg);
 
             this.pool.on('acquire', function (connection) {
-                // console.log(path.basename(__filename),'Connection %d acquired', connection.threadId);
+                // console.log(unit_date.getTime(),path.basename(__filename),'Connection %d acquired', connection.threadId);
             });
 
             this.pool.on('connection', function (connection) {
                 connection.query('SET SESSION auto_increment_increment=1')
-                // console.log(path.basename(__filename),'connection');
+                // console.log(unit_date.getTime(),path.basename(__filename),'connection');
             });
 
             this.pool.on('enqueue', function () {
-                // console.log(path.basename(__filename),'Waiting for available connection slot');
+                // console.log(unit_date.getTime(),path.basename(__filename),'Waiting for available connection slot');
             });
 
             this.pool.on('release', function (connection) {
-                // console.log(path.basename(__filename),'Connection %d released', connection.threadId);
+                // console.log(unit_date.getTime(),path.basename(__filename),'Connection %d released', connection.threadId);
             });
         }
     };
@@ -68,7 +69,7 @@ var web_DB_config = function()
     this.mysql_pool_getConnection();
 
     this.query = function(sql,callback){
-        console.log(path.basename(__filename),"query-sql",sql);
+        console.log(unit_date.getTime(),path.basename(__filename),"query-sql",sql);
         var rows = [];
         this.pool.getConnection(function(err, connection){
             // connected! (unless `err` is set) 
@@ -83,11 +84,11 @@ var web_DB_config = function()
                         // callback = null;
                     }
                     
-                    console.log(path.basename(__filename),"1 error",err);
+                    console.log(unit_date.getTime(),path.basename(__filename),"1 error",err);
                 })
                 .on('fields', function(fields) {
                     // the field packets for the rows to follow 
-                    // console.log("fields>>"+JSON.stringify(fields));
+                    // console.log(unit_date.getTime(),"fields>>"+JSON.stringify(fields));
                     /**
                     [
                     {"catalog":"def"
@@ -132,7 +133,7 @@ var web_DB_config = function()
                 .on('end', function() {
                 // all rows have been received
 
-                    //console.log(path.basename(__filename),'query-end',rows);
+                    //console.log(unit_date.getTime(),path.basename(__filename),'query-end',rows);
 
                     if(rows.length == 0){
                         if(callback){
@@ -152,7 +153,7 @@ var web_DB_config = function()
                 });
             }else{
                 if(callback){
-                    console.log(path.basename(__filename),err.code);
+                    console.log(unit_date.getTime(),path.basename(__filename),err.code);
                     callback('error2',err);
                     callback = null;
                 }
@@ -169,7 +170,7 @@ var web_DB_config = function()
         self.connection.beginTransaction(function(err) {
             if (err) { throw err; }
             // self.connection.query('INSERT INTO posts SET title=?', title, function (error, results, fields) {
-                console.log(path.basename(__filename),'transaction-sql1',sql1);
+                console.log(unit_date.getTime(),path.basename(__filename),'transaction-sql1',sql1);
                 self.connection.query(sql1, function (error, results, fields) {
                 if (error) {
                     return self.connection.rollback(function() {
@@ -179,7 +180,7 @@ var web_DB_config = function()
 
                 // results.insertId;
                 // self.connection.query('INSERT INTO log SET data=?', log, function (error, results, fields) {
-                console.log(path.basename(__filename),'transaction-sql2',sql2);
+                console.log(unit_date.getTime(),path.basename(__filename),'transaction-sql2',sql2);
                 self.connection.query(sql2, function (error, results, fields) {
 
                     if (error) {
@@ -187,14 +188,14 @@ var web_DB_config = function()
                             throw error;
                         });
                     }
-                    console.log(path.basename(__filename),'transaction',JSON.stringify(results));
+                    console.log(unit_date.getTime(),path.basename(__filename),'transaction',JSON.stringify(results));
                     self.connection.commit(function(err) {
                         if (err) {
                             return self.connection.rollback(function() {
                                 throw err;
                             });
                         }
-                        console.log(path.basename(__filename),'transaction','success!');
+                        console.log(unit_date.getTime(),path.basename(__filename),'transaction','success!');
                         callback('success');
                     });
                 });

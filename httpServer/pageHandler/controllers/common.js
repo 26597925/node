@@ -110,7 +110,7 @@ exports.main = function(){
 };
 
 var judgeMain = function(param,self){
-    console.log('common',param);
+    console.log(unit_date.getTime(),'common',param);
     if(param == 'failse'){
 	    self.render(['login.html','login.js'], {message:''});
     }else if(param == 'success'){
@@ -131,13 +131,13 @@ var renderCommonPage = function(file_js,file_html,common_js){
 
 
 exports.detailOrder = function(){
-    // console.log("detailOrder");
+    // console.log(unit_date.getTime(),"detailOrder");
     var self = this;
     self.responseDirect( 200,"text/html",renderCommonPage("detailOrder.js","detailOrder.html","common.js") );
 };
 
 exports.detailStock = function(){
-    // console.log("detailStock");
+    // console.log(unit_date.getTime(),"detailStock");
     var self = this;
     self.responseDirect( 200,"text/html",renderCommonPage("detailStock.js","detailStock.html","common.js") );
 };

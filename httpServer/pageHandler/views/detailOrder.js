@@ -31,10 +31,10 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             ID:'PNAME',
             NAME:"策略名称"
         }
-        // ,{
-        //     ID:'POLICYPARAM',
-        //     NAME:"子策略类型"
-        // }
+        ,{
+            ID:'POLICYPARAM',
+            NAME:"策略参数"
+        }
         ,{
             'ID':"STOCKSET",
             'NAME':"自选股"
@@ -129,18 +129,23 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             detail_item['PGROUPID']['ELEMENT'] = preload.getPGroupItem(detail_item['PGROUPID']['ELEMENT'])['NAME'];    
         }
 //--
-        if(detail_item['POLICYPARAM'] && !detail_item['POLICYPARAM'].hasOwnProperty('ELEMENT')){
-            var POLICYPARAM = detail_item['POLICYPARAM'];
-            detail_item['POLICYPARAM'] = {};
-            detail_item['POLICYPARAM']['ELEMENT'] =  POLICYPARAM;
-        }
+        
         if(detail_item.hasOwnProperty('POLICYPARAM') 
             && detail_item['POLICYPARAM']
             && detail_item['POLICYPARAM'].hasOwnProperty('ELEMENT')
         ){
-            detail_item['POLICYPARAM']['ELEMENT'] = oojs$.fetch_paramName(detail_item['POLICYPARAM']['ELEMENT'])
+    
+            var jsonView = new oojs$.com.stock.JsonView();
+            var divs = jsonView.init( detail_item["POLICYPARAM"]['ELEMENT'],0 );
+            var JSONVIEW = {};
+            for(var idx = 0; idx<divs.length; idx++){
+                JSONVIEW["ELEMENT"+(idx+1)] = divs[idx];
+            }
+            JSONVIEW["COMPONENT"] = jsonView;
+            JSONVIEW["ROWSPAN"] = divs.length;
+            detail_item["POLICYPARAM"] = JSONVIEW;
         }
-//--  
+//--       
         if(detail_item['STARTTIME'] 
             && !detail_item['STARTTIME'].hasOwnProperty('ELEMENT') 
         ){
@@ -148,6 +153,7 @@ oojs$.com.stock.order_detail = oojs$.createClass(
             detail_item['STARTTIME'] = {};
             detail_item['STARTTIME']['ELEMENT'] =  STARTTIME;
         }
+
         if(detail_item.hasOwnProperty('STARTTIME') 
             && detail_item['STARTTIME']
             && detail_item['STARTTIME'].hasOwnProperty('ELEMENT')

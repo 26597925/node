@@ -106,7 +106,7 @@ exports.select_orderPeriod = function(){
 // exports.select_userPolicyGID = function(){
 //     this.alias = path.basename(__filename);
 //     this.callback = callback_userPolicyGID;
-//     console.log( path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
+//     console.log(unit_date.getTime(), path.basename(__filename).replace('.js',''),"alias select_userPolicyGID:",JSON.stringify(this.alias) );
 //     policy.select_alreadySubscrible.apply(this,arguments[0],"test123_567");
 //
 // };
@@ -115,7 +115,7 @@ exports.insert_orderPeriod = function(){
   var  self = this;
   var uID = sessions.get_uID(self.req);
   var result = {'success':true,'data':''};
-  console.log( path.basename(__filename), "insert_preorder", JSON.stringify(self.req.post));
+  console.log(unit_date.getTime(), path.basename(__filename), "insert_preorder", JSON.stringify(self.req.post));
   var sql = "INSERT INTO `view_orderid_period` (" +
     "`ORDERID`" +//1
     ", `USERID`" +//2
@@ -250,7 +250,7 @@ exports.insert_orderPeriod = function(){
       }
     );
   }
-  // console.log( path.basename(__filename), "http_post", JSON.stringify(reportServer));
+  // console.log(unit_date.getTime(), path.basename(__filename), "http_post", JSON.stringify(reportServer));
   http_post(reportServer);
   db.query(sql+sqldata,function(){
     if(arguments.length==1){
@@ -266,19 +266,28 @@ var http_post=function(){
   var result = JSON.stringify(arguments[0]) ;
   result = result.replace("\\","");
   //result = result.replace("\"","'");
-  console.log( path.basename(__filename), "http_post", result);
-   
-  var req = http.request(cfg_httpserver.order, function(res) {
-    console.log('Status: ' + res.statusCode);
-    console.log('Headers: ' + JSON.stringify(res.headers));
+  console.log(unit_date.getTime(), path.basename(__filename), "http_post", result);
+	var options = {};
+	
+	for(var elm in cfg_httpserver.order){
+		options[elm] = cfg_httpserver.order[elm];
+	}
+	
+	options.path = options.path+"?rdm="+Math.ceil(Math.random()*10000);
+ 
+	console.log(unit_date.getTime(), path.basename(__filename), "http_post", options);
+	
+  var req = http.request(options, function(res) {
+    console.log(unit_date.getTime(),'Status: ' + res.statusCode);
+    console.log(unit_date.getTime(),'Headers: ' + JSON.stringify(res.headers));
     res.setEncoding('utf8');
     res.on('data', function (body) {
-      console.log('Body: ' + body);
+      console.log(unit_date.getTime(),'Body: ' + body);
     });
   });
 
   req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
+    console.log(unit_date.getTime(),'problem with request: ' + e.message);
   });
 
   req.write(result);
@@ -342,9 +351,9 @@ exports.update_orderPeriod = function(){
     BUYAMOUNT = unit_date.string2num(self.req.post[0]['BUYAMOUNT']);
     PERCENT =  unit_date.string2num(self.req.post[0]['PERCENT']);
 	  
-	  console.log("_POLICYPARAM",JSON.stringify(self.req.post[0]['POLICYPARAM']));
+	  console.log(unit_date.getTime(),"_POLICYPARAM",JSON.stringify(self.req.post[0]['POLICYPARAM']));
 	  var _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM'])).toString('base64');
-	  console.log("_POLICYPARAM",_POLICYPARAM);
+	  console.log(unit_date.getTime(),"_POLICYPARAM",_POLICYPARAM);
 	  
 	  var _POLICYPARAM_RESULT = new Buffer(JSON.stringify(self.req.post[0]['POLICYPARAM']['result'])).toString('base64');
 	  sql  = util.format(sql

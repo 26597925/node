@@ -259,10 +259,19 @@ exports.insert_orderPeriod = function(){
 var http_post=function(){
   var result = JSON.stringify(arguments[0]) ;
   result = result.replace("\\","");
-  //result = result.replace("\"","'");
   console.log( path.basename(__filename), "http_post", result);
   
-  var req = http.request(cfg_httpserver.order, function(res) {
+	var options = {};
+	
+	for(var elm in cfg_httpserver.order){
+		options[elm] = cfg_httpserver.order[elm];
+	}
+	
+	options.path = options.path+"?rdm="+Math.ceil(Math.random()*10000);
+	
+	console.log(unit_date.getTime(), path.basename(__filename), "http_post", options);
+	
+	var req = http.request(options, function(res) {
     console.log('Status: ' + res.statusCode);
     console.log('Headers: ' + JSON.stringify(res.headers));
     res.setEncoding('utf8');

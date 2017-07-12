@@ -53,7 +53,7 @@ var select_combinePolicy = function(){
   db.query(sql,function(){
     if(arguments.length==1){
 
-      console.log(path.basename(__filename).replace('.js',''),"select_combinePolicy",arguments[0]);
+      console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),"select_combinePolicy",arguments[0]);
 
       var groupList = [];
       result1 = [];
@@ -120,7 +120,7 @@ var combinePolicyResult=function(){
     {
       MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
     }
-    console.log("policy combinePolicyResult:",new Buffer(result2[i]['POLICYPARAM'], 'base64').toString('UTF8'));
+    console.log(unit_date.getTime(),"policy combinePolicyResult:",new Buffer(result2[i]['POLICYPARAM'], 'base64').toString('UTF8'));
     obj[result2[i]['POLICYID'] ] =
       {
         USERID:result2[i]['USERID'],
@@ -157,7 +157,7 @@ var combinePolicyResult=function(){
           MODTIME = unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss");
         }
 	
-        console.log("policy combinePolicyResult:",new Buffer(result1[i]['POLICYPARAM'], 'base64').toString('UTF8'));
+        console.log(unit_date.getTime(),"policy combinePolicyResult:",new Buffer(result1[i]['POLICYPARAM'], 'base64').toString('UTF8'));
         obj[ result1[i]['USERID']+"_"+result1[i]['POLICYID'] ] = {
           USERID:result1[i]['USERID'],
           PGROUPID:result1[i]['PGROUPID'],
@@ -188,7 +188,7 @@ var combinePolicyResult=function(){
       }
     }
 
-    console.log(path.basename(__filename).replace('.js',''),'combinePolicyResult ',JSON.stringify(obj));
+    console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'combinePolicyResult ',JSON.stringify(obj));
     debugger;
     return arr;
 };
@@ -196,7 +196,7 @@ var combinePolicyResult=function(){
 
 exports.select_alreadySubscrible = function(){
 
-  console.log( path.basename(__filename).replace('.js',''),"alias select_alreadySubscrible:",JSON.stringify(this.alias) );
+  console.log(unit_date.getTime(), path.basename(__filename).replace('.js',''),"alias select_alreadySubscrible:",JSON.stringify(this.alias) );
 
   var self = this;
   var result = {'success':true,'data':''};
@@ -235,7 +235,7 @@ exports.update_subscrible = function(){
   var uID = sessions.get_uID(self.req);
     
   if(self.req.post){
-    console.log(path.basename(__filename).replace('.js',''),'update_subscrible ',self.req.post);
+    console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'update_subscrible ',self.req.post);
 
     var sql = '';
     var db_type = 'insert';
@@ -254,14 +254,14 @@ exports.update_subscrible = function(){
         self.req.post['POLICYPARAM'] = '';
       }
 	          
-      console.log("policy update_subscrible:",self.req.post['POLICYPARAM']);
+      console.log(unit_date.getTime(),"policy update_subscrible:",self.req.post['POLICYPARAM']);
       var STARTTIME = unit_date.objToNumber(self.req.post['STARTTIME']); // (!self.req.post['STARTTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['STARTTIME'];
       var ENDTIME = unit_date.objToNumber(self.req.post['ENDTIME']); //(!self.req.post['ENDTIME']) ?unit_date.Format(new Date(),'yyyy-MM-dd'):self.req.post['ENDTIME'];
 
       self.req.post['STOCKSET'] = (!self.req.post['STOCKSET'])?"":self.req.post['STOCKSET'];
       self.req.post['STATUS'] = (!self.req.post['STATUS'])?0:self.req.post['STATUS'];
       self.req.post['FLAG'] = (!self.req.post['FLAG'])?0:self.req.post['FLAG'];
-      console.log(path.basename(__filename).replace('.js',''),"update STARTTIME:",STARTTIME,'ENDTIME:',ENDTIME);
+      console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),"update STARTTIME:",STARTTIME,'ENDTIME:',ENDTIME);
 
       if(db_type == 'insert'){
         sql = "INSERT INTO `tb_policy_usage` (" +

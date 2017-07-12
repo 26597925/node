@@ -510,8 +510,8 @@ var oojs$ = {
                     tr = $('<tr></tr>',{'class':"odd"}).appendTo(tb);
                 }
                 if(COLSPAN == ""){
-                	//width:100px;
-                    $('<td></td>',{ 'class':"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]+": ");
+                    //width:100px;
+                    $('<td></td>',{ 'class':"td",style:"max-width:46px"}).appendTo(tr).text(head[i]["NAME"]);
                     $('<td></td>',{ 'class':"td"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
                 }else if(COLSPAN == "2"){
                     $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"]);
@@ -520,9 +520,6 @@ var oojs$ = {
                 }
             }else{
                 int_ROWSPAN = parseInt(ROWSPAN);
-                if(int_ROWSPAN<2){
-                    throw "the value of ROWSPAN not allowed"+ROWSPAN;
-                }
 
                 if(i%2==0){
                     tmpClass = "even";
@@ -531,12 +528,12 @@ var oojs$ = {
                 }
 
                 tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
-                $('<td></td>',{ 'rowspan':int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+": ");
+                $('<td></td>',{ 'rowspan':int_ROWSPAN}).appendTo(tr).text(head[i]["NAME"]+" ");
                 $('<td></td>',{ }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT1"]);
                 for(var j = 0; j < int_ROWSPAN-1; j++)
                 {
                     tr = $('<tr></tr>',{'class':tmpClass}).appendTo(tb);
-                    $('<td></td>',{  }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT2"]);
+                    $('<td></td>',{  }).appendTo(tr).append(item[head[i]["ID"]]["ELEMENT"+(j+2)]);
                 }
 
             }
@@ -666,6 +663,455 @@ var oojs$ = {
     }
 
 };
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
+oojs$.ns("com.stock.JsonView");
+oojs$.com.stock.JsonView = oojs$.createClass(
+{
+    frame_jsonView:null
+    ,jsonData:null
+    ,tags:null
+    ,enable:null
+    ,init:function( jsonData ,enable){
+        //jsonData : {view:jsonData,result:[{'id':,value:}]}
+        var self = this;
+        self.jsonData = jsonData;
+        self.enable = enable;
+        self.draw_jsonView();
+        return self.frame_jsonView;
+    }
+
+    ,fun_policy:function(div,obj_json,result,fun_plcy,enable){
+        var tag = null;
+        switch(obj_json['type']){
+            case 'label':
+                tag = new oojs$.com.stock.Label();
+                tag.init(div,obj_json,result,fun_plcy,enable);
+                return tag;
+            case 'input':
+                tag = new oojs$.com.stock.Input();
+                tag.init(div,obj_json,result,fun_plcy,enable);
+                return tag ;
+            case 'select':
+                tag = new oojs$.com.stock.Select();
+                tag.init(div,obj_json,result,fun_plcy,enable);
+                return tag;
+            case 'check':
+                tag = new oojs$.com.stock.Check();
+                tag.init(div,obj_json,result,fun_plcy,enable);
+                return tag;
+            case 'space':
+                tag = new oojs$.com.stock.Space();
+                tag.init(div,obj_json,result,fun_plcy,enable);
+                return tag;
+            default :
+                return null;
+        }
+    }
+
+    ,draw_jsonView:function(){
+        var self = this;
+        
+        if(self.frame_jsonView!=null
+            && $.isArray(self.frame_jsonView)
+        ){
+            for(var idx=0; idx < self.frame_jsonView.length; idx++){
+                self.frame_jsonView[idx].empty();
+            }
+            self.frame_jsonView = null;
+        }
+
+        self.tags = [];
+        self.frame_jsonView = [];
+
+        if(self.jsonData.view!=null){
+            for(var id = 0; id < self.jsonData.view.length; id++){
+                if(self.jsonData.view[id] == null){continue;}
+                self.frame_jsonView[id] = $('<div></div>',{});
+                var root = self.fun_policy(self.frame_jsonView[id],self.jsonData.view[id],self.jsonData.result,self.fun_policy,self.enable);
+                self.tags.push(root);
+            }
+        }
+    }
+
+    ,val:function(){
+        var self = this;
+        var result = [];
+        for(var idx = 0; idx < self.tags.length; idx++){
+            self.tags[idx].val(result);
+        }
+        
+        self.jsonData.result = result;
+        return self.jsonData;
+    }
+
+    ,clear:function(){
+    }
+})
+
+
+oojs$.ns("com.stock.Space");
+oojs$.com.stock.Space = oojs$.createClass(
+{
+    type:"space"
+    ,suf:null
+    ,init:function(div, obj_json, result, fun_policy,enable){
+        var self = this;
+        if(obj_json!=null ){
+            $("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>").appendTo(div);
+            if(
+                obj_json.hasOwnProperty('suf')
+                && obj_json['suf']
+            ){
+                self.div = $('<div></div>',{style:"display:inline"});
+                div.append(self.div);
+                if(fun_policy!=null){
+                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy, enable);
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        if( self.suf != null ){
+            return self.suf.val(arr);
+        }else{
+            return null;
+        }
+    }
+});
+
+
+oojs$.ns("com.stock.Label");
+oojs$.com.stock.Label = oojs$.createClass(
+{
+    type:"label"
+    ,suf:null
+    ,div:null
+    ,init:function(div, obj_json, result, fun_policy,enable){
+        var self = this;
+        
+        if(obj_json!=null ){
+            if(
+                obj_json.hasOwnProperty('value')
+                && obj_json['value']
+            ){
+                $('<label></label>').text(obj_json['value']).appendTo(div);
+            }
+            
+            if(
+                obj_json.hasOwnProperty('suf')
+                && obj_json['suf']
+            ){
+                self.div = $('<div></div>',{style:"display:inline"});
+                div.append(self.div);
+                if(fun_policy!=null){
+                    self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy, enable);
+                }
+            }
+        }
+    }
+
+    ,val:function(arr){
+        var self = this;
+        if( self.suf != null ){
+            self.suf.val(arr);
+        }
+    }
+});
+
+
+oojs$.ns("com.stock.Input");
+oojs$.com.stock.Input = oojs$.createClass(
+{
+    type:'input'
+    ,id:''
+    ,value:''
+    ,div:null
+    ,suf:null
+    ,tag_input:null
+    ,init:function(div, obj_json, result, fun_policy,enable){
+        var self = this;
+        if(obj_json!=null ){
+            self.obj_json = obj_json;
+            if(
+                obj_json.hasOwnProperty('id')
+                && obj_json['id']
+                
+            ){
+                self.id = obj_json['id'];
+                self.value = obj_json['value'];
+                self.tag_input = $('<input></input>',
+                {
+                    'type':'text'
+                })
+                .appendTo(div);
+
+                if(enable!=null&&enable==0){
+                    self.tag_input.prop("disabled",true);
+                }
+
+                for(var idx = 0; idx < result.length; idx++){
+                    if(result[idx]['id'] == self.id){
+                        self.tag_input
+                        .val(result[idx]['value']);
+                    }
+                }
+                
+                if(
+                    obj_json.hasOwnProperty('suf')
+                    && obj_json['suf']
+                ){
+                    self.div = $('<div></div>',{style:"display:inline"});
+                    div.append(self.div);
+                    if(fun_policy!=null){
+                        self.suf = fun_policy(self.div, obj_json['suf'], result, fun_policy, enable);
+                    }
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        
+        arr.push(
+            {
+                "id":self.id
+                ,"value":self.tag_input.val()
+            }
+        );
+
+        if( self.suf != null ){
+            self.suf.val(arr);
+        };
+    }
+});
+
+oojs$.ns("com.stock.Select");
+oojs$.com.stock.Select = oojs$.createClass(
+{
+    type:"select"
+    ,id:null
+    ,key:null
+    ,value:null
+    ,default:null
+    ,div_parent:null
+    ,div_self:null
+    ,suf:null
+    ,enable:null
+    ,obj_json:null
+    ,fun_policy:null
+    ,tag_select:null
+    ,init:function(div, obj_json, result, fun_policy, enable){
+        var self = this;
+        self.fun_policy = fun_policy;
+        self.div_parent = div;
+        self.enable = enable;
+        if(obj_json!=null ){
+            self.obj_json = obj_json;
+            if(
+                obj_json.hasOwnProperty('id')
+                && obj_json['id']
+                && obj_json.hasOwnProperty('key')
+                && obj_json['key']
+                && obj_json.hasOwnProperty('value')
+                && obj_json['value']
+            ){
+                self.id = obj_json['id'];
+                self.key = obj_json['key'];
+                self.value = obj_json['value'];
+                if(self.key.length!=self.value.length  ){
+                    oojs$.showError("jsonview length not match!");
+                    return;
+                }else
+                {
+                    self.tag_select = $('<select ></select>',{
+                        style:"height:25px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+                    }).appendTo(div).change(
+                    {'scope':self},
+                    self.select_change
+                    );
+
+                    if(enable!=null&&enable==0){
+                        self.tag_select.prop("disabled",true);
+                    }
+                    for(var id = 0; id < self.value.length; id++){
+                        $('<option value="'+self.key[id]+'">'+self.value[id]+'</option>').appendTo(self.tag_select);
+                    }
+
+                    for(var idx = 0; idx < result.length; idx++){
+                        if(result[idx]['id'] == self.id){
+                            self.default = result[idx]['value'];
+                            self.hand_suf();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        
+        arr.push({
+            "id":self.id,
+            "value":self.default
+        });
+
+        if( self.suf != null ){
+            self.suf.val(arr);
+        }
+    }
+    ,select_change:function(event){
+        var self = event.data['scope'];
+        var div = event.data['div'];
+        console.log($(this).val());
+        self.default = $(this).val();
+        self.hand_suf();
+    }
+    ,hand_suf:function(){
+        var self = this;
+
+        if(self.div_self!=null){
+            self.div_self.empty();
+        }else{
+            self.div_self = $('<div></div>',{style:"display:inline"});
+        }
+
+        self.suf = null;
+
+        if(
+            self.default!=null
+        ){
+            self.tag_select.val(self.default);
+            if(
+                self.obj_json.hasOwnProperty('suf')
+                && self.obj_json['suf']
+            ){
+                if(self.fun_policy!=null){
+                    for(var id_suf = 0; id_suf < self.value.length; id_suf++){
+                        if(self.default == self.key[id_suf]){
+                            if(self.obj_json['suf'][id_suf]!=null){
+                                
+                                self.div_parent.append(self.div_self);
+                                self.suf = self.fun_policy(self.div_self, self.obj_json['suf'][id_suf], result, self.fun_policy, self.enable);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+
+oojs$.ns("com.stock.Check");
+oojs$.com.stock.Check = oojs$.createClass(
+{
+    type:"check"
+    ,id:null
+    ,key:null
+    ,value:null
+    ,default:null
+    ,suf:null
+    ,div:null
+    ,checks:null
+    ,result:null
+    ,init:function(div, obj_json, result, fun_policy,enable){
+        var self = this;
+        self.div_parent = div;
+        if(obj_json!=null ){
+            if(
+                obj_json.hasOwnProperty('id')
+                && obj_json['id']
+                && obj_json.hasOwnProperty('key')
+                && obj_json['key']
+                && obj_json.hasOwnProperty('value')
+                && obj_json['value']
+            ){
+                
+                self.id = obj_json['id'];
+                self.key = obj_json['key'];
+                self.value = obj_json['value'];
+
+                if(self.key.length!=self.value.length  ){
+                    oojs$.showError("jsonview_check length not match!");
+                    return;
+                }else{
+                    div.prop('style','display:inline-block');
+                    var table = $('<table></table>',{}).appendTo(div);
+                    if(self.checks == null){self.checks=[]}
+                    for(var idx = 0; idx < result.length; idx++){
+                        if(result[idx]['id'] == self.id){
+                            self.default = result[idx]['value'];
+                        }
+                    }
+                    for(var id_ck = 0; id_ck < self.value.length; id_ck++){
+                        
+                        var tr = $('<tr></tr>').appendTo(table);
+                        var td = $('<td></td>',{style:'padding:0;font-family:Microsoft YaHei, Verdana, Geneva, sans-serif;font-size: 10px;'}).appendTo(tr);
+                        self.default
+                        var check = $('<input></input>',{
+                            'type':'checkbox'
+                            ,'name':self.key[id_ck]
+                        })
+                        .appendTo(td)
+                        .change(
+                            {'scope':self},
+                            self.check_change
+                        );
+                        if(self.default[id_ck]) {
+                            check.prop("checked",true)
+                        }else{
+                            check.prop("checked",false)
+                        }
+                        if(enable!=null&& enable==0){
+                             check.prop("disabled",true);
+                        }
+                        self.checks.push(check)
+                        $('<label></label>').text(self.value[id_ck])
+                        .appendTo(td);
+                    }
+                }
+            }
+        }
+    }
+    ,val:function(arr){
+        var self = this;
+        var obj = {};
+        arr.push({
+            "id":self.id
+            ,"value":self.default
+        });
+
+        if( self.suf != null ){
+            obj.suf = self.suf.val(arr);
+            return obj;
+        }else{
+            return obj;
+        }
+
+    }
+
+    ,check_change:function(event){
+        var self = event.data.scope;
+        var div = event.data['div'];
+        // self.result = {}
+        self.default = [];
+        for(var id = 0; id < self.checks.length; id++)
+        {
+            self.default.push(self.checks[id].is(':checked')?1:0)
+            // self.result[self.checks[id].prop('name')] = self.checks[id].is(':checked')
+        }
+    }
+});
+
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 
 /**
 * var acountset = new oojs$.com.stock.component.acountset();

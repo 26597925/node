@@ -35,7 +35,7 @@ exports.select_userAccount = function(){
   sql = util.format(sql,uID);
   
   db.query(sql,function(){
-    console.log(path.basename(__filename).replace('.js',''),"select_userAccount", arguments);
+    console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),"select_userAccount", arguments);
     if(arguments.length==1){
       result['data'] = arguments[0];
       self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -62,7 +62,7 @@ exports.modify_userAccount = function(){
       &&self.req.post.hasOwnProperty("PASSWORD")
 	    &&self.req.post.hasOwnProperty("TXPASSWD")
     ){
-      console.log(path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(self.req.post));
+      console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(self.req.post));
       
       var sql1 = "UPDATE `tb_capital_conf` SET " +
         " `MAXBUY` = '%s', " +
@@ -117,7 +117,7 @@ exports.modify_userAccount = function(){
           self.responseDirect(200,"text/json",JSON.stringify(result));
         });
       }catch(err){
-        console.log(path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(err));
+        console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(err));
         result = {'success':false,'message':'非法请求数据，请联系管理员'};
         self.responseDirect(200,"text/json",JSON.stringify(result));
       }
@@ -173,15 +173,16 @@ exports.add_userAccount = function(){
       &&self.req.post.hasOwnProperty("BUYCOUNT")
       &&self.req.post.hasOwnProperty("BUYAMOUNT")
     ){
-      console.log(path.basename(__filename).replace('.js',''),'add_userAccount',JSON.stringify(self.req.post));
+      console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'add_userAccount',JSON.stringify(self.req.post));
       
-      var param = "tradeid="+self.req.post["TRADEID"]
+      var param = "?tradeid="+self.req.post["TRADEID"]
         +"&accountid="+self.req.post["ACCOUNTID"]
         +"&password="+self.req.post["PASSWORD"]
-        +"&txpasswd="+(self.req.post["TXPASSWORD"]?self.req.post["TXPASSWORD"]:"")+"";
+        +"&txpasswd="+(self.req.post["TXPASSWORD"]?self.req.post["TXPASSWORD"]:"")
+        +"&rdm="+Math.ceil(Math.random()*10000);
      
       var url = cfg_httpserver.account.url+param;
-      console.log(path.basename(__filename).replace('.js',''),'param',url);
+      console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'param',url);
       http_get(url,function(hresult,url){
         try{
           // hresult = '{ "status": 200, "tradeid": 1, "accountid": "'+Math.floor(Math.random()*1000000000)+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
@@ -285,19 +286,19 @@ var insert_userAccount = function(context,account_result){
         ,post["BUYAMOUNT"]
         ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
       );
-      console.log("db.transaction",sql1,sql2);
+      console.log(unit_date.getTime(),"db.transaction",sql1,sql2);
       try{
         db.transaction(sql1,sql2,function(){
           context.responseDirect(200,"text/json",JSON.stringify(result));
         });
       }catch(err){
-        console.log(path.basename(__filename).replace('.js',''),"catch",err);
+        console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),"catch",err);
         result = {'success':false,'message':'操作数据库异常'+path.basename(__filename).replace('.js','')};
         self.responseDirect(200,"text/json",JSON.stringify(result));
       }
 
     }else{
-      console.log("db.transaction",self.alias);//var parentAlias = this.alias;
+      console.log(unit_date.getTime(),"db.transaction",self.alias);//var parentAlias = this.alias;
          
       self.alias = "add";
       require("./user_account.js").modify_userAccount.apply(self);
@@ -308,8 +309,9 @@ var insert_userAccount = function(context,account_result){
 };
 
 var http_get=function(url,callback,param){
+  
   http.get(url,function(res){
-    // console.log("content-type",res.headers['content-type'] );
+    console.log(unit_date.getTime(),"user_account","http_get",url );
     var result="";
     res.setEncoding("utf8");
     // res.setEncoding("gbk");
@@ -317,7 +319,7 @@ var http_get=function(url,callback,param){
       result += chunk;
     });
     res.on("end",function(){
-      console.log("老夏接口",JSON.stringify(result));
+      console.log(unit_date.getTime(),"老夏接口",JSON.stringify(result));
       if(param){
         callback(result,url,param);
       }else{
@@ -325,7 +327,7 @@ var http_get=function(url,callback,param){
       }
     });
   }).on("error",function(err){
-    console.log("error>>>",err);
+    console.log(unit_date.getTime(),"error>>>",err);
     callback("error>>>"+JSON.stringify(err.message),url);
   })
 };

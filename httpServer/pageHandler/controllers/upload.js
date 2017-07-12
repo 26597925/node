@@ -40,14 +40,14 @@ exports.upload = function(){
 
   var stocks = [];
   form.on('file', function(field, file) {
-    // console.log("path:",file.path);
+    // console.log(unit_date.getTime(),"path:",file.path);
 
     fs.readFile(file.path, 'utf8', function (err,data) {
       if (err) {
         result.success = false;
         result.message = "upload code 1 read file error!";
         self.responseDirect(200,"text/json",JSON.stringify(result));
-        return console.log(err);
+        return console.log(unit_date.getTime(),err);
       }
 
       var lines = data.split("\n");
@@ -60,7 +60,7 @@ exports.upload = function(){
         for(var j = 0; j < lines[i].length; j++){
           if(j == 0){stock = '';}
           letter = parseInt(lines[i][j]);
-          // console.log(letter);
+          // console.log(unit_date.getTime(),letter);
           if( !isNaN(letter) ){
             stock += letter;
           }else{
@@ -85,7 +85,7 @@ exports.upload = function(){
   });
 
   form.on('error', function(err) {
-    console.log('An error has occured: \n' + err);
+    console.log(unit_date.getTime(),'An error has occured: \n' + err);
     result.message = "upload code 2 upload file  error!";
     self.responseDirect(200,"text/json",JSON.stringify(result));
   });

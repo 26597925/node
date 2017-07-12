@@ -103,7 +103,7 @@ exports.invertTimestamp = function(sID){
 	if(sID_Obj!=null){
 		var ymd = sID_Obj['yMd'].toString().substr(0,4)+"-"+sID_Obj['yMd'].toString().substr(4,2)+"-"+sID_Obj['yMd'].toString().substr(6,2);
 		var hms = sID_Obj['HH']+":"+sID_Obj['mm']+":"+sID_Obj['ss'];
-		// console.log(path.basename(__filename).replace('.js',''),ymd,hms);
+		// console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),ymd,hms);
 		return new Date(ymd+" "+hms).getTime();
 
 	}else{

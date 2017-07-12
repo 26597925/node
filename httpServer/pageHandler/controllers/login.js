@@ -68,7 +68,7 @@ exports.logup_submit = function(){
 	      && self.req.post.hasOwnProperty('VERIFY')
     ){
       var verify =  self.req.post['VERIFY'];
-      console.log(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))), String(verify));
+      console.log(unit_date.getTime(),String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))), String(verify));
 	    if(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))) != String(verify) ){
 		    result = {'success':false,'message':'校验码验证失败'};
 		    self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -170,7 +170,7 @@ exports.login = function(args){
         var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){
             if( arguments.length==1 ){
-                console.log('login USERID',arguments[0][0]['USERID']);
+                console.log(unit_date.getTime(),'login USERID',arguments[0][0]['USERID']);
                 insert_tb_log_login(arguments[0][0]['USERID'],ip);
                 updateUserLoginTime(arguments[0][0]['USERID'],self);
             }else{
@@ -210,7 +210,7 @@ var insert_exit_log_login = function(USERID,IPADDRESS){
 };
 
 var updateUserLoginTime = function(USERID,context){
-    console.log(path.basename(__filename).replace('.js',''),'updateUserLoginTime');
+    console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'updateUserLoginTime');
     var self = null;
     if(context){self = context;}
     var req = self.req;
@@ -228,7 +228,7 @@ var updateUserLoginTime = function(USERID,context){
 
     var result = {'success':true,'message':'登录成功'};
     db.query(sql2,function(){
-        console.log("updateUserLoginTime",arguments);
+        console.log(unit_date.getTime(),"updateUserLoginTime",arguments);
         if(arguments.length==1){
             self.responseDirect(200,'text/json',JSON.stringify(result));
         }else{

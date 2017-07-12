@@ -23,7 +23,7 @@ exports.select_preorder = function(){
   if(!uID){
     result = {'success':false,'message':path.basename(__filename).replace('.js','')+'数据错误'};
     self.responseDirect(200,"text/json",JSON.stringify(result));
-    console.log("error order_today is null");
+    console.log(unit_date.getTime(),"error order_today is null");
     return;
   }
 
@@ -93,7 +93,7 @@ exports.insert_preorder = function(){
   var  self = this;
   var uID = sessions.get_uID(self.req);
   var result = {'success':true,'data':''};
-  console.log( path.basename(__filename), "insert_preorder", JSON.stringify(self.req.post));
+  console.log(unit_date.getTime(), path.basename(__filename), "insert_preorder", JSON.stringify(self.req.post));
   var sql = "INSERT INTO `view_orderid_today` (" +
     "`ORDERID`" +//1
     ", `USERID`" +//2
@@ -214,7 +214,7 @@ exports.insert_preorder = function(){
     );
     
   }
-    // console.log( path.basename(__filename), "http_post", JSON.stringify(reportServer));
+    // console.log(unit_date.getTime(), path.basename(__filename), "http_post", JSON.stringify(reportServer));
     
   db.query(sql+sqldata,function(){
     if(arguments.length==1){
@@ -230,22 +230,30 @@ exports.insert_preorder = function(){
 
 var http_post=function(){
   var result = JSON.stringify(arguments[0]) ;
-  console.log( path.basename(__filename), "http_post", result);
   result = result.replace("\\","");
   //result = result.replace("\"","'");
-  console.log( path.basename(__filename), "http_post", result);
-    
-  var req = http.request(cfg_httpserver.order, function(res) {
-    console.log('Status: ' + res.statusCode);
-    console.log('Headers: ' + JSON.stringify(res.headers));
+	var options = {};
+	
+	for(var elm in cfg_httpserver.order){
+		options[elm] = cfg_httpserver.order[elm];
+	}
+	
+	options.path = options.path+"?rdm="+Math.ceil(Math.random()*10000);
+	
+	console.log(unit_date.getTime(), path.basename(__filename), "http_post", result);
+	console.log(unit_date.getTime(), path.basename(__filename), "http_post", options);
+	
+  var req = http.request(options, function(res) {
+    console.log(unit_date.getTime(),'Status: ' + res.statusCode);
+    console.log(unit_date.getTime(),'Headers: ' + JSON.stringify(res.headers));
     res.setEncoding('utf8');
     res.on('data', function (body) {
-      console.log('Body: ' , body);
+      console.log(unit_date.getTime(),'Body: ' , body);
     });
   });
 
   req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
+    console.log(unit_date.getTime(),'problem with request: ' + e.message);
   });
 
   req.write(result);
@@ -255,7 +263,7 @@ var http_post=function(){
 var http_post_2=function(){
 	var result = JSON.stringify(arguments[0]) ;
 	result = result.replace("\\","");
-	console.log("http_post_2",result);
+	console.log(unit_date.getTime(),"http_post_2",result);
 	var options = {
 		headers: {
 			'Content-Type': 'application/json',
@@ -267,18 +275,20 @@ var http_post_2=function(){
 		options[param] = cfg_httpserver.order_hongfu[param];
   }
 	
+	options.path = options.path+"?rdm="+Math.ceil(Math.random()*10000);
+	console.log(unit_date.getTime(),'options: ' , JSON.stringify(options));
 	
 	var req = http.request(options, function(res) {
-		console.log('Status: ' + res.statusCode);
-		console.log('Headers: ' + JSON.stringify(res.headers));
+		console.log(unit_date.getTime(),'Status: ' + res.statusCode);
+		console.log(unit_date.getTime(),'Headers: ' + JSON.stringify(res.headers));
 		res.setEncoding('utf8');
 		res.on('data', function (body) {
-			console.log('Body: ', body);
+			console.log(unit_date.getTime(),'Body: ', body);
 		});
 	});
 	
 	req.on('error', function(e) {
-		console.log('problem with request: ' + e.message);
+		console.log(unit_date.getTime(),'problem with request: ' + e.message);
 	});
 	
 	req.write(result);

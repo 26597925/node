@@ -8,6 +8,7 @@ const querystring = require("querystring");
 
 const localIP = require(path.join(__dirname,'..','localIP'));
 const bean = require(path.join(__dirname,'..','bean','bean_entity'));
+const unit_date = require(path.join(__dirname,"..","js_unit","unit_date.js"));
 
 const web_DB_config = require(path.join(__dirname,"web_DB.js"));
 const pgconfig = require(path.join(__dirname,'pageHandler','models','PageConfig'));
@@ -95,7 +96,7 @@ exports.runPageServer = function( port )
 {
 	port = port || 80;
   // port = port || 20080;
-	console.log('Collector Server 127.0.0.1:'+ port );
+	console.log(unit_date.getTime(),'Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 	if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
 
@@ -104,14 +105,14 @@ exports.runPageServer = function( port )
 			controller['upload'].apply(ct);
 
 	}else{
-			// console.log(path.basename(__filename),"url:", req.url);
+			// console.log(unit_date.getTime(),path.basename(__filename),"url:", req.url);
 			var _bufData = '';
 			req.on('data', function (chunkData) {
 				_bufData += chunkData;
 			})
 		.on('end', function () {
 		var reqData = "";
-		//console.log(JSON.stringify(req.headers));
+		//console.log(unit_date.getTime(),JSON.stringify(req.headers));
 		if ("POST" == req.method.toUpperCase()) {
 			if ( (req.headers.hasOwnProperty('content-type')
 				&& req.headers['content-type']
@@ -128,7 +129,7 @@ exports.runPageServer = function( port )
 				  reqData = JSON.parse(_bufData);
 
 				} catch (err) {
-				  console.log("not json format",err);
+				  console.log(unit_date.getTime(),"not json format",err);
 				}
 			} else {
 				reqData = {};
@@ -152,7 +153,7 @@ exports.runPageServer = function( port )
 var handlerWss = function(ws){
 
 	ws.on('open',function(){
-		console.log('open');
+		console.log(unit_date.getTime(),'open');
 	});
 
 	ws.on('message',function(data){
@@ -178,11 +179,11 @@ var handlerWss = function(ws){
 				controller_ws[actionInfo_ws.action].apply(ws_ct);
 			}
 		}
-		}catch(err){console.log('error',err.message)}
+		}catch(err){console.log(unit_date.getTime(),'error',err.message)}
 	});
 
 	ws.on('close',function(){
-		console.log('close root');
+		console.log(unit_date.getTime(),'close root');
 	});
 };
 
@@ -352,7 +353,7 @@ require(path.join(__dirname,'pageHandler','controllers','proxy')).stock_load(fun
 
 
 // process.argv.forEach((val, index) => {
-//	 console.log(`${index}: ${val}`);
+//	 console.log(unit_date.getTime(),`${index}: ${val}`);
 // });
 
 
