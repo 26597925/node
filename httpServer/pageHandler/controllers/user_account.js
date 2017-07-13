@@ -17,6 +17,7 @@ exports.select_userAccount = function(){
     " `tb_capital_conf`.`USERID`," +
     " `tb_user_account`.`TRADEID`," +
     " `tb_capital_conf`.`ACCOUNTID`," +
+		" `tb_user_account`.`MODTIME`," +
     " `CANAME`," +
     " `PASSWORD`," +
 		" `TXPASSWD`," +
