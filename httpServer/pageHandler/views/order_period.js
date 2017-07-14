@@ -531,7 +531,7 @@ oojs$.com.stock.order_period = oojs$.createClass(
                     div.append($('<br />'));
                 }
                 
-                list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
+                list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'ORIGIN':list[elm]['DEALSTOCK']};
             }
 
             status = list[elm]['STATUS'];

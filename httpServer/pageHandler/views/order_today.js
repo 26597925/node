@@ -117,6 +117,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
     ,order_today_tab2_clk:function(event){
         var self = order_today;
+
+        
         dictTrade.load_userAccount(function(){
             if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
                 self.status = "notinit";
@@ -177,7 +179,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var _sendData = {};
         var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
         var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
-        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
+        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"]);
+        //var DEALSTOCK = sendData['DEALSTOCK']['ORIGIN'];
         
         for(var elm in sendData){
             _sendData[elm] = sendData[elm]["ELEMENT"];
@@ -185,6 +188,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
         _sendData['DIRTYPE'] = DIRTYPE;
         _sendData['STARTTIME'] = STARTTIME;
         _sendData['ENDTIME'] = ENDTIME;
+        //_sendData['DEALSTOCK'] = DEALSTOCK;
+
         if(String(_sendData['VISIBLE']) == "0"){
            _sendData['VISIBLE'] = "1";
         }else if(String(_sendData['VISIBLE']) == "1"){
@@ -244,13 +249,15 @@ oojs$.com.stock.order_today = oojs$.createClass(
         var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
         var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
         var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
-        
+        //var DEALSTOCK = sendData['DEALSTOCK']['ORIGIN'];
+
         for(var elm in sendData){
             _sendData[elm] = sendData[elm]["ELEMENT"];
         }
         _sendData['DIRTYPE'] = DIRTYPE;
         _sendData['STARTTIME'] = STARTTIME;
         _sendData['ENDTIME'] = ENDTIME;
+        //_sendData['DEALSTOCK'] = DEALSTOCK;
 
         if(String(_sendData['FLAG_USER']) == "0"){
            _sendData['FLAG_USER'] = "1";
@@ -328,6 +335,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
             drawitem_data["STOCKSET"]['ELEMENT']);
+
         if(drawitem_data['PGROUPID'] && !drawitem_data['PGROUPID'].hasOwnProperty('ELEMENT')){
             drawitem_data['PGROUPID'] = {
                 'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
@@ -374,6 +382,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,true
             ,null
         );
+        
         var sendAccounts = [{'accountid':drawitem_data['ACCOUNTID']['ELEMENT']}];
         
         oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
@@ -581,7 +590,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     stockCount++;
                 }
                 
-                list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
+                // list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
+                list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'ORIGIN':list[elm]['DEALSTOCK']};
             }
             status = list[elm]['STATUS'];
             list_body[elm]['STATUS'] = {'ELEMENT':preload.getExecute(list[elm]['STATUS']),'ORIGIN': status };
