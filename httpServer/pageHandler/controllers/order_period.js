@@ -384,7 +384,7 @@ exports.update_orderPeriod = function(){
     }
     reportServer.push(
       {
-        "orderid":self.req.post[0]['ORDERID']
+        "orderid":String(self.req.post[0]['ORDERID'])
         ,"operation":operation//0删除 1增加 2启用 3禁用
         ,"accountid":String(self.req.post[0]['ACCOUNTID'])
         ,"tradeid":String(self.req.post[0]['TRADEID'])

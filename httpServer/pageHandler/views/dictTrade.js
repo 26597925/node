@@ -356,7 +356,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         var TXPASSWD=null;
         
         if(item_TRADE && item_TRADE['STATUS'] == "2"){
-            TXPASSWD = $('<input type="text" value="'+record["TRADEID"]+'" ></input>');
+            TXPASSWD = $('<input type="text" value="'+record["TXPASSWD"]+'" ></input>');
         }
         $("#dictTrade_tabs_1").empty();
 
@@ -400,7 +400,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         };
 
         if(TXPASSWD!=null){
-            body['TXPASSWD'] = $('<input type="text" value=""></input>');
+            body['TXPASSWD'] = TXPASSWD;
         }
 
         var value2 = parseInt(record["BUYAMOUNT"]);

@@ -1483,6 +1483,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,PERCENT_tmp:''
     ,ACCOUNT:null
     ,CAPITAL:null
+    ,ENABLE:null
     ,select_tradetype:[
         {id:"BUYCOUNT",name:"交易股数"}
         ,{id:"BUYAMOUNT",name:"交易金额"}
@@ -1503,6 +1504,18 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.CHECKED = CHECKED;
         self.ACCOUNT = ACCOUNT;
 
+        if(ACCOUNT.hasOwnProperty("ADDTIME")
+            &&ACCOUNT.ADDTIME
+            &&ACCOUNT.hasOwnProperty("STIME")
+            &&ACCOUNT.STIME
+        ){
+            var addtime = new Date(ACCOUNT.ADDTIME);
+            var systime = new Date(ACCOUNT.STIME);
+            if(oojs$.Format(addtime,"yyyy-MM-dd") == oojs$.Format(systime,"yyyy-MM-dd")){
+                self.ENABLE = false;
+            }
+        }
+
         self.INPUT = $('<input></input>',{'type':'text'});
         self.LABEL_UNIT = $('<label></label>');
 
@@ -1517,6 +1530,8 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         if(CHECKED){
             checkbox.prop('checked', true);
         }
+
+        
         
         div1.append(checkbox);
         var label_name = $('<label></label>').text('帐户:');
@@ -1576,6 +1591,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             
         }
 
+
         if(DIRTYPE == null||DIRTYPE != 9){
             if( self.SELECT == null ){//one_third
                 self.SELECT = self.append_select_tradetype(CHECKED);
@@ -1590,9 +1606,40 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             if(!CHECKED){
                 self.INPUT.prop("disabled", true );
             }
+
             div2.append(self.INPUT);
             
             div2.append(self.LABEL_UNIT);
+        }
+
+        if(self.ENABLE!=null&&self.ENABLE==false){
+            checkbox.prop('checked', false);
+            checkbox.prop('disabled', true);
+        }
+
+        if(self.ENABLE!=null
+            &&self.ENABLE==false
+            &&self.SELECT
+        ){
+            self.SELECT.prop("disabled", true );
+        }
+
+        if(self.ENABLE!=null
+            &&self.ENABLE==false
+            &&self.SELECT_DIRTYPE
+        ){
+            self.SELECT_DIRTYPE.prop("disabled", true );
+        }
+
+        if(self.ENABLE!=null
+            &&self.ENABLE==false
+            &&self.INPUT
+        ){
+            self.INPUT.prop("disabled", true );
+            if(self.LABEL_UNIT){
+                self.LABEL_UNIT.text("当日添加的账户，下一个交易日才能使用");
+                self.LABEL_UNIT.css({ 'color': 'red', 'font-size': '80%' });
+            }
         }
     }
     /****

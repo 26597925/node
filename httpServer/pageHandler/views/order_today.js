@@ -831,7 +831,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
             var trade_list = [];
             var index = 0;
             var item_account = null;
-            console.log("同时请求账号中的数据");
             
             var sendAccounts = [];
             for(var elm in dictTrade.dictTrade_list_body){
@@ -868,7 +867,6 @@ oojs$.com.stock.order_today = oojs$.createClass(
                     
                     //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
                     // result.success=true;
-                    
                     // if(result.success){
                         var capitals;
                         try{

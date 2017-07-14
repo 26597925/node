@@ -17,13 +17,14 @@ exports.select_userAccount = function(){
     " `tb_capital_conf`.`USERID`," +
     " `tb_user_account`.`TRADEID`," +
     " `tb_capital_conf`.`ACCOUNTID`," +
-		" `tb_user_account`.`MODTIME`," +
+		" `tb_user_account`.`ADDTIME`," +
     " `CANAME`," +
     " `PASSWORD`," +
 		" `TXPASSWD`," +
     " `MAXBUY`," +
     " `BUYCOUNT`," +
-    " `BUYAMOUNT`" +
+    " `BUYAMOUNT`,  " +
+		" now() AS STIME" +
     " from " +
     " `tb_capital_conf`" +
     " inner join " +
@@ -64,64 +65,112 @@ exports.modify_userAccount = function(){
 	    &&self.req.post.hasOwnProperty("TXPASSWD")
     ){
       console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(self.req.post));
-      
-      var sql1 = "UPDATE `tb_capital_conf` SET " +
-        " `MAXBUY` = '%s', " +
-        " `BUYCOUNT` = '%s', " +
-        " `BUYAMOUNT` = '%s', " +
-        " `MODTIME` = '%s' " +
-        " WHERE " +
-        " `ACCOUNTID` = '%s'";
-      sql1 = util.format(sql1,
-        self.req.post["MAXBUY"]
-        ,self.req.post["BUYCOUNT"]
-        ,self.req.post["BUYAMOUNT"]
-        ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
-        ,self.req.post["ACCOUNTID"]
-      );
-      
-      var sql2 = '';
-      if(this.alias == "add"){
-        sql2= "UPDATE `tb_user_account` SET " +
-          " `PASSWORD` = '%s', " +
-	        " `TXPASSWD` = '%s', " +
-          " `VISIBLE` = '1'" +
-          " WHERE " +
-          " `TRADEID` = %s " +
-          " AND " +
-          " `ACCOUNTID` = '%s'";
-        sql2 = util.format(sql2,
-          self.req.post["PASSWORD"]
-	        ,self.req.post["TXPASSWD"]
-          ,self.req.post["TRADEID"]
-          ,self.req.post["ACCOUNTID"]
-        );
-      }else{
-        sql2= "UPDATE `tb_user_account` SET " +
-          " `PASSWORD` = '%s', " +
-	        " `TXPASSWD` = '%s' " +
-          // ", " +
-          " WHERE " +
-          " `TRADEID` = %s " +
-          " AND " +
-          " `ACCOUNTID` = '%s'";
-        sql2 = util.format(sql2,
-          self.req.post["PASSWORD"]
-	        ,self.req.post["TXPASSWD"]
-          ,self.req.post["TRADEID"]
-          ,self.req.post["ACCOUNTID"]
-        );
-      }
-      
-      try{
-        db.transaction(sql1,sql2,function(){
-          self.responseDirect(200,"text/json",JSON.stringify(result));
-        });
-      }catch(err){
-        console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(err));
-        result = {'success':false,'message':'非法请求数据，请联系管理员'};
-        self.responseDirect(200,"text/json",JSON.stringify(result));
-      }
+      var sql_slt_pwd = "select `PASSWORD`, `TXPASSWD`  FROM tb_user_account where `ACCOUNTID` = %s";
+	    sql_slt_pwd = util.format(sql_slt_pwd,self.req.post["ACCOUNTID"]);
+	
+	    db.query(
+		    sql_slt_pwd,function(){
+		    	
+			    //UPDATE `tb_user_account` SET `ADDTIME`='2017-07-14 00:00:00' where `ACCOUNTID`=309219249819;
+			    var sql1 = "UPDATE `tb_capital_conf` SET " +
+				    " `MAXBUY` = '%s', " +
+				    " `BUYCOUNT` = '%s', " +
+				    " `BUYAMOUNT` = '%s', " +
+				    " `MODTIME` = '%s' " +
+				    " WHERE " +
+				    " `ACCOUNTID` = '%s'";
+			    sql1 = util.format(sql1,
+				    self.req.post["MAXBUY"]
+				    ,self.req.post["BUYCOUNT"]
+				    ,self.req.post["BUYAMOUNT"]
+				    ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")
+				    ,self.req.post["ACCOUNTID"]
+			    );
+			
+			    var sql2 = '';
+		    	if(String(arguments[0][0]['PASSWORD']) == String(self.req.post["PASSWORD"])
+				    && String(arguments[0][0]['TXPASSWD']) == String(self.req.post["TXPASSWD"])
+			    ){
+				    
+				    if(self.alias == "add"){
+					    sql2= "UPDATE `tb_user_account` SET " +
+						    " `PASSWORD` = '%s', " +
+						    " `TXPASSWD` = '%s', " +
+						    " `ADDTIME`=now(), " +
+						    " `VISIBLE` = '1'" +
+						    " WHERE " +
+						    " `TRADEID` = %s " +
+						    " AND " +
+						    " `ACCOUNTID` = '%s'";
+					    sql2 = util.format(sql2,
+						    self.req.post["PASSWORD"]
+						    ,self.req.post["TXPASSWD"]
+						    ,self.req.post["TRADEID"]
+						    ,self.req.post["ACCOUNTID"]
+					    );
+				    }else{
+					    sql2= "UPDATE `tb_user_account` SET " +
+						    " `PASSWORD` = '%s', " +
+						    " `TXPASSWD` = '%s' " +
+						    // ", " +
+						    " WHERE " +
+						    " `TRADEID` = %s " +
+						    " AND " +
+						    " `ACCOUNTID` = '%s'";
+					    sql2 = util.format(sql2,
+						    self.req.post["PASSWORD"]
+						    ,self.req.post["TXPASSWD"]
+						    ,self.req.post["TRADEID"]
+						    ,self.req.post["ACCOUNTID"]
+					    );
+				    }
+			    }else{//also change addtime
+				    if(self.alias == "add"){
+					    sql2= "UPDATE `tb_user_account` SET " +
+						    " `PASSWORD` = '%s', " +
+						    " `TXPASSWD` = '%s', " +
+						    " `ADDTIME`=now(), " +
+						    " `VISIBLE` = '1'" +
+						    " WHERE " +
+						    " `TRADEID` = %s " +
+						    " AND " +
+						    " `ACCOUNTID` = '%s'";
+					    sql2 = util.format(sql2,
+						    self.req.post["PASSWORD"]
+						    ,self.req.post["TXPASSWD"]
+						    ,self.req.post["TRADEID"]
+						    ,self.req.post["ACCOUNTID"]
+					    );
+				    }else{
+					    sql2= "UPDATE `tb_user_account` SET " +
+						    " `ADDTIME`=now(), " +
+						    " `PASSWORD` = '%s', " +
+						    " `TXPASSWD` = '%s' " +
+						    // ", " +
+						    " WHERE " +
+						    " `TRADEID` = %s " +
+						    " AND " +
+						    " `ACCOUNTID` = '%s'";
+					    sql2 = util.format(sql2,
+						    self.req.post["PASSWORD"]
+						    ,self.req.post["TXPASSWD"]
+						    ,self.req.post["TRADEID"]
+						    ,self.req.post["ACCOUNTID"]
+					    );
+				    }
+			    }
+			
+			    try{
+				    db.transaction(sql1,sql2,function(){
+					    self.responseDirect(200,"text/json",JSON.stringify(result));
+				    });
+			    }catch(err){
+				    console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(err));
+				    result = {'success':false,'message':'非法请求数据，请联系管理员'};
+				    self.responseDirect(200,"text/json",JSON.stringify(result));
+			    }
+		    }
+	    );
       
     }else{
       result = {'success':false,'message':'非法请求数据，请联系管理员'};
@@ -187,7 +236,7 @@ exports.add_userAccount = function(){
       http_get(url,function(hresult,url){
         try{
           // hresult = '{ "status": 200, "tradeid": 1, "accountid": "'+Math.floor(Math.random()*1000000000)+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
-          // hresult = '{ "status": 200, "tradeid": '+self.req.post.hasOwnProperty("TRADEID")+', "accountid": "'+self.req.post["ACCOUNTID"]+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
+          // hresult = '{ "status": 200, "tradeid": '+self.req.post["TRADEID"]+', "accountid": "'+self.req.post["ACCOUNTID"]+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
           hresult = JSON.parse(hresult);
           if(hresult['status'] == 200){
             insert_userAccount(self,hresult);
