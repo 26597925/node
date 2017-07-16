@@ -1504,7 +1504,8 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.CHECKED = CHECKED;
         self.ACCOUNT = ACCOUNT;
 
-        if(ACCOUNT.hasOwnProperty("ADDTIME")
+        if(ACCOUNT
+            &&ACCOUNT.hasOwnProperty("ADDTIME")
             &&ACCOUNT.ADDTIME
             &&ACCOUNT.hasOwnProperty("STIME")
             &&ACCOUNT.STIME
