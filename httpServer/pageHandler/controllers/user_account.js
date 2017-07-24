@@ -228,7 +228,7 @@ exports.add_userAccount = function(){
       var param = "?tradeid="+self.req.post["TRADEID"]
         +"&accountid="+self.req.post["ACCOUNTID"]
         +"&password="+self.req.post["PASSWORD"]
-        +"&txpasswd="+(self.req.post["TXPASSWORD"]?self.req.post["TXPASSWORD"]:"")
+        +"&txpasswd="+(self.req.post["TXPASSWD"]?self.req.post["TXPASSWD"]:"")
         +"&rdm="+Math.ceil(Math.random()*10000);
      
       var url = cfg_httpserver.account.url+param;
