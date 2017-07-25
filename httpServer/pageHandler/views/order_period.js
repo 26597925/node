@@ -259,13 +259,13 @@ oojs$.com.stock.order_period = oojs$.createClass(
 
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
-        var start_s = oojs$.Format(new Date(drawitem_data['STARTTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss');
+        var start_s = oojs$.Format(new Date(drawitem_data['STARTTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss').split("-");
         var hh_mm_ss = {'hh':start_s[3],'mm':start_s[4],'ss':start_s[5]};
         start_component.init(STARTTIME,hh_mm_ss,'datepicker',new Date(drawitem_data['STARTTIME']['ELEMENT']));
 
         var ENDTIME = $('<div></div>');
         var end_component = new  oojs$.com.stock.component.hh_mm_ss();
-        start_s = oojs$.Format(new Date(drawitem_data['ENDTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss');
+        start_s = oojs$.Format(new Date(drawitem_data['ENDTIME']['ELEMENT']),'yyyy-MM-dd-HH-mm-ss').split("-");
         var hh_mm_ss = {'hh':start_s[3],'mm':start_s[4],'ss':start_s[5]};
         end_component.init(ENDTIME,hh_mm_ss,'datepicker',new Date(drawitem_data['ENDTIME']['ELEMENT']));
 
