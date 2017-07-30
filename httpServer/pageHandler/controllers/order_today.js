@@ -154,13 +154,13 @@ exports.insert_preorder = function(){
   var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
   var reportServer = [];
   var _POLICYPARAM = '',_POLICYPARAM_RESULT = '';
-  debugger;
-  for( var i = 0; i < self.req.post.length; i++ ){
+	debugger;
+	ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
+	for( var i = 0; i < self.req.post.length; i++ ){
     if(i!=0){
       sqldata += ",";
     }
 
-    ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
     STARTTIME = unit_date.objToNumber(self.req.post[i]['STARTTIME']);
     ENDTIME = unit_date.objToNumber(self.req.post[i]['ENDTIME']);
 
