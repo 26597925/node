@@ -706,7 +706,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
         // );
 
         var value = -1;
-        if(event.data != null){
+        if(event.data != null
+            && event.data.hasOwnProperty('value')){
             value = event.data.value;
         }else{
             value = this.value;
