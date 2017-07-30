@@ -732,6 +732,8 @@ oojs$.com.stock.order_today = oojs$.createClass(
         // }else{
         //     value = self.order_select2.val();
         // }
+        var select1 = self.order_select1.val()?self.order_select1.val():0;
+        var select2 = self.order_select2.val()?self.order_select2.val():0;
         var tempArr = self.select_title[ self.order_select1.val()][self.order_select2.val()];
         var event ={};
         event.data = {};
