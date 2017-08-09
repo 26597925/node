@@ -553,15 +553,15 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             list_body[elm]['CTRL'] = {ELEMENT:$(
             	'<input type="button" name="12" value="删除" ' +
 				'onclick="dictTrade.handler_trd_del('+
-					this.dictTrade_list_body[elm]['USERID']+','+
-					this.dictTrade_list_body[elm]['ACCOUNTID']+', '+
+					this.dictTrade_list_body[elm]['USERID']+',\''+
+                    this.dictTrade_list_body[elm]['ACCOUNTID']+'\', '+
 					this.dictTrade_list_body[elm]['TRADEID']+
 				')"; >'
 				+
                 '<input type="button" name="12" value="修改"' +
 				' onclick="dictTrade.handler_trd_chg('+
-					this.dictTrade_list_body[elm]['USERID']+','+
-					this.dictTrade_list_body[elm]['ACCOUNTID']+', '+
+					this.dictTrade_list_body[elm]['USERID']+',\''+
+                    this.dictTrade_list_body[elm]['ACCOUNTID']+'\', '+
 					this.dictTrade_list_body[elm]['TRADEID']+
 				');" >'
 			)};
