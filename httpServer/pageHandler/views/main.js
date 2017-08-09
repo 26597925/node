@@ -1249,11 +1249,13 @@ oojs$.com.stock.Select = oojs$.createClass(
     ,obj_json:null
     ,fun_policy:null
     ,tag_select:null
+    ,result:null
     ,init:function(div, obj_json, result, fun_policy, enable){
         var self = this;
         self.fun_policy = fun_policy;
         self.div_parent = div;
         self.enable = enable;
+        self.result = result;
         if(obj_json!=null ){
             self.obj_json = obj_json;
             if(
@@ -1340,7 +1342,7 @@ oojs$.com.stock.Select = oojs$.createClass(
                             if(self.obj_json['suf'][id_suf]!=null){
                                 
                                 self.div_parent.append(self.div_self);
-                                self.suf = self.fun_policy(self.div_self, self.obj_json['suf'][id_suf], result, self.fun_policy, self.enable);
+                                self.suf = self.fun_policy(self.div_self, self.obj_json['suf'][id_suf], self.result, self.fun_policy, self.enable);
                             }
                         }
                     }
