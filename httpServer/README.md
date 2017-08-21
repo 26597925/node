@@ -245,3 +245,51 @@ oojs$.com.utils.Audio = oojs$.createClass(
 </pre>
 </p>
 
+<pre>
+	 <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                test
+            </td>
+            <td>
+                test
+            </td>
+            <td>
+                test
+            </td>
+        </tr>
+        <tr>
+            <td>
+                test
+            </td>
+            <td>
+                test
+            </td>
+            <td>
+                test
+            </td>
+        </tr>
+    </table>
+    <div id="divInput" style="display:none;position:absolute;">
+        <input type="type" name="name" value=" " />
+    </div>
+</pre>
+
+<pre>
+	<script type="text/javascript">
+    var s = 'ss';
+    $('table tr').each(function () {
+        var this_tr = $(this);
+        this_tr.find('td:first').mouseenter(function () {
+            var this_td = $(this);
+
+            $('#divInput').css({ top: this_td.offset().top + this_td.height(), left: this_td.offset().left });
+            $('#divInput').show();
+        }).mouseout(function () {
+            var this_td = $(this);
+            $('#divInput').css({ top: this_td.offset().top + this_td.height(), left: this_td.offset().left });
+            $('#divInput').hide();
+        })
+    })
+	</script>
+</pre>

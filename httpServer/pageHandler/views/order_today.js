@@ -1,10 +1,21 @@
-oojs$.ns("com.stock.order_today");
-oojs$.com.stock.order_today = oojs$.createClass(
+// dir//买入卖出标志:0买入|1卖出|9撤单
+oojs$.ns("com.stock.order");
+oojs$.com.stock.order = oojs$.createClass(
 {
-    list_benchmark_head: [
+	list_benchmark_head: [
+        // {
+        //     ID:'ACCOUNTID',
+        //     NAME:"帐户"
+        // }
+        // ,
         {
-            ID:'ACCOUNTID',
-            NAME:"帐户"
+            ID:'ORDERID',
+            NAME:"订单"
+        }
+        ,
+        {
+            ID:'LABLE',
+            NAME:"自定义标签"
         }
         ,
         {
@@ -19,18 +30,21 @@ oojs$.com.stock.order_today = oojs$.createClass(
         //     'ID':"STOCKSET",
         //     'NAME':"自选股"
         // }
-        ,{
-            'ID':"ONETHIRD",
-            'NAME':"金额／数量" //三选一
-        }
-        ,{
-            'ID':"STATUS",
-            'NAME':"状态"
-        }
+        // ,{
+        //     'ID':"ONETHIRD",
+        //     'NAME':"金额／数量" //三选一
+        // }
+        
+        // ,{
+        //     'ID':"STATUS",
+        //     'NAME':"状态"
+        // }
+
         ,{
             'ID':'DEALSTOCK',
             'NAME':"执行情况"//stockid
         }
+        
         ,{
             'ID':'ADDTIME',
             'NAME':"提交时间"
@@ -39,50 +53,97 @@ oojs$.com.stock.order_today = oojs$.createClass(
             'ID':'MODTIME',
             'NAME':"修改时间"
         }
+        /*
         ,{
             'ID':'FROMID',
             'NAME':"来源"
         }
+        */
         ,{
             'ID':"CTRL",
             'NAME':"操作"
         }
     ]
-    ,order_today_list: []
-    ,preOerder_ctrl_div:null
-    ,order_today_body_div:null
+    //聚合条件，以orderid为键值，下列策略及相近的数据聚合
+    ,merge_if:[
+	    'ORDERID',
+	    'USERID',
+	    'PNAME',
+	    'PGROUPID',
+	    'POLICYID',
+	    'POLICYPARAM',
+	    'DIRTYPE',
+	    'STARTTIME',
+	    'ENDTIME',
+	    'ADDTIME',
+	    'MODTIME',
+	    'STOCKSET',
+	    'FLAG_USER',
+	    'VISIBLE',
+        'LABLE'
+	    //,
+	    //'STATUS',
+	    //'FLAG',
+	    //'SUBSCRBLE',
+	    //'PERCENT',
+	    //'PRICES'
+        //FROMID
+    ]
+    //及时卖出,测单条件，dirtype:1卖出 groupid:5实时 policyid:1002即时卖出，请求爬虫数据
+    ,ontime_cdtion: {
+        'DIRTYPE':['0','1','9'],
+        'PGROUPID':['5'],
+        'POLICYID':['1003','1004','1005']
+    }
+    
+    ,instance:null
+    ,order_list: []
+    ,nvg:null				//左侧导航
+    ,panel:null				//总面板
+    ,tabs1:null				//1st标签
+    ,tabs2:null				//2cdbiaoqian
+    ,panel1:null			//1st面板
+    ,panel2:null			//2cd面板
+    ,order_ctl_div:null		//订单下拉框div
+    ,select_title:null		//订单顶部下拉框数据结构
+    ,tb:null				//下拉框选择后，显示的数据
     ,order_select1:null
     ,order_select2:null
     ,order_select3:null
-    ,select_title:null//顶部下拉框数据结构
-    ,status:'init'
-    ,tb:null
-    ,action:''
-    ,stock_market:''
-    ,origin:''
-    ,init:function(){
-        var self = this;
-        $( "#order_today_tabs" ).tabs();
-        $( "#order_today_tabs" ).tabs({ selected: 0 });
-        // $("#order_today_tabs").tabs('select', 2);
-        $("#order_today").click(this.order_today_tab1_clk);
-        $("#order_today_tabs_a1").click(this.order_today_tab1_clk);
-        $("#order_today_tabs_a2").click(this.order_today_tab2_clk);
+    ,status:'init'			//是否第一次打开该页面
+    ,action:''				//ws action字段
+    ,stock_market:''		//ws 股票代码
+    ,origin:''				//ws 订单源
+    ,TYPE_NEW: 'new'
+    ,TYPE_MDF: 'modify'
+    ,TYPE_DTL: 'detail'
+    ,capitals: ''           //缓存资金数据变量
+	,init:function(){
+		var self = this;
+        $('#'+self.tabs).tabs();
+        $('#'+self.tabs).tabs({ selected: 0 });
         
+        $('#'+self.nvg).click({"scope":self},self.order_tab1_clk);
+        $('#'+self.tabs1).click({"scope":self},self.order_tab1_clk);
+        $('#'+self.tabs2).click({"scope":self},self.order_tab2_clk);
+        
+        if("order_today" == self.instance){
         preload.getStock(function(){
             if(oojs$.getPanelID() == 2){
                 if(self.action == 'order_new'){
-                    $( "#order_today_tabs" ).tabs({ 'selected': 1 });
-                    order_today.order_today_tab2_clk();
+                    $('#'+self.tabs).tabs({ 'selected': 1 });
+                    self.order_tab2_clk({"data":{"scope":self}});
                 }else{
-                    order_today.order_today_tab1_clk();
+                    self.order_tab1_clk({"data":{"scope":self}});
                 }
-                
             }
         });
+        }
         oojs$.addEventListener('order_today',self.handler_ordtoday);
-    }
-    
+        // oojs$.addEventListener('order_period',self.handler_period);
+        // oojs$.addEventListener('order_tomorrow',self.handler_tomorrow);
+	}
+
     ,handler_ordtoday:function(dt){
         /*** action
         client  <-->    server
@@ -91,7 +152,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
 
         dt{type,action,data}
         */
-        console.log('order_today dt:',dt);
+        console.log('order dt:',dt);
         var self = order_today;
         switch(dt.action){
             case "new_data":
@@ -102,228 +163,468 @@ oojs$.com.stock.order_today = oojs$.createClass(
                 break;
             case "list":
                 console.log('order_today list:',dt.data)
-                self.order_today_list = dt.data.data;
-                if(self.order_today_list.length != 0 ){
-                    self.appendTB_order_today();
+                self.order_list = [];
+                self.order_list = dt.data.data;
+                if(self.order_list.length != 0 ){
+                    self.appendTB_order_list();
                 }
                 break;
         }
     }
 
-    ,order_today_tab1_clk:function(){
-        var self = order_today;
-        order_today.load_order_today();
+    //event handler
+	,order_tab1_clk:function(event){
+        var self = event.data.scope;
+        self.load_order();
     }
-
-    ,order_today_tab2_clk:function(event){
-        var self = order_today;
-
+    ,order_tab2_clk:function(event){
         
+        var self = event.data.scope;
+
         dictTrade.load_userAccount(function(){
             if(dictTrade.dictTrade_list_body.length == 0 && self.status == "init"){
+                //首次调用，如果券商没有数据，直接进入券商
                 self.status = "notinit";
                 $('#accordion').accordion({'active':0});
                 oojs$.dispatch("ready");
             }else if(dictTrade.dictTrade_list_body.length > 0 ){
+            	//通知策略加载数据
                 policy.load_subscribe(function () {
                     console.log("order\n","load subscrible\n");
                     self.status = "notinit";
                     if(policy.policy_subscribe.length == 0){
                         $('#accordion').accordion({'active':1});
                         oojs$.dispatch("ready");
+                         //首次调用，如果策略没有数据，直接进入策略
                     }else{
-                        order_today.appendTB_new_order_today();
-                        order_today.select_title = null;
-                        order_today.select_title = {};
+
+                    	//构建dirtype买卖，gid(抄底，实时)，策略树形结构
+                        self.select_title = null;
+                        self.select_title = {};
                         for(var i = 0; i < policy.policy_subscribe.length; i++ ){
-                            order_today.parse2obj_DIRTYPE( order_today.select_title, policy.policy_subscribe[i] );
+                            self.parse2obj_DIRTYPE( self.select_title, policy.policy_subscribe[i] );
                         }
-                        order_today.appendTB_order_today_slct();
-                        if(policy.policy_subscribe.length>0){
-                            $(order_today.order_select1).val(parseInt(policy.policy_subscribe[0]['DIRTYPE']));
-                            order_today.handler_dirtype({'data':{'value':parseInt(policy.policy_subscribe[0]['DIRTYPE'])}});
-                            $(order_today.order_select2).val( parseInt(policy.policy_subscribe[0]['PGROUPID']) );
-                            order_today.handler_group({'data':{'value':parseInt(policy.policy_subscribe[0]['PGROUPID'])}});
-                            $(order_today.order_select3).val( policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'] ); 
-                        }
+                        self.init_order({
+                        	'data':{
+	                        	'scope':self,
+	                        	'from':'init',
+	                        	'DIRTYPE':parseInt(policy.policy_subscribe[0]['DIRTYPE']),
+	                        	'PGROUPID':parseInt(policy.policy_subscribe[0]['PGROUPID']),
+	                        	'USERID_POLICYID':policy.policy_subscribe[0]['USERID']+"_"+policy.policy_subscribe[0]['POLICYID'], 
+	                        	'type':self.TYPE_NEW, 
+	                        	'data':null
+                        	}
+                        });
+
                     }
                 })
-            }  
+            }
         });
     }
+    
+    ,load_order:function(){
+        var self = this;
+        var sendData = {};
+        
+        if(self.instance == "order_today"){
+            oojs$.httpPost_json("/select_preorder",sendData,function(result,textStatus,token){
+                if(result
+                        &&result.hasOwnProperty('success')
+                        &&result.success){
+                    self.order_list = [];
+                    self.order_list = result.data;
+                    if(self.order_list.length == 0 && self.status == 'init' ){
+                        $('#'+self.tabs).tabs({ 'selected': 1 });
+                        self.order_tab2_clk({'data':{'scope':self}});
+                    }else{
+                        self.appendTB_order_list();
+                    }
+                }else if(result){
+                    oojs$.showError(result.message);
+                }
+            });
+        }else if(self.instance == "order_period"){
+            oojs$.httpPost_json("/select_orderPeriod",sendData,function(result,textStatus,token){
+                if(result
+                        &&result.hasOwnProperty('success')
+                        &&result.success){
+                    self.order_list = [];
+                    self.order_list = result.data;
+                    self.appendTB_order_list();
+                }else if(result){
+                    oojs$.showError(result.message);
+                }
+            });
+        }else if(self.instance == "order_tomorrow"){
+            oojs$.httpPost_json("/select_orderTomorrow",sendData,function(result,textStatus,token){
+                if(result
+                        &&result.hasOwnProperty('success')
+                        &&result.success){
+                    self.order_list = [];
+                    self.order_list = result.data;
+                    self.appendTB_order_list();
+                }else  if(result){
+                    oojs$.showError(result.message);
+                }
+            });
+        }
 
-    ,option_append: function(select,obj,filter){
-        for(var elm in obj){
+    }
 
-            select.append(
-                "<option value='"
-                +elm
-                +"'>"+filter(elm)+"</option>"
+    //添加列表appendTB_order_list
+    ,appendTB_order_list: function(){
+    	var self = this;
+    	$('#'+self.panel1).empty();
+        var panel,list_head,list_body;
+        panel = $('#'+self.panel1);
+
+        list_head = self.list_benchmark_head;
+        list_body = [];
+        var list = null;
+        list = self.order_list;
+       
+        list = self.orderId_filter(list,'ORDERID',self.merge_if);
+
+        var one_third = '';
+        var btnName = '';
+        var forbid = '';
+        var del = '';
+        var href = null;
+        var hrefs = null;
+        var div = null;
+        var stocks = [];
+        var status = '';
+
+        for(var elm = 0; elm < list.length; elm++){
+        	list_body[elm] = {};
+            for(var  inner in  list[elm]){
+                list_body[elm][inner] = {
+                	'ELEMENT': list[elm][inner],
+                	'ORIGIN': list[elm][inner] 
+                };
+                if(self.merge_if.indexOf(inner)>=0 ){
+                	if( inner == 'PGROUPID' ){
+                		list_body[elm][inner]['ELEMENT'] = String( preload.getPGroupItem(list_body[elm][inner]['ORIGIN'])['NAME']);
+                	}
+
+                	if( inner == 'STOCKSET' ){
+						list_body[elm][inner]['ELEMENT'] = String( oojs$.valideString(list_body[elm][inner]['ORIGIN']));
+                	}
+
+                	if( inner == 'DIRTYPE' ){
+                		list_body[elm][inner]['ELEMENT'] = preload.getDirtype(list_body[elm][inner]['ORIGIN']);
+                	}
+
+                	if( inner == 'DEALSTOCK' ){
+						var stockCount = 0;
+	                    if( list_body[elm][inner]['ORIGIN'] && (list_body[elm][inner]['ORIGIN']).length>5 ){
+	                        stocks = list_body[elm][inner]['ORIGIN'].split(",");
+	                        div = $('<div></div>');
+	                        for(var jj=0; jj < stocks.length; jj++){
+	                            href = $('<a href="#"></a>').text(stocks[jj]).click(
+	                                {'item':list_body[elm],'stock':stocks[jj],'scope':self},
+	                                self.order_btn_herf
+	                            );
+
+	                            div.append(href)
+	                            div.append($('<br />'));
+	                            stockCount++;
+	                        }
+	                        
+	                        list_body[elm][inner]['ELEMENT'] =  div;
+	                    }
+                	}
+
+                	if( inner == 'STATUS' ){
+                		status = list_body[elm][inner]['ORIGIN'];
+                    	list_body[elm][inner]['ELEMENT'] = preload.getExecute(list_body[elm][inner]['ORIGIN']);
+                	}
+
+                	if( inner == 'FROMID' ){
+                		list_body[elm][inner]['ELEMENT'] = preload.getFrom(list_body[elm][inner]['ORIGIN']);
+                	}
+                	
+	            }else{
+                    if( inner == 'DEALSTOCK' ){
+                        list_body[elm][inner]['ELEMENT']='信息'
+                    }
+	            }
+            }
+
+            var div = $('<div></div>');
+
+            $('<input></input>',{type:"button",value:"详情"}).appendTo(div).click(
+                {'scope':self,
+                	'from':'detail',
+                	'DIRTYPE':list_body[elm]['DIRTYPE']['ORIGIN'],
+                	'PGROUPID':list_body[elm]['PGROUPID']['ORIGIN'],
+                	'USERID_POLICYID':list_body[elm]['USERID']['ORIGIN']+"_"+list_body[elm]['POLICYID']['ORIGIN'], 
+                	'type':self.TYPE_DTL, 
+                	'data':list_body[elm]
+                	},
+                	self.init_order
             );
-        }
-    }
 
-    ,appendTB_order_today_slct:function () {
-        var self = this;
-        self.option_append(self.order_select1, self.select_title, preload.getDirtype);
-    }
-    ,detail_today:null
-    ,get_detail:function(){
-        return this.detail_today;
-    }
-    ,order_today_btn_del:function(event){
-        //删除
-        var self = event.data.scope;
-        var sendData = event.data.data;
+            // if((status == "3"||status == "4")&&stockCount == 1){
+            //     $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
+            // }else {//if(status == "0"||status == "1")
+                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
+                	{'scope':self,
+                	'from':'chg',
+                	'DIRTYPE':list_body[elm]['DIRTYPE']['ORIGIN'],
+                	'PGROUPID':list_body[elm]['PGROUPID']['ORIGIN'],
+                	'USERID_POLICYID':list_body[elm]['USERID']['ORIGIN']+"_"+list_body[elm]['POLICYID']['ORIGIN'], 
+                	'type':self.TYPE_MDF, 
+                	'data':list_body[elm]
+                	},
+                	self.init_order
+                );
+            // }
 
-        var _sendData = {};
-        var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
-        var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
-        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"]);
-        //var DEALSTOCK = sendData['DEALSTOCK']['ORIGIN'];
-        
-        for(var elm in sendData){
-            _sendData[elm] = sendData[elm]["ELEMENT"];
-        }
-        _sendData['DIRTYPE'] = DIRTYPE;
-        _sendData['STARTTIME'] = STARTTIME;
-        _sendData['ENDTIME'] = ENDTIME;
-        //_sendData['DEALSTOCK'] = DEALSTOCK;
-
-        if(String(_sendData['VISIBLE']) == "0"){
-           _sendData['VISIBLE'] = "1";
-        }else if(String(_sendData['VISIBLE']) == "1"){
-            _sendData['VISIBLE'] = "0"
-        }
-        console.log("del",JSON.stringify(_sendData))
-        oojs$.httpPost_json("/update_ordertoday",[_sendData],function(result,textStatus,token){
-            if(result
-                    &&result.hasOwnProperty('success')
-                    &&result.success){
-                _sendData=null;
-                if(event&&event.data){
-                    if(event&&event.data&&event.data.data){
-                        if(typeof(event.data.data)=='object'){
-                            for(var ine in event.data.data){
-                                event.data.data[ine]=null;
-                                delete event.data.data[ine];
-                            }
-                        }
-                        event.data.data = null;
-                        event.data = null;
-                    }
-                    event.data = null;
-                }
-                $( "#order_today_tabs" ).tabs({ selected: 0 });
-                order_today.order_today_tab1_clk();
-            }else{
-                oojs$.showError(result.message);
+            btnName = "X";
+            forbid = 1;
+            if(list_body[elm]['FLAG_USER'] && parseInt(list_body[elm]['FLAG_USER']['ELEMENT']) == 1){
+                btnName = '✓';
+                forbid = 0;
             }
-        });
 
-    }
-    ,order_today_btn_detail:function(event){
-        //订单详情
-        var self = event.data.scope;
-        self.detail_today = $.extend(true,{},event.data.data);
-        console.log('order_today_btn_detail',JSON.stringify(event.data));
-        shareObj.detailName = 'order_today';
-        var p=window.open("detailOrder.html");
-        
-    }
-    ,order_today_btn_chg:function(event){
-        //修改
-        var self = event.data.scope;
-        self.detail = event.data.data;
-        self.appendTB_modify_order(self.detail);
-    }
-    ,order_today_btn_switch:function(event){
-        //启动／禁用
-        var self = event.data.scope;
-        var sendData = event.data.data;
-        
-        console.log("switch",JSON.stringify(sendData))
+            $('<input></input>',{type:"button",value:btnName}).appendTo(div).click(
+                {'scope':self,
+                	'from':'forbid',
+                	'attach':forbid,
+                	'DIRTYPE':list_body[elm]['DIRTYPE']['ORIGIN'],
+                	'PGROUPID':list_body[elm]['PGROUPID']['ORIGIN'],
+                	'USERID_POLICYID':list_body[elm]['USERID']['ORIGIN']+"_"+list_body[elm]['POLICYID']['ORIGIN'], 
+                	'type':self.TYPE_MDF, 
+                	'data':list_body[elm]
+                	},
+                	self.init_order
+            );
 
-        var _sendData = {};
-        
-        var  DIRTYPE=  sendData['DIRTYPE']['ORIGIN'];
-        var STARTTIME = oojs$.toHMSOBJ(sendData['STARTTIME']["ELEMENT"]);
-        var ENDTIME = oojs$.toHMSOBJ(sendData['ENDTIME']["ELEMENT"])
-        //var DEALSTOCK = sendData['DEALSTOCK']['ORIGIN'];
+            $('<input></input>',{type:"button",value:"删除"}).appendTo(div).click(
+                {'scope':self,
+                	'from':'del',
+                	//'attach':0,
+                	'DIRTYPE':list_body[elm]['DIRTYPE']['ORIGIN'],
+                	'PGROUPID':list_body[elm]['PGROUPID']['ORIGIN'],
+                	'USERID_POLICYID':list_body[elm]['USERID']['ORIGIN']+"_"+list_body[elm]['POLICYID']['ORIGIN'], 
+                	'type':self.TYPE_MDF, 
+                	'data':list_body[elm]
+                	},
+                	self.init_order
+            );
 
-        for(var elm in sendData){
-            _sendData[elm] = sendData[elm]["ELEMENT"];
+            list_body[elm]['CTRL'] = {'ELEMENT':div};
+
         }
-        _sendData['DIRTYPE'] = DIRTYPE;
-        _sendData['STARTTIME'] = STARTTIME;
-        _sendData['ENDTIME'] = ENDTIME;
-        //_sendData['DEALSTOCK'] = DEALSTOCK;
 
-        if(String(_sendData['FLAG_USER']) == "0"){
-           _sendData['FLAG_USER'] = "1";
-        }else if(String(_sendData['FLAG_USER']) == "1"){
-            _sendData['FLAG_USER'] = "0"
-        }
-        console.log("switch",JSON.stringify(_sendData))
-        oojs$.httpPost_json("/update_ordertoday",[_sendData],function(result,textStatus,token){
-            if(result
-                    &&result.hasOwnProperty('success')
-                    &&result.success){
-                _sendData=null;
-                if(event&&event.data&&event.data.data){
-                    if(typeof(event.data.data)=='object'){
-                        for(var ine in event.data.data){
-                            event.data.data[ine]=null;
-                            delete event.data.data[ine];
-                        }
-                    }
-                    event.data.data = null;
-                    event.data = null;
-                }
-                $( "#order_today_tabs" ).tabs({ selected: 0 });
-                order_today.order_today_tab1_clk();
-            }else{
-                oojs$.showError(result.message);
+        oojs$.appendTB_list(panel,list_head,list_body);
+    }
+    ,isRegistSelect:false
+    ,init_order: function(event){
+        var self = event.data.scope;
+        var DIRTYPE = event.data.DIRTYPE;
+        var PGROUPID = event.data.PGROUPID; 
+        var USERID_POLICYID = event.data.USERID_POLICYID; 
+        var type = event.data.type; 
+        var data = event.data.data;
+        var from = event.data.from;
+        var attach = event.data.hasOwnProperty('attach')?event.data.attach:null;
+        if( type == self.TYPE_NEW ){
+            var opt_1st=null;
+
+            if(null == DIRTYPE){
+                oojs$.showError('显示控件存在问题, code:'+DIRTYPE);
             }
-        });
+            
+            if( null != self.order_select1 ){
+                self.order_select1.empty();
+            }
+            if( null == self.order_select1 ){
+            self.order_select1 = $('<select></select>',{});}
+            self.appendOption_select1();
+            self.order_select1.prop('disabled',true);
+            self.order_select1.val( DIRTYPE );
+            
+            if( null != self.order_select2 ){
+                self.order_select2.empty();
+            }
+            if( null == self.order_select2){
+            self.order_select2 = $('<select></select>',{});}
+            opt_1st = self.appendOption_select2( DIRTYPE );
+            if(null == PGROUPID){
+                PGROUPID = opt_1st;
+            }
+            self.order_select2.prop('disabled',true);
+            self.order_select2.val(PGROUPID);
+
+            if( null != self.order_select3 ){
+                self.order_select3.empty();
+            }
+            if( null == self.order_select3){
+            self.order_select3 = $('<select></select>',{});}
+            opt_1st = self.appendOption_select3( DIRTYPE, PGROUPID );
+            if( null == USERID_POLICYID ){
+                USERID_POLICYID = opt_1st;
+            }
+            self.order_select3.prop('disabled',true);
+            self.order_select3.val(USERID_POLICYID);
+            
+            
+            if(self.isRegistSelect == false){
+                console.log("add self.order_select3.change");
+                self.isRegistSelect = true;
+                self.order_select1.change({'scope':self, 'type':type, 'data':data}, self.handler_dirtype);
+                self.order_select2.change({'scope':self, 'type':type, 'data':data}, self.handler_group);
+                self.order_select3.change({'scope':self, 'type':type, 'data':data, 'from':'policy'}, self.handler_policy);
+            }
+            self.order_select1.prop('disabled',false);
+            self.order_select2.prop('disabled',false);
+            self.order_select3.prop('disabled',false);
+        }
+
+        //|| self.select_title[DIRTYPE][PGROUPID].length==1|| 'group' == from
+        // if(!('dirtype' == from ) ){
+            self.handler_policy({'data':{ 
+                'scope':self, 
+                'USERID_POLICYID':USERID_POLICYID, 
+                'from':from,
+                'type':type,
+                'attach':attach, 
+                'data':data }});
+        // }
     }
-    ,
-    stockDetail:null
-    ,
-    get_stockDetail:function(){
-        var self = this;
-        return self.stockDetail;
-    }
-    ,
-    stock:null
-    ,
-    order_today_btn_herf:function(event){
-        //股票详情
-        console.log(JSON.stringify(event.data.item))
+    ,handler_policy: function(event){
         var self = event.data.scope;
-        self.stockDetail = event.data.item;
-        self.stock = event.data.stock;
-        event.preventDefault();
-        var p=window.open("detailStock.html");
-    }
-    ,order_today_btn_modifyreback:function(event){
-        //返回
-        order_today.load_order_today();
-    }
-    ,appendTB_modify_order:function(){
-        var self = this;
-        var drawitem_data = arguments[0];
-        console.log('appendTB_modify_order\n',JSON.stringify(drawitem_data));
+        var type = event.data.type;
+        var from = event.data.from;
+        var attach = event.data['attach'];
+        
+        var USERID = '';
+        var POLICYID = '';
+        var USERID_POLICYID = '';
+
+        if( event.data.hasOwnProperty('USERID_POLICYID') ){
+            USERID_POLICYID = event.data['USERID_POLICYID'];
+        }else{
+            USERID_POLICYID = this.value;
+        }
+
+        // var obj = $(this).find("option:selected");
+        // var name = obj.text();
+        var key_value = USERID_POLICYID.split("_");
+        USERID = key_value[0];
+        POLICYID = key_value[1];
+
+        var trade_list = [];
+        var policy_data = {};
+        var item = null;
+
+        //及时卖出dirtype:1 groupid:2 policyid:1002，请求爬虫数据
+        var ontimeSend_slct = {
+            'DIRTYPE':'0',
+            'PGROUPID':'0',
+            'POLICYID':'0'
+        }
+
+
+        if(type == self.TYPE_NEW){
+
+            item = policy.search_policyList_Item(USERID, POLICYID, policy.policy_subscribe);
+            //及时卖出处理
+            ontimeSend_slct.POLICYID = item['POLICYID'];
+            ontimeSend_slct.PGROUPID = item['PGROUPID'];
+            ontimeSend_slct.DIRTYPE = item['DIRTYPE'];
+            
+
+            for(var elm in item){
+                policy_data[elm] = {
+                    'ELEMENT': item[elm],
+                    'ORIGIN': item[elm]
+                };
+                if('STARTTIME' == elm || 'ENDTIME' == elm){
+                    if(self.instance == "order_tomorrow" ){
+                        policy_data[elm]['datepicker'] = 'tomorrow';
+                        policy_data[elm]['DATE'] = null;
+                    }else if(self.instance == "order_period"){
+                        policy_data[elm]['datepicker'] = 'datepicker';
+                        policy_data[elm]['DATE'] = null;
+                    }else if(self.instance == "order_today"){
+                        policy_data[elm]['datepicker'] = null;
+                        policy_data[elm]['DATE'] = null;
+                    }
+                }
+            }
+            
+        }else if( type == self.TYPE_MDF || type == self.TYPE_DTL){
+            var item_order = event.data.data;
+            ontimeSend_slct.POLICYID = item_order['POLICYID']['ORIGIN'];
+            ontimeSend_slct.PGROUPID = item_order['PGROUPID']['ORIGIN'];
+            ontimeSend_slct.DIRTYPE = item_order['DIRTYPE']['ORIGIN'];
+
+            //policy_data 存有订单的所有数据
+            var ymd = null;
+            for(var elm in item_order){
+                //oojs$.toHMSOBJ(policy_data['STARTTIME']['ELEMENT'])
+                if('STARTTIME' == elm || 'ENDTIME' == elm){
+                    policy_data[elm] = {
+                        'ORIGIN': item_order[elm]['ORIGIN']
+                    }
+
+                    if(self.instance == "order_tomorrow" || self.instance == "order_period"){
+                        ymd = oojs$.Format(new Date(item_order[elm]['ORIGIN']),'yyyy-MM-dd-HH-mm-ss').split("-");
+                        policy_data[elm]['ELEMENT'] = {'hh':ymd[3], 'mm':ymd[4], 'ss':ymd[5]};
+                        policy_data[elm]['datepicker'] = 'datepicker';
+                        if(self.instance == "order_tomorrow"){
+                            policy_data[elm]['datepicker'] = 'tomorrow';
+                        }
+                        policy_data[elm]['DATE'] = new Date(item_order[elm]['ORIGIN']);
+                    }else if(self.instance == "order_today"){
+                        policy_data[elm]['ELEMENT'] = oojs$.toHMSOBJ(item_order[elm]['ORIGIN'])
+                        policy_data[elm]['datepicker'] = null;
+                        policy_data[elm]['DATE'] = null;
+                    }
+                }else{
+                    policy_data[elm] = {
+                        'ELEMENT': item_order[elm]['ELEMENT'],
+                        'ORIGIN': item_order[elm]['ORIGIN']
+                    }
+                }
+            }
+        }
+
+        var enable = null;
+        if(self.TYPE_DTL == type){
+            enable = 0;
+        }
+        var count_right = 0;
+        for(var elm in ontimeSend_slct){
+            if( self.ontime_cdtion[elm].indexOf( String(ontimeSend_slct[elm]) ) >= 0 ){
+                count_right++;
+            }   
+        }
+        if(count_right == 3){
+            policy_data['ONTIMESEND'] = {'ELEMENT':true,'ORIGIN':true};
+        }else{
+            policy_data['ONTIMESEND'] = {'ELEMENT':false,'ORIGIN':false};
+        }
         
         var STARTTIME = $('<div></div>');
         var start_component = new  oojs$.com.stock.component.hh_mm_ss();
-        start_component.init(STARTTIME,oojs$.toHMSOBJ(drawitem_data['STARTTIME']['ELEMENT']));
-
+        start_component.init(STARTTIME, 
+            policy_data["STARTTIME"]['ELEMENT'], 
+            policy_data["STARTTIME"]['datepicker'], 
+            policy_data["STARTTIME"]['DATE'],
+            enable);
+        
         var ENDTIME = $('<div></div>');
         var end_component = new  oojs$.com.stock.component.hh_mm_ss();
-        end_component.init(ENDTIME,oojs$.toHMSOBJ(drawitem_data["ENDTIME"]['ELEMENT']));
-
-
+        end_component.init(ENDTIME, 
+            policy_data["ENDTIME"]['ELEMENT'], 
+            policy_data["ENDTIME"]['datepicker'], 
+            policy_data["ENDTIME"]['DATE'],
+            enable);
+        
         var stockset = new oojs$.com.stock.component.stockset();
         var STOCKSET = {
             'ELEMENT':null
@@ -334,347 +635,293 @@ oojs$.com.stock.order_today = oojs$.createClass(
         stockset.init(
             STOCKSET['ELEMENT1'],
             STOCKSET['ELEMENT2'],
-            drawitem_data["STOCKSET"]['ELEMENT']);
-
-        if(drawitem_data['PGROUPID'] && !drawitem_data['PGROUPID'].hasOwnProperty('ELEMENT')){
-            drawitem_data['PGROUPID'] = {
-                'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
-                ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
-            };
-        }
+            policy_data["STOCKSET"]['ORIGIN'],
+            (policy_data.hasOwnProperty('ONTIMESEND') && policy_data['ONTIMESEND']['ORIGIN'])?1:0,
+            enable
+            );
         
-        if(drawitem_data['DIRTYPE'] && !drawitem_data['DIRTYPE'].hasOwnProperty('ELEMENT')){
-            drawitem_data['DIRTYPE'] = {
-                'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
-                ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
-            };
-        }
+        policy_data['PGROUPID']['ELEMENT'] = 
+        preload.getPGroupItem(policy_data['PGROUPID']['ORIGIN'])["NAME"];
+
+        policy_data['DIRTYPE']['ELEMENT'] = 
+        preload.getDirtype(policy_data['DIRTYPE']['ORIGIN']);
 
         var jsonView = new oojs$.com.stock.JsonView();
-        var divs = jsonView.init( drawitem_data["POLICYPARAM"]['ELEMENT'] );
+        
+        if( String(policy_data['DIRTYPE']['ORIGIN']) == '9' ){
+            enable = 0;//如果及时卖出
+        }
+
+        var divs = jsonView.init( policy_data["POLICYPARAM"]['ORIGIN'], enable );
         var JSONVIEW = {};
         for(var idx = 0; idx<divs.length; idx++){
             JSONVIEW["ELEMENT"+(idx+1)] = divs[idx];
         }
         JSONVIEW["COMPONENT"] = jsonView;
         JSONVIEW["ROWSPAN"] = divs.length;
-        drawitem_data["POLICYPARAM"] = JSONVIEW;
-        
-        drawitem_data["STARTTIME"] ={'ELEMENT':STARTTIME,'COMPONENT':start_component};
-        drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
-        drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
+        policy_data["POLICYPARAM"] = JSONVIEW;
 
-        var policyHead = policy.get_preOrder_head();
-        var accountOBJ = {};
-        accountOBJ["ELEMENT"] = drawitem_data['ACCOUNTID']['ELEMENT'];
-        accountOBJ["COLUMN1"] = $('<div></div>');
-        accountOBJ["COLUMN2"] = $('<div></div>');
-        accountOBJ["COMPONENT"] = new oojs$.com.stock.component.accountset();
-        accountOBJ["COMPONENT"].init(
-            accountOBJ["COLUMN1"]
-            ,accountOBJ["COLUMN2"]
-            ,drawitem_data['ACCOUNTID']['ELEMENT']
-            ,null
-            ,null
-            ,drawitem_data['BUYCOUNT']["ELEMENT"]
-            ,drawitem_data['BUYAMOUNT']["ELEMENT"]
-            ,drawitem_data['PERCENT']["ELEMENT"]
-            ,true
-            ,null
-        );
-        
-        var sendAccounts = [{'accountid':drawitem_data['ACCOUNTID']['ELEMENT']}];
-        
-        oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
-            console.log(JSON.stringify(arguments));
+        policy_data["STARTTIME"]['ELEMENT'] = STARTTIME;
+        policy_data["STARTTIME"]['COMPONENT'] = start_component;
+        policy_data["ENDTIME"]['ELEMENT'] = ENDTIME;
+        policy_data["ENDTIME"]['COMPONENT'] = end_component;
+
+        policy_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
+
+        if(!policy_data.hasOwnProperty('LABLE')){
+            policy_data["LABLE"]={'ELEMENT':null,'COMPONENT':null};
+        }
+        var txt = $('<input></input>',{'type':"text"});
+        policy_data["LABLE"]['ELEMENT'] = $('<div></div>').append(txt);
+        policy_data["LABLE"]['COMPONENT'] = txt;
+        policy_data["LABLE"]['COMPONENT'].val(policy_data["LABLE"]['ORIGIN']==null?"":policy_data["LABLE"]['ORIGIN']);
+
+        if( type == self.TYPE_NEW ){
+            if( !('dirtype' == from || 'group' == from || 'policy' == from) ){
+                //不是下拉框触发，需要加载数据
+                dictTrade.load_userAccount(function(){
+                    self.parseTrade_list(policy_data, dictTrade.dictTrade_list_body,  type, from);
+                })
+            }else{
+                //下拉框触发，不用再加载数据
+                self.parseTrade_list(policy_data, dictTrade.dictTrade_list_body,  type, from);
+            }
             
-            // result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
-            // result.success = true;
-            
-            // if(result.success){//CAPITAL.account_muse
-                var capitals;
-                try{
-                    capitals = JSON.parse(result.data);
-                }catch(err){
-                    capitals = '';
-                    console.log('order_today',err);
-                    // oojs$.showError('您的资金验证出了问题!');
+        }else if(type == self.TYPE_MDF || type == self.TYPE_DTL){
+            //依据merge_if，把合并的数据从policy_data裁开到dictTrade_list_body
+            var dictTrade_list_bod = [];
+            for(var elm in policy_data){
+                if(self.merge_if.indexOf(elm)>=0 || elm == "CTRL"){
+                    continue;
+                }else{
+                    for(var idx = 0; idx < policy_data[elm]['ORIGIN'].length; idx++ ){
+                        if( null == dictTrade_list_bod[idx] ){
+                            dictTrade_list_bod[idx] = {};
+                        }
+                        dictTrade_list_bod[idx][elm] = policy_data[elm]['ORIGIN'][idx];
+                    }
                 }
-                if(capitals && capitals.length>0 
-                    && capitals[0].hasOwnProperty('status')
-                    && capitals[0]['status'] == 200){
-                    accountOBJ["COMPONENT"].addCapital(capitals[0]);
-                }
-                // else{
-                //     oojs$.showError('您的资金验证出了问题!');
-                // }
-                 self.appendTB_modifyorder_flush(policyHead,drawitem_data,[accountOBJ]);
-            // }else{
-            //     oojs$.showError('您的资金验证出了问题!');
-            // }
-        });
-        
+            }
+            self.parseTrade_list(policy_data, dictTrade_list_bod, type, from, attach);
+        }
     }
-    ,appendTB_modifyorder_flush:function(policy_head,policy_data,account_list){
+    ,parseTrade_list: function( policy_data, dictTrade_list_body,  type, from, attach ){
         var self = this;
+        var trade_list = [];
+        var index = 0;
+        var item_account = null;
+        
+        var sendAccounts = [];
+        var PERCENT = '';
+        var CHECKED = 1;
+        var tmp_trade = null;
+        for( var elm in dictTrade_list_body ){
+            item_account = dictTrade_list_body[elm];
+            sendAccounts.push({"accountid":item_account['ACCOUNTID']})
+            tmp_trade = trade_list[index] = {};
+            
+            trade_list[index]["ELEMENT"] = item_account;
+            trade_list[index]["COLUMN1"] = $('<div></div>');
+            trade_list[index]["COLUMN2"] = $('<div></div>');
+            trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
+            ////div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED)
+            if(type == self.TYPE_NEW){
+                PERCENT = policy_data["PERCENT"]['ORIGIN']
+            }else if(type == self.TYPE_MDF){
+                PERCENT = item_account['PERCENT']
+            }
+            if(item_account.hasOwnProperty('CHECKED')
+                ){
+                 CHECKED = item_account['CHECKED'] == null?'1':item_account['CHECKED']
+            }
+           
+            trade_list[index]["COMPONENT"].init(
+                trade_list[index]["COLUMN1"]
+                ,trade_list[index]["COLUMN2"]
+                ,item_account['ACCOUNTID']
+                ,policy_data['DIRTYPE']['ORIGIN']
+                ,preload.getTradeItem(item_account['TRADEID'])["BORROW"]
+                ,item_account['BUYCOUNT']
+                ,item_account['BUYAMOUNT']
+                ,PERCENT//item_account['PERCENT']
+                ,CHECKED
+                ,item_account
+            );
+            if( type == self.TYPE_DTL ){
+                index++;
+                trade_list[index]={"COLUMN1":"状态","COLUMN2": preload.getExecute( tmp_trade['ELEMENT']['STATUS'] )};
+                index++;
+                trade_list[index]={"COLUMN1":"执行情况","COLUMN2":tmp_trade['ELEMENT']['DEALSTOCK']};
+                index++;
+                trade_list[index]={"COLUMN1":"来源","COLUMN2":preload.getFrom(tmp_trade['ELEMENT']['FROMID'])};
+                index++;
+                trade_list[index]={"COLUMN1":" ","COLUMN2":" "};
+            }
+            index++;
+        }
+        var policyHead = self.get_policy_head(); 
+        if('forbid' == from || 'del' == from){
+            //{'scope':self,"policy_data":policy_data,"trade_list":trade_list, "type":type}
+            self.order_submit( {'data':{
+                'scope':self,
+                'policy_data': policy_data, 
+                'trade_list':trade_list, 
+                'from':from,
+                'attach':attach,
+                'type': type
+            }} );
+        }else{
+            if(sendAccounts.length>0){
+                console.log("trade_list",JSON.stringify(trade_list));
+                self.capitalVerify( policyHead, policy_data, sendAccounts, trade_list, type, from ); 
+            }else{
+                oojs$.showError("您还没有添加账号");
+            }
+        }
+    }
+    //资金验证 drawitem_data , sendAccounts, trade_list, type
+    ,capitalVerify:function( policyHead, policy_data, sendAccounts, trade_list, type, from ){
+        var self = this;
+        if( !('dirtype' == from || 'group' == from || 'policy' == from) || self.capitals == '' ){
+                //不是下拉框触发,或者资金为空，需要加载数据
+                oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
+                    console.log(JSON.stringify(arguments));
+                     try{
+                        var capitals = JSON.parse(result.data);
+                    }catch(err){
+                        capitals = '';
+                        console.log('order',err);
+                    }
+                    self.capitals = capitals;
+                    self.parseCapital(trade_list,capitals);
+                });
+            }else{
+                //下拉框触发，不用再加载数据
+                self.parseCapital(trade_list, self.capitals);
+            }
+        
+ 		self.draw_order( policyHead, policy_data, trade_list, type );
+    }
+    ,parseCapital: function(trade_list, capitals){
+        if(capitals!=''){
+            for(var i = 0; i < trade_list.length; i++){
+                for(var elm in capitals){
+                    var item_capital = capitals[elm];
+                    if(trade_list[i]["ELEMENT"] && String(trade_list[i]["ELEMENT"]['ACCOUNTID']) == String(item_capital.accountid) ){
+                        if(String(item_capital.status) != "200"){
+                            continue;
+                        }else{
+                            trade_list[i]["COMPONENT"].addCapital(item_capital);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //绘制订单 account_list
+    ,draw_order: function(policy_head, policy_data, trade_list, type){
+    	var self = this;
 
-        var order_today_body_div =  $('#order_today_tabs_1').empty()
+    	var order_body_div = null;
+    	if(type == self.TYPE_NEW){
+    		//订单下拉框
+    		if(self.order_ctl_div==null){
+	            self.order_ctl_div = $('<div></div>');
+	            self.order_ctl_div.appendTo($('#'+self.panel2));
+	            
+	            self.tb = $('<table></table>', {
+		            'class':"display dataTable"
+		        }).appendTo(self.order_ctl_div);
+		       
+	            var tr = $('<tr></tr>',{'class':"even"}).appendTo(self.tb);
+        		var td =$('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
+        		td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        		td.append($('<label></label>').text("交易类型:"));
+        		td.append( self.order_select1 );
+        		td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        		td.append($('<label></label>').text("策略类型:"));
+        		td.append( self.order_select2 );
+        		td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
+        		td.append($('<label></label>').text("策略名称:"));
+        		td.append( self.order_select3 );
+	        }
+	        //订单内容
+    		if(self.order_body_div == null){
+                
+                self.order_body_div = $('<div ></div>');
+                self.order_body_div.appendTo($('#'+self.panel2));
+               
+            }
+
+            self.order_body_div.empty();
+            order_body_div = self.order_body_div;
+    	}else if( type == self.TYPE_MDF || type == self.TYPE_DTL ){
+    		order_body_div = $('#'+self.panel1).empty();
+    	}
+    	
 
         var tb = $('<table></table>', {
             'class':"display dataTable"
-        }).appendTo(order_today_body_div);
+        }).appendTo(order_body_div);
 
         oojs$.appendTB_item_D2(tb,policy_head,policy_data);
         self.appendTB_accountHint(tb);
         // self.appendTB_account_body(tb, account_itemD2, dirtype);
 
-        oojs$.appendTB_item_D2x(tb,account_list);
-
+        oojs$.appendTB_item_D2x(tb,trade_list);
 
         var tr = $('<tr></tr>',{}).appendTo(tb);
         var td = $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr)
-        $('<input></input>',{'type':"button",value:"提交"}).appendTo(td).click(
-            {"policy_data":policy_data,"account_list":account_list,"type":"modify"}
-            ,self.order_today_new_submit
-            // 
-        );
-
-        $('<input></input>',{'type':"button",value:"取消"}).appendTo(td).click(
-            self.order_today_btn_modifyreback
-        );
-
-    }
-    ,appendTB_new_order_today:function(){
-        var self = this;
-        var container =$('#order_today_tabs_2');
-        //container.empty();
-        if(self.tb != null){
-            self.tb.empty();
+        
+        if(self.TYPE_MDF == type && policy_data['ONTIMESEND']['ORIGIN'] || self.TYPE_DTL == type){
+            //实时处理 与 详情
+            // $('<input></input>',{'type':"button",value:"提交"}).appendTo(td).click(
+            //     {'scope':self,"policy_data":policy_data,"trade_list":trade_list, "type":type}
+            //     ,self.order_submit
+            // );
         }else{
-            self.tb = $('<table></table>', {
-            'class':"display dataTable"
-        });
-        }
-        
-        if(self.preOerder_ctrl_div==null){
-            self.preOerder_ctrl_div = $('<div></div>');
-            self.preOerder_ctrl_div.appendTo(container);
-            
-        }
-        
-        
-        console.log('appendTB_new_order_today\n',JSON.stringify(policy.policy_subscribe[0]));
-        
-        self.appendTB_control(self.tb);
-
-        if(policy.policy_subscribe.length>0){
-            var event = {};
-            event.data = {};
-            event.data['USERID'] = policy.policy_subscribe[0]['USERID'];
-            event.data['POLICYID'] = policy.policy_subscribe[0]['POLICYID'];
-            self.handler_policy(event);
-        }
-    }
-
-    ,appendTB_control:function(tb){
-        var self = this;
-        self.preOerder_ctrl_div.append(tb);
-        var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
-        var td =$('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
-        //1----------------------------
-        td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-        td.append($('<label></label>').text("交易类型:"));
-
-        self.order_select1 = $('<select></select>',{
-            id:'order_select1'
-        });
-        // self.order_select1.append(
-        //     "<option  value='-1'>请选择交易类型</option>"
-        // );
-        // self.option_append(self.order_select1, self.select_title, policy.getDirtype);
-        self.order_select1.change(self.handler_dirtype);
-        td.append( self.order_select1 );
-        //2----------------------------
-        td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-        td.append($('<label></label>').text("策略类型:"));
-
-        self.order_select2 = $('<select></select>',{
-            id:'order_select2'
-        });
-        // self.order_select2.append(
-        //     "<option  value='-1'>请选择策略类型</option>"
-        // );
-
-        self.order_select2.prop("disabled", true);
-        self.order_select2.change(self.handler_group);
-
-        td.append( self.order_select2 );
-
-        //3----------------------------
-        td.append($("<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>"));
-        td.append($('<label></label>').text("策略名称:"));
-
-        self.order_select3 = $('<select></select>',{
-            id:'order_select3'
-        });
-
-        // self.order_select3.append(
-        //     "<option value='-1'>请选择策略名称</option>"
-        // );
-
-        self.order_select3.change({'from':'appendTB_control'},self.handler_policy);
-        self.order_select3.prop("disabled", true);
-        td.append( self.order_select3 );
-        
-    }
-
-    ,appendTB_accountHint:function(tb){
-        var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
-        var td = $('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
-        td.append($('<label></label>').text("请选择您帐户:"));
-        var label = $('<label></label>',{
-
-        }).text('(*注：只有选择了账户才能选择交易策略)');
-        label.css({ 'color': 'red', 'font-size': '80%' });
-        td.append(label);
-    }
-
-    ,appendTB_order_today:function(){
-        var self = this;
-
-        var panel,list_head,list_body;
-        panel = $('#order_today_tabs_1');
-
-        list_head = order_today.list_benchmark_head;//order_today_list;//self.list_benchmark_head;
-        list_body = [];
-        var list = null;
-        list = this.order_today_list;
-
-        var one_third = '';
-        var btnName = '';
-        var href = null;
-        var hrefs = null;
-        var div = null;
-        var stocks = [];
-        var status = '';
-        for(var elm = 0; elm < list.length; elm++){
-            list_body[elm] = {};
-            for(var  inner in  list[elm]){
-                list_body[elm][inner] = {'ELEMENT': list[elm][inner]};
-            }
-            list_body[elm]['PGROUPID'] = {
-                'ELEMENT':String( preload.getPGroupItem(list[elm]['PGROUPID'])['NAME']),
-                'ORIGIN':list[elm]['PGROUPID'] 
-            };
-            // getFrom
-            list_body[elm]['STOCKSET'] = {
-                'ELEMENT':String( oojs$.valideString(list[elm]['STOCKSET'])),
-                'ORIGIN':list[elm]['STOCKSET'] 
-            };
-            list_body[elm]['DIRTYPE']= {
-                'ELEMENT': preload.getDirtype(list[elm]['DIRTYPE']),
-                'ORIGIN':list[elm]['DIRTYPE']};
-
-            var stockCount = 0;
-            if(""+list[elm]['DEALSTOCK']&& (""+list[elm]['DEALSTOCK']).length>5 ){
-                stocks = (list[elm]['DEALSTOCK']).split(",");
-                div = $('<div></div>');
-                for(var jj=0;jj<stocks.length;jj++){
-                    href = $('<a href="#"></a>').text(stocks[jj]).click(
-                        {'item':list_body[elm],'stock':stocks[jj],'scope':self},
-                        self.order_today_btn_herf
-                    );
-
-                    div.append(href)
-                    div.append($('<br />'));
-                    stockCount++;
-                }
-                
-                // list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'COMPONENT':list[elm]['DEALSTOCK'],'ORIGIN':list[elm]['DEALSTOCK']};
-                list_body[elm]['DEALSTOCK'] ={'ELEMENT': div,'ORIGIN':list[elm]['DEALSTOCK']};
-            }
-            status = list[elm]['STATUS'];
-            list_body[elm]['STATUS'] = {'ELEMENT':preload.getExecute(list[elm]['STATUS']),'ORIGIN': status };
-            //<a id="sign_up" class="sign_new">Sign up</a>
-            one_third = '';
-            if(parseInt(list[elm]['BUYCOUNT'])>0){
-                one_third = parseInt(list[elm]['BUYCOUNT'])+"股";
-            }else if(parseInt(list[elm]['BUYAMOUNT'])>0){
-                one_third = parseInt(list[elm]['BUYAMOUNT'])+"¥";
-            }else if(Number(list[elm]['PERCENT'])>0){
-                one_third = Number(list[elm]['PERCENT'])//+"％";
-            }
-            list_body[elm]['ONETHIRD'] = {'ELEMENT':one_third};
-            list_body[elm]['POLICYID'] = {'ELEMENT':list[elm]['POLICYID']};//{ELEMENT:preload.getPGroupItem(list[elm]['POLICYID'])};
-            list_body[elm]['FROMID'] = {'ELEMENT':preload.getFrom(list[elm]['FROMID'])};
-            
-
-            var div = $('<div></div>');
-            $('<input></input>',{type:"button",value:"详情"}).appendTo(div).click(
-                {'data':list_body[elm],'scope':self},
-                order_today.order_today_btn_detail
+            $('<input></input>',{'type':"button",value:"提交"}).appendTo(td).click(
+                {'scope':self,"policy_data":policy_data,"trade_list":trade_list, "type":type}
+                ,self.order_submit
             );
-
-
-            // if((status == "3"||status == "4")&&stockCount == 1){
-            //     $('<input></input>',{type:"button",value:"修改"}).appendTo(div).prop('disabled',true);
-            // }else {//if(status == "0"||status == "1")
-                $('<input></input>',{type:"button",value:"修改"}).appendTo(div).click(
-                {'data':list_body[elm],'scope':self},
-                order_today.order_today_btn_chg
-                );
-            // }
-            
-
-            btnName = "X";
-            if(parseInt(list_body[elm]['FLAG_USER']['ELEMENT']) == 1){
-                btnName = '✓'
-            }
-
-            $('<input></input>',{type:"button",value:btnName}).appendTo(div).click(
-                {'data':list_body[elm],'scope':self},
-                order_today.order_today_btn_switch
-            );
-
-            $('<input></input>',{type:"button",value:"删除"}).appendTo(div).click(
-                {'data':list_body[elm],'scope':self},
-                order_today.order_today_btn_del
-            );
-
-            list_body[elm]['CTRL'] = {'ELEMENT':div};
         }
-        oojs$.appendTB_list(panel,list_head,list_body);
+
+        if( self.TYPE_MDF == type || self.TYPE_DTL == type ){
+            $('<input></input>',{'type':"button",value:"取消"}).appendTo(td).click(
+                 {'scope':self},
+                self.order_btn_modifyreback
+            );
+        }
     }
 
-    ,load_order_today:function(){
-        var self = this;
-        var sendData = {};
-        //oojs$.sendWSMessage({'type':'order_today','action':'list','data':''});
-        oojs$.httpPost_json("/select_preorder",sendData,function(result,textStatus,token){
-            if(result
-                    &&result.hasOwnProperty('success')
-                    &&result.success){
-                self.order_today_list = [];
-                self.order_today_list = result.data;
-                if(self.order_today_list.length == 0 && self.status == 'init' ){
-                    $('#order_today_tabs').tabs({ 'selected': 1 });
-                    self.order_today_tab2_clk();
-                }else{
-                    self.appendTB_order_today();
-                }
-            }else{
-                oojs$.showError(result.message);
-            }
+    ,handler_dirtype: function(event){
+        var self = event.data.scope;
+        var DIRTYPE = this.value;
+        self.init_order(
+        	{'data':{'scope':self,
+        	'from':'dirtype',
+        	'DIRTYPE':DIRTYPE,
+        	'PGROUPID':null,
+        	'USERID_POLICYID':null, 
+        	'type':event.data.type, 
+        	'data':event.data.data}
         });
     }
 
-    //顶部下拉框数据结构
-        /**
-         *
-         * @param obj select_title
-         * @param appendObj, scribleObj
-         */
-    ,parse2obj_DIRTYPE:function(obj,appendObj){
+    ,handler_group: function(event){
+        var self = event.data.scope;
+        self.init_order(
+        	{'data':{'scope':self,
+        	'from':'group',
+        	'DIRTYPE':self.order_select1.val(),
+        	'PGROUPID':self.order_select2.val(),
+        	'USERID_POLICYID':null, 
+        	'type':event.data.type, 
+        	'data':event.data.data}
+        }); 
+    }
+
+    ,parse2obj_DIRTYPE: function(obj, appendObj){
         var self = this;
         if( !obj.hasOwnProperty( appendObj['DIRTYPE'] ) ){
             obj[appendObj['DIRTYPE']] = {};
@@ -682,7 +929,7 @@ oojs$.com.stock.order_today = oojs$.createClass(
         self.parse2obj_PGROUPID( obj[appendObj['DIRTYPE']], appendObj );
     }
 
-    ,parse2obj_PGROUPID:function(obj,appendObj){
+    ,parse2obj_PGROUPID: function(obj, appendObj){
         var self = this;
         if( !obj.hasOwnProperty( appendObj['PGROUPID'] ) ){
             obj[appendObj['PGROUPID']]  = [];
@@ -695,270 +942,133 @@ oojs$.com.stock.order_today = oojs$.createClass(
         });
     }
 
-    ,handler_dirtype: function(event){
-        var self = order_today;
-        self.order_select2.empty();
-        self.order_select3.empty();
-        self.order_select2.prop("disabled", false);
-        self.order_select3.prop("disabled", true);
-        // self.order_select2.append(
-        //     "<option  value='-1'>请选择策略类型</option>"
-        // );
+    ,appendOption_select1: function () {
+        var self = this;
+        return self.option_append(self.order_select1, self.select_title, preload.getDirtype);
+    }
 
-        var value = -1;
-        if(event.data != null
-            && event.data.hasOwnProperty('value')){
-            value = event.data.value;
-        }else{
-            value = this.value;
-        }
-        
-        self.option_append(self.order_select2,self.select_title[value],function(pp){
+    ,appendOption_select2: function (DIRTYPE) {
+        var self = this;
+        return self.option_append(self.order_select2,self.select_title[DIRTYPE],function(pp){
             return preload.getPGroupItem(pp)["NAME"];
         });
-
-        self.handler_group();
     }
 
-    ,handler_group: function(event){
-        var self = order_today;
-        self.order_select3.empty();
-        self.order_select3.prop("disabled", false);
-        // self.order_select3.append(
-        //     "<option value='-1'>请选择策略名称</option>"
-        // );
-        // var value = -1
-        // if(event.data != null){
-        //     value = event.data.value;
-        // }else{
-        //     value = self.order_select2.val();
-        // }
-        var select1 = self.order_select1.val()?self.order_select1.val():0;
-        var select2 = self.order_select2.val()?self.order_select2.val():0;
-        var tempArr = self.select_title[ self.order_select1.val()][self.order_select2.val()];
-        var event ={};
-        event.data = {};
-        for( var i = 0; i < tempArr.length; i++ ){
-            if(i==0){
-                event.data['USERID'] = tempArr[i]['USERID'];
-                event.data['POLICYID'] =  tempArr[i]['POLICYID'];
-            }
-            
-            self.order_select3.append(
+    ,appendOption_select3: function (DIRTYPE, PGROUPID) {
+        var self = this;
+        var options = self.select_title[DIRTYPE][PGROUPID];
+        for(var idx=0;idx < options.length;idx++){
+        	self.order_select3.append(
+			    "<option value='"
+			    +options[idx]['USERID']+"_"+options[idx]['POLICYID']
+			    +"'>"+options[idx]["PNAME"]+"</option>"
+			);
+        }
+        return options[0]['USERID']+"_"+options[0]['POLICYID'];
+    }
+
+    ,option_append: function(select,obj,filter){
+    	var firstElm=null;
+        for(var elm in obj){
+        	if(firstElm==null){
+        		firstElm = elm;
+        	}
+            select.append(
                 "<option value='"
-                +tempArr[i]['USERID']+"_"+tempArr[i]['POLICYID']
-                +"'>"+tempArr[i]["PNAME"]+"</option>"
+                +elm
+                +"'>"+filter(elm)+"</option>"
             );
         }
-
-        self.handler_policy(event);
+        return elm;
     }
-    ,handler_policy: function(event){
-        // console.log("order_today >>>>>>>>>>",
-        // self.order_select1.val(),
-        // self.order_select2.val(),
-        // this.value,$(this).find("option:selected").text() );
-        var USERID = '';
-        var POLICYID = '';
-        var self = order_today;
-        var from = '';
-        if(event.data != null && event.data.hasOwnProperty('from') ){
-            from = event.data.from;
-            var obj = $(this).find("option:selected");
-            var name = obj.text();
-            var key_value = obj.val().split("_");
-            USERID = key_value[0];
-            POLICYID = key_value[1];
-        }else{
-            USERID = event.data['USERID'];
-            POLICYID = event.data['POLICYID'];
-        }
-        //today handler_policy------------------------
 
-        var item = policy.search_policyList_Item(USERID,POLICYID,policy.policy_subscribe);
-        var PERCENT = item['PERCENT'];
-        var drawitem_data = {};
-        if(self.stock_market != '' && self.origin == 'market'){
-           item['STOCKSET'] += (','+self.stock_market);
-        }
-        for(var elm in item){
-            drawitem_data[elm] = {ELEMENT:item[elm]};
-        }
-
-        var STARTTIME = $('<div></div>');
-        var start_component = new  oojs$.com.stock.component.hh_mm_ss();
-        start_component.init(STARTTIME,item["STARTTIME"]);
-
-        var ENDTIME = $('<div></div>');
-        var end_component = new  oojs$.com.stock.component.hh_mm_ss();
-        end_component.init(ENDTIME,item["ENDTIME"]);
-
-        var stockset = new oojs$.com.stock.component.stockset();
-        var STOCKSET = {
-            'ELEMENT':null
-            ,'ELEMENT1':$('<div></div>')
-            ,'ELEMENT2':$('<div></div>')
-            ,'ROWSPAN':2
-            ,'COMPONENT':stockset};
-        stockset.init(
-            STOCKSET['ELEMENT1'],
-            STOCKSET['ELEMENT2'],
-            item["STOCKSET"]);
-
-        drawitem_data['PGROUPID'] = {
-            'ELEMENT': preload.getPGroupItem(drawitem_data['PGROUPID']['ELEMENT'])["NAME"]
-            ,'ORIGIN': drawitem_data['PGROUPID']['ELEMENT']
-        };
-        drawitem_data['DIRTYPE'] = {
-            'ELEMENT': preload.getDirtype(drawitem_data['DIRTYPE']['ELEMENT'])
-            ,'ORIGIN': drawitem_data['DIRTYPE']['ELEMENT']
-        };
-
-        var jsonView = new oojs$.com.stock.JsonView();
-        var divs = jsonView.init( item["POLICYPARAM"] );
-        var JSONVIEW = {};
-        for(var idx = 0; idx<divs.length; idx++){
-            JSONVIEW["ELEMENT"+(idx+1)] = divs[idx];
-        }
-        JSONVIEW["COMPONENT"] = jsonView;
-        JSONVIEW["ROWSPAN"] = divs.length;
-        drawitem_data["POLICYPARAM"] = JSONVIEW;
-
-        drawitem_data["STARTTIME"] = {'ELEMENT':STARTTIME,'COMPONENT':start_component};
-        drawitem_data["ENDTIME"] = {'ELEMENT':ENDTIME,'COMPONENT':end_component};
-        drawitem_data["STOCKSET"] = STOCKSET;//{ELEMENT:STOCKSET};
-
-        var policyHead = policy.get_preOrder_head();
-
-        dictTrade.load_userAccount(function(){
-            var trade_list = [];
-            var index = 0;
-            var item_account = null;
-            
-            var sendAccounts = [];
-            for(var elm in dictTrade.dictTrade_list_body){
-                item_account = dictTrade.dictTrade_list_body[elm];
-                sendAccounts.push({"accountid":item_account['ACCOUNTID']})
-                trade_list[index] = {};
-                
-                trade_list[index]["ELEMENT"] = item_account;
-                trade_list[index]["COLUMN1"] = $('<div></div>');
-                trade_list[index]["COLUMN2"] = $('<div></div>');
-                trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
-                ////div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED)
-                
-                trade_list[index]["COMPONENT"].init(
-                    trade_list[index]["COLUMN1"]
-                    ,trade_list[index]["COLUMN2"]
-                    ,item_account['ACCOUNTID']
-                    ,item['DIRTYPE']
-                    ,preload.getTradeItem(item_account['TRADEID'])["BORROW"]
-                    ,item_account['BUYCOUNT']
-                    ,item_account['BUYAMOUNT']
-                    ,PERCENT//item_account['PERCENT']
-                    ,true
-                    ,item_account
-                );
-                index++;
-            }
-
-            if(sendAccounts.length>0){
-                console.log("trade_list",JSON.stringify(trade_list));
-                   
-                oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
-                    console.log(JSON.stringify(arguments));
-                    
-                    //result.data = '[{ "status": "200", "tradeid": "1", "accountid": "309219512983", "userid": "20000","account_muse": "1986.90","account_value": "6544.00","account_msum": "8530.90" }]';
-                    // result.success=true;
-                    // if(result.success){
-                        var capitals;
-                        try{
-                            capitals= JSON.parse(result.data);
-                        }catch(err){
-                            capitals = '';
-                            console.log('order_today',err);
-                        }
-                        
-                         if(capitals!=''){
-                            for(var i = 0; i < trade_list.length; i++){
-                                for(var elm in capitals){
-                                    var item_capital = capitals[elm];
-                                    if(String(trade_list[i]["ELEMENT"]['ACCOUNTID']) == String(item_capital.accountid) ){
-                                        if(String(item_capital.status) != "200"){
-                                            //     oojs$.showError("您的账号："+item_capital.accountid+"资金验证存在问题");
-                                            //     // return;
-                                            continue;
-                                        }else{
-                                            trade_list[i]["COMPONENT"].addCapital(item_capital);
-                                        }
-                                    }
-                                }
-                            }
-                            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
-                        }else{
-                        //     oojs$.showError("您的资金验证存在问题 code data 604");
-                            self.appendTB_neworder_flush(policyHead,drawitem_data,trade_list);
-                        }
-                    // }else{
-                    //     oojs$.showError("您的资金验证存在问题 code url 404");
-                    // }
-                });
-
-            }else{
-                oojs$.showError("您还没有添加账号");
-            }
-
-            
-        })
-    }
     
-    ,appendTB_neworder_flush:function(policy_head,policy_data,account_list){
+    ,get_policy_head:function(){
+        var policyHead_arr;
+        policyHead_arr = policy.get_preOrder_head();
+        var hasLABLE = false;
+        for(var idx_head = 0; idx_head < policyHead_arr.length; idx_head++ ){
+            if(policyHead_arr[idx_head].hasOwnProperty('LABLE')){
+                hasLABLE = true;
+            }
+        }
+        if(!hasLABLE){
+            policyHead_arr.push({
+            'ID':'LABLE',
+            'NAME':"自定义标签"
+            })
+        }
+        return policyHead_arr;
+    }
+    ,orderId_filter:function(list, label, merge_if){
         var self = this;
-        //today appendTB_neworder_flush ---------
-        if(self.order_today_body_div == null){
-            self.order_today_body_div = $('<div id="order_today_body_div"></div>');
-            self.order_today_body_div.appendTo($('#order_today_tabs_2'));
+
+        var list_cp = [];
+        var root_obj = {};
+        //ORDERID分类
+        for(var idx = 0; idx < list.length; idx++){
+            if(list[idx].hasOwnProperty(label)){
+                if(root_obj.hasOwnProperty(list[idx][label])){
+                    root_obj[list[idx][label]].push(list[idx])
+                }else{
+                    root_obj[list[idx][label]]=[];
+                    root_obj[list[idx][label]].push(list[idx]);
+                }
+            }
+        }
+        //merge_if的元素合并
+        var tmp_obj = null;
+        var one_record = null;
+        for(var indx in root_obj){
+            var item_obj = {};
+            for(var idx = 0; idx < root_obj[indx].length; idx++){
+                one_record = root_obj[indx][idx];
+                for(var param in one_record){
+                    if(merge_if.indexOf(param)>=0){
+                        item_obj[param] = one_record[param];
+                    }else{
+                        if(!item_obj.hasOwnProperty(param)){
+                           item_obj[param] = [];
+                        }
+                        item_obj[param].push(one_record[param]);
+                    }
+                }
+            }
+            list_cp.push(item_obj);
         }
 
-        self.order_today_body_div.empty();
-
-        var tb = $('<table></table>', {
-            'class':"display dataTable"
-        }).appendTo(self.order_today_body_div);
-
-        oojs$.appendTB_item_D2(tb,policy_head,policy_data);
-        self.appendTB_accountHint(tb);
-        // self.appendTB_account_body(tb, account_itemD2, dirtype);
-
-        oojs$.appendTB_item_D2x(tb,account_list);
-
-
-        var tr = $('<tr></tr>',{}).appendTo(tb);
-        var td = $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr)
-        $('<input></input>',{'type':"button",value:"提交"}).appendTo(td).click(
-            {"policy_data":policy_data,"account_list":account_list}
-            ,self.order_today_new_submit
-            // 
-        );
-
-        // $('<input></input>',{'type':"button",value:"取消"}).appendTo(td).click(
-        //     drawitem_data,
-        //     self.policy_item_reback
-        // );
-
-
+        // console.log('orderId_filter',list_cp);
+        return list_cp;
     }
-    ,order_today_new_submit:function(event){
+    ,appendTB_accountHint:function(tb){
+        var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
+        var td = $('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
+        td.append($('<label></label>').text("请选择您帐户:"));
+        var label = $('<label></label>',{
+
+        }).text('(*注：只有选择了账户才能选择交易策略)');
+        label.css({ 'color': 'red', 'font-size': '80%' });
+        td.append(label);
+    }
+    ,order_btn_modifyreback:function(event){
+        //返回
+        var self = event.data.scope;
+        self.appendTB_order_list();
+    }
+
+    ,order_submit:function(event){
+        var self = event.data.scope;
+
         var policy_data = event.data['policy_data'];
-        var account_list = event.data['account_list'];
-        var type = "add"
+        var trade_list = event.data['trade_list'];
+
+        var type = "new"
         if(event.data.hasOwnProperty("type")){
             type = event.data['type']
         }
 
         var policy_data_new = {};
-        console.log("policy_data",JSON.stringify(policy_data));
-
+        
         for(var elm in policy_data){
             if(policy_data[elm] && policy_data[elm].hasOwnProperty("COMPONENT")
                 &&policy_data[elm].hasOwnProperty('ELEMENT')){
@@ -971,35 +1081,66 @@ oojs$.com.stock.order_today = oojs$.createClass(
         policy_data_new['PGROUPID']=policy_data['PGROUPID']['ORIGIN'];
         policy_data_new['DIRTYPE']=policy_data['DIRTYPE']['ORIGIN'];
         policy_data_new['POLICYPARAM'] = policy_data['POLICYPARAM']['COMPONENT'].val();
+        
+        //策略中判断 stockset ，股校验限制
+        //'type':
+        //'0' 允许空
+        //'1' 不允许为空
+        //'2' 只允许一只股
+        var policy_stockset_doc = '';
+        if(policy_data_new['POLICYPARAM'].hasOwnProperty('stockset')
+            && policy_data_new['POLICYPARAM']['stockset'].hasOwnProperty('type') ){
+            policy_stockset_doc =  policy_data_new['POLICYPARAM']['stockset']['type'];
+        }
+
 
         console.log("policy_data\n",JSON.stringify(policy_data_new));
-        console.log("account_list\n",JSON.stringify(account_list));
+        console.log("account_list\n",JSON.stringify(trade_list));
+
         var account_result = [];
-        var index = 0;
+        // var index = 0;
         var COMPONENT_ACCOUNTSET = null;
-        for(var i =0; i< account_list.length;i++){
-            if(account_list[i]["COMPONENT"]){
-                COMPONENT_ACCOUNTSET = account_list[i]["COMPONENT"].val();
+        for(var idx = 0; idx < trade_list.length; idx++){
+
+            if( trade_list[idx]["COMPONENT"] 
+                && trade_list[idx]["COMPONENT"].val() 
+                && !trade_list[idx]["COMPONENT"].val()['CHECKED']
+                && type == self.TYPE_NEW
+                ){//如果下单，不勾选的不作为数据发送
+                continue;
+            }
+
+            if( trade_list[idx]["COMPONENT"]){
+                COMPONENT_ACCOUNTSET = trade_list[idx]["COMPONENT"].val();
                 if(COMPONENT_ACCOUNTSET==null ){
                     return ; 
                 }//accountset返回的null的情况
             }
-            if(account_list[i]["COMPONENT"] 
-                && account_list[i]["COMPONENT"].val() 
-                && account_list[i]["COMPONENT"].val()['CHECKED']){
-                account_result[index] = {};
+            
+            
+
+            account_result[idx] = {};
                 
-                for(var elm in account_list[i]["ELEMENT"]){
-                    account_result[index][elm] = account_list[i]["ELEMENT"][elm];
+            for(var elm in trade_list[idx]["ELEMENT"]){
+                account_result[idx][elm] = trade_list[idx]["ELEMENT"][elm];
+            }
+            
+            for( var elm in  COMPONENT_ACCOUNTSET ){
+                if(typeof(COMPONENT_ACCOUNTSET[elm]) == 'object'){
+                    continue
                 }
+                account_result[idx][elm] = COMPONENT_ACCOUNTSET[elm];
+            }
+
+            if( trade_list[idx]["COMPONENT"] 
+                && trade_list[idx]["COMPONENT"].val() 
+                && trade_list[idx]["COMPONENT"].val()['CHECKED']
+                ){
                 
-                for( var elm in  COMPONENT_ACCOUNTSET ){
-                    if(typeof(COMPONENT_ACCOUNTSET[elm]) == 'object'){
-                        continue
-                    }
-                    account_result[index][elm] = COMPONENT_ACCOUNTSET[elm];
-                }
-                index++;
+                account_result[idx]['CHECKED'] = 1;
+                
+            }else{
+                account_result[idx]['CHECKED'] = 0;
             }
         }
         
@@ -1028,62 +1169,189 @@ oojs$.com.stock.order_today = oojs$.createClass(
             ,'PERCENT':null
             ,'FLAG_USER':null
             ,'VISIBLE':null
+            ,'LABLE':null
+            ,'CHECKED':null
+            ,'ONTIMESEND':null
         }
 
+        //TRADEID
+        //ISTEST
+        // var specialField = [
+        //     'FLAG_USER'
+        //     ,'VISIBLE'
+        //     ,'ROWID'
+        //     ,'TRADEID'
+        //     ,'ISTEST'
+        // ];
         var sendData = [];
         for( var i = 0; i < account_result.length; i++ ){
             sendData[i] = {};
-            //account_result[i]
             for(var elm in sentStruct){
                 //policy_data
                 //account_result
                 if(policy_data_new.hasOwnProperty(elm)){
                     sendData[i][elm] = policy_data_new[elm];
                 }
+                
                 if(account_result[i] && account_result[i].hasOwnProperty(elm)){
-                    if(type == "modify" && elm == 'DIRTYPE'){
-                        continue;
-                    }
                     sendData[i][elm] = account_result[i][elm];
                 }
+
+                if( elm == 'STOCKSET' && policy_stockset_doc != '' ){
+                    if( policy_stockset_doc == '0' ){
+                        //允许空
+                    }else if( policy_stockset_doc == '1' ){
+                        //不允许为空
+                        if(sendData[i][elm] == ''){
+                            oojs$.showError("该策略不允许股票为空");
+                            return;
+                        }
+                    }else if( policy_stockset_doc == '2' ){
+                        //只允许一只股
+                        //为空，或者有逗号的都不允许通过
+                        if(sendData[i][elm] == '' || sendData[i][elm].indexOf(',')!= -1 ){
+                            oojs$.showError("该策略只允许股票为1股");
+                            return;
+                        }
+                    }
+                }
+            }
+            if(event.data.hasOwnProperty('from')
+            	&&event.data.from == 'forbid'
+            ){
+            	sendData[i]['FLAG_USER'] = event.data.attach;
+            }
+            if(event.data.hasOwnProperty('from')
+            	&&event.data.from == 'del'
+            ){
+            	sendData[i]['VISIBLE'] = 0;
             }
         }
 
-        console.log("today sendData",JSON.stringify(sendData));
+        console.log("order sendData",JSON.stringify(sendData));
         
-        if(type == "add"){
-            oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
-                if(result
-                    &&result.hasOwnProperty('success')
-                    &&result.success){
+        if(self.instance == "order_today"){
+            if(type == self.TYPE_NEW){
+                oojs$.httpPost_json("/insert_preorder",sendData,function(result,textStatus,token){
+                    if(result
+                        &&result.hasOwnProperty('success')
+                        &&result.success){
 
-                    $( "#order_today_tabs" ).tabs({ selected: 0 });
-                    order_today.order_today_tab1_clk();
-                }else{
-                    oojs$.showError(result.message);
-                }
-            });
-        }else if(type == "modify"){
-            oojs$.httpPost_json("/update_ordertoday",sendData,function(result,textStatus,token){
-                if(result
-                    &&result.hasOwnProperty('success')
-                    &&result.success){
-                    
-                    $( "#order_today_tabs" ).tabs({ selected: 0 });
-                    order_today.order_today_tab1_clk();
-                }else{
-                    oojs$.showError(result.message);
-                }
-            });
+                        $( "#"+self.tabs ).tabs({ selected: 0 });
+                        self.order_tab1_clk({"data":{"scope":self,"param":'6'}});
+
+                    }else if(result){
+                        oojs$.showError(result.message);
+                    }
+                });
+            }else if(type == self.TYPE_MDF){
+                oojs$.httpPost_json("/update_ordertoday",sendData,function(result,textStatus,token){
+                    if(result
+                        &&result.hasOwnProperty('success')
+                        &&result.success){
+                        
+                        $( "#"+self.tabs ).tabs({ selected: 0 });
+                        self.order_tab1_clk({"data":{"scope":self}});
+
+                    }else if(result){
+                        oojs$.showError(result.message);
+                    }
+                });
+            }
+        }else if(self.instance == "order_period"){
+        	if(type == self.TYPE_NEW){
+        		oojs$.httpPost_json("/insert_orderPeriod",sendData,function(result,textStatus,token){
+	                if(result
+	                    &&result.hasOwnProperty('success')
+	                    &&result.success){
+	                    $( "#"+self.tabs ).tabs({ selected: 0 });
+	                    self.order_tab1_clk({"data":{"scope":self}});
+	                }else if(result){
+	                    oojs$.showError(result.message);
+	                }
+	            });
+        	}else if(type == self.TYPE_MDF){
+        		oojs$.httpPost_json("/update_orderPeriod",sendData,function(result,textStatus,token){
+	                if(result
+	                    &&result.hasOwnProperty('success')
+	                    &&result.success){
+	                    
+	                    $( "#"+self.tabs ).tabs({ selected: 0 });
+	                    self.order_tab1_clk({"data":{"scope":self}});
+	                }else if(result){
+	                    oojs$.showError(result.message);
+	                }
+	            });
+        	}
+        }else if(self.instance == "order_tomorrow"){
+        	if(type == self.TYPE_NEW){
+        		oojs$.httpPost_json("/insert_orderTomorrow",sendData,function(result,textStatus,token){
+	                if(result
+	                    &&result.hasOwnProperty('success')
+	                    &&result.success){
+	                    $( "#"+self.tabs ).tabs({ selected: 0 });
+	                    self.order_tab1_clk({"data":{"scope":self}});
+	                }else if(result){
+	                    oojs$.showError(result.message);
+	                }
+	            });
+        	}else if(type == self.TYPE_MDF){
+        		oojs$.httpPost_json("/update_orderTomorrow",sendData,function(result,textStatus,token){
+	                if(result
+	                    &&result.hasOwnProperty('success')
+	                    &&result.success){
+	                    
+	                    $( "#"+self.tabs ).tabs({ selected: 0 });
+	                    self.order_tab1_clk({"data":{"scope":self}});
+	                }else if(result){
+	                    oojs$.showError(result.message);
+	                }
+	            });
+        	}
+        }
+
+    }
+    ,__ctor:function(){
+        var self = this;
+        if(arguments[0].hasOwnProperty('instance')){
+            self.instance = arguments[0]['instance'];
+        }
+        if(arguments[0].hasOwnProperty('nvg')){
+            self.nvg = arguments[0]['nvg'];
+        }
+        if(arguments[0].hasOwnProperty('tabs')){
+            self.tabs = arguments[0]['tabs'];
+        }
+        if(arguments[0].hasOwnProperty('tabs1')){
+            self.tabs1 = arguments[0]['tabs1'];
+        }
+        if(arguments[0].hasOwnProperty('tabs2')){
+            self.tabs2 = arguments[0]['tabs2'];
+        }
+        if(arguments[0].hasOwnProperty('panel1')){
+            self.panel1 = arguments[0]['panel1'];
+        }
+        if(arguments[0].hasOwnProperty('panel2')){
+            self.panel2 = arguments[0]['panel2'];
         }
     }
 });
 
-var order_today = new oojs$.com.stock.order_today();
+var order_today = new oojs$.com.stock.order({
+    "instance":"order_today"
+    ,'nvg':'order_today'
+    ,'tabs':'order_today_tabs'
+    ,'tabs1':'order_today_tabs_a1'
+    ,'tabs2':'order_today_tabs_a2'
+    ,'panel1':'order_today_tabs_1'
+    ,'panel2':'order_today_tabs_2'
+});
+
 oojs$.addEventListener("ready",function(){
     console.log('order ready',JSON.stringify(arguments));
     //{'type':'showPanel','action':'order_new','origin':'market','data':param}
     if(typeof(arguments[0]) == 'object'){
+    	//来源ws协议
         var obj = arguments[0];
         if(obj.hasOwnProperty('type') 
             && obj.hasOwnProperty('action')
@@ -1100,7 +1368,9 @@ oojs$.addEventListener("ready",function(){
             order_today.stock_market = '';
             order_today.origin = '';
         }
+
+    }else{
+    	order_today.init();
     }
-    //order ready {"0":"order_new","1":"603788"}
-    order_today.init();
+  
 });

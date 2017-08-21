@@ -90,7 +90,7 @@ oojs$.com.stock.policy = oojs$.createClass(
         var self = this;
 
         oojs$.httpGet("/select_subscrible",function(result,textStatus,token){
-            if(result.success){
+            if(result && result.success){
 
                 self.policy_unsubscribe = [];
                 self.policy_unsubscribe = result.data;
@@ -417,7 +417,7 @@ oojs$.com.stock.policy = oojs$.createClass(
         var self = this;
 
         oojs$.httpGet("/select_alreadySubscrible",function(result,textStatus,token){
-            if(result.success){
+            if(result && result.success){
                 self.is_load_subscribe = true;
                 console.log("load_subscribe",JSON.stringify(result.data));
                 self.policy_subscribe = [];

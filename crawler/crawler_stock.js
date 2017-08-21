@@ -15,13 +15,13 @@ const descrip = require(path.join(__dirname,'..','bean','des_stock'));
 
 //以分钟为单位，访问6秒
 
-
 var getStockInfo = function(param,callback){
 	
 	if(typeof param == 'string'){
 	var headers = {
 		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.65 Safari/537.36'
 	};
+	//http:qt.gtimg.cn/q=sz000001,sz000002,sz000004,sz000005,sz000006,sz000007
 	var options ={
 		hostname: 'qt.gtimg.cn',
 		port: 80,
@@ -164,6 +164,42 @@ var parseStocks = function(timestamp,data){
 	data=null;
 };
 
+var parseOntimeStocks = function( data ){
+	if(null == data){return null}
+	var lines = data.split("\n");
+	var reg = /^v_(.*)=/g;
+	var reg2 = /\"(.*)\"/g;
+	var fields = [];
+	var field_eq1 ='';
+	var field_eq2 ='';
+	var param = [];
+	var result = {};
+	var stockID = '';
+	try{
+		for(var i = 0; i < lines.length ; i++){
+			if(lines[i].length>3){
+				fields = lines[i].split('=');
+				field_eq1 = fields[0];
+				
+				field_eq2 = fields[1]
+					.replace(';','')
+					.replace(/\"/g,"");
+				
+				param = field_eq2.split('~');
+				stockID = param[2];//股票代码
+				result[stockID] = [];
+				
+				for(var j = 0; j < descrip.tx_structor_ontime.length; j++){
+					result[stockID].push(param[descrip.tx_structor_ontime[j].id]);
+				}
+			}
+		}
+	}catch(err){
+		console.log("crawler parseOntimeStocks parse lines err");
+	}
+	
+	return result;
+};
 
 var parseStocksNull = function( timestamp ){
 	var sendDate = new bean.stock();
@@ -172,6 +208,49 @@ var parseStocksNull = function( timestamp ){
 	sendDate.data[timestamp] = {};
 	process.send(sendDate);
 };
+
+var addPrefix = function(data){
+	var count = 0;
+	var tmpParam = '';
+	var addcomma = false;
+	for(var i=0;i<data.length;i++){
+		
+		if( !( i==0 || !addcomma) ){
+			tmpParam +=',';
+		}
+		
+		if(parseInt(data[i])>=600000){
+			tmpParam += 'sh'+data[i];
+		}else{
+			tmpParam += 'sz'+data[i];
+		}
+		
+		addcomma = true;
+		count++;
+		
+		if(count == 60 || (i+1) == data.length){
+			count = 0;
+			addcomma = false;
+		}
+	}
+	
+	return tmpParam;
+};
+
+
+//start 每天9点15，更新爬虫记录
+var intervalId = null;
+var startEverydayDrawler = function(){
+	if(null == intervalId){
+		setInterval(function(){
+		
+		},200);
+	}
+};
+
+exports.parseOntimeStocks = parseOntimeStocks;
+exports.getStockInfo = getStockInfo;
+exports.addPrefix = addPrefix;
 
 //process.send({'type':"timely_share",'value':'aaaa'});
 //console.log('child',process.env);

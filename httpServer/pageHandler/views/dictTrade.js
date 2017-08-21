@@ -554,14 +554,14 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             	'<input type="button" name="12" value="删除" ' +
 				'onclick="dictTrade.handler_trd_del('+
 					this.dictTrade_list_body[elm]['USERID']+',\''+
-                    this.dictTrade_list_body[elm]['ACCOUNTID']+'\', '+
+					this.dictTrade_list_body[elm]['ACCOUNTID']+'\', '+
 					this.dictTrade_list_body[elm]['TRADEID']+
 				')"; >'
 				+
                 '<input type="button" name="12" value="修改"' +
 				' onclick="dictTrade.handler_trd_chg('+
 					this.dictTrade_list_body[elm]['USERID']+',\''+
-                    this.dictTrade_list_body[elm]['ACCOUNTID']+'\', '+
+					this.dictTrade_list_body[elm]['ACCOUNTID']+'\', '+
 					this.dictTrade_list_body[elm]['TRADEID']+
 				');" >'
 			)};
@@ -594,13 +594,18 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
 	,load_userAccount: function(callback,token){
 		var self = this;
         oojs$.httpGet("/select_userAccount",function(result,textStatus,token){
-			if(result.success){
+			if(result && result.success){
                 self.is_load_tradelist = true;
 				self.dictTrade_list_body = [];
                 console.log("trade\n","load_userAccount\n",JSON.stringify(result.data));
                 self.dictTrade_list_body = result.data;
 			}else{
-                oojs$.showError(result.message);
+                if(result && result.message){
+                    oojs$.showError(result.message);
+                }else{
+                    oojs$.showError('数据加载失败，请重试 code：001 message：券商');
+                }
+                
 			}
 			if(callback){
                 callback(token);

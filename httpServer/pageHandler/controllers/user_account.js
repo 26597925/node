@@ -73,6 +73,7 @@ exports.modify_userAccount = function(){
 		    	
 			    //UPDATE `tb_user_account` SET `ADDTIME`='2017-07-14 00:00:00' where `ACCOUNTID`=309219249819;
 			    var sql1 = "UPDATE `tb_capital_conf` SET " +
+				    // " `USERID` = '%s', " +
 				    " `MAXBUY` = '%s', " +
 				    " `BUYCOUNT` = '%s', " +
 				    " `BUYAMOUNT` = '%s', " +
@@ -80,6 +81,7 @@ exports.modify_userAccount = function(){
 				    " WHERE " +
 				    " `ACCOUNTID` = '%s'";
 			    sql1 = util.format(sql1,
+				    //ID,
 				    self.req.post["MAXBUY"]
 				    ,self.req.post["BUYCOUNT"]
 				    ,self.req.post["BUYAMOUNT"]
@@ -94,6 +96,7 @@ exports.modify_userAccount = function(){
 				    
 				    if(self.alias == "add"){
 					    sql2= "UPDATE `tb_user_account` SET " +
+						    // " `USERID` = '%s', " +
 						    " `PASSWORD` = '%s', " +
 						    " `TXPASSWD` = '%s', " +
 						    " `ADDTIME`=now(), " +
@@ -103,6 +106,7 @@ exports.modify_userAccount = function(){
 						    " AND " +
 						    " `ACCOUNTID` = '%s'";
 					    sql2 = util.format(sql2,
+						    //ID
 						    self.req.post["PASSWORD"]
 						    ,self.req.post["TXPASSWD"]
 						    ,self.req.post["TRADEID"]
@@ -110,6 +114,7 @@ exports.modify_userAccount = function(){
 					    );
 				    }else{
 					    sql2= "UPDATE `tb_user_account` SET " +
+						    // " `USERID` = '%s', " +
 						    " `PASSWORD` = '%s', " +
 						    " `TXPASSWD` = '%s' " +
 						    // ", " +
@@ -118,6 +123,7 @@ exports.modify_userAccount = function(){
 						    " AND " +
 						    " `ACCOUNTID` = '%s'";
 					    sql2 = util.format(sql2,
+						    //ID
 						    self.req.post["PASSWORD"]
 						    ,self.req.post["TXPASSWD"]
 						    ,self.req.post["TRADEID"]
@@ -127,6 +133,7 @@ exports.modify_userAccount = function(){
 			    }else{//also change addtime
 				    if(self.alias == "add"){
 					    sql2= "UPDATE `tb_user_account` SET " +
+						    // " `USERID` = '%s', " +
 						    " `PASSWORD` = '%s', " +
 						    " `TXPASSWD` = '%s', " +
 						    " `ADDTIME`=now(), " +
@@ -136,6 +143,7 @@ exports.modify_userAccount = function(){
 						    " AND " +
 						    " `ACCOUNTID` = '%s'";
 					    sql2 = util.format(sql2,
+						    //ID
 						    self.req.post["PASSWORD"]
 						    ,self.req.post["TXPASSWD"]
 						    ,self.req.post["TRADEID"]
@@ -143,6 +151,7 @@ exports.modify_userAccount = function(){
 					    );
 				    }else{
 					    sql2= "UPDATE `tb_user_account` SET " +
+						    // " `USERID` = '%s', " +
 						    " `ADDTIME`=now(), " +
 						    " `PASSWORD` = '%s', " +
 						    " `TXPASSWD` = '%s' " +
@@ -152,6 +161,7 @@ exports.modify_userAccount = function(){
 						    " AND " +
 						    " `ACCOUNTID` = '%s'";
 					    sql2 = util.format(sql2,
+						    //ID
 						    self.req.post["PASSWORD"]
 						    ,self.req.post["TXPASSWD"]
 						    ,self.req.post["TRADEID"]

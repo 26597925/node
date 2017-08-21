@@ -17,7 +17,7 @@ const wsconfig = require(path.join(__dirname,'pageHandler','models','WSSConfig')
 const wssRoute = require(path.join(__dirname,'pageHandler','models','WSSRoute'));
 const descrip = require(path.join(__dirname,'..','bean','des_stock'));
 
-//console.log("localIP",localIP.localIP);
+console.log("localIP",localIP.localIP);
 var self = this;
 self.wss = null;//web socket server
 this.stocks = {'date':new Date(),'data':null};//stock {date,data[{name,code},....]}
@@ -95,7 +95,7 @@ this.broadcast = function (broadcastData) {
 exports.runPageServer = function( port )
 {
 	port = port || 80;
-  // port = port || 20080;
+	// port = port || 20080;
 	console.log(unit_date.getTime(),'Collector Server 127.0.0.1:'+ port );
 	var server = http.createServer(function(req, res){
 	if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
@@ -329,13 +329,15 @@ var staticFileServer = function(req, res, filePath){
 	}	
 
 	fs.readFile(filePath, "binary", function(err, file) {	
-		if(err) {	
+		if(err) {
+			
 			handler500(req, res, err);
 			return;	
 		}
 		
 		var ext = path.extname(filePath);
 		ext = ext ? ext.slice(1) : 'html';
+		res.setHeader('Cache-Control', 'public, max-age=31557600');
 		res.writeHead(200, {'Content-Type': contentTypes[ext] || 'text/html'});
 		res.write(file, "binary");
 		res.end();

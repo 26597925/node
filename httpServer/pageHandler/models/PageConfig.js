@@ -259,7 +259,19 @@ route.map({
     controller:'detail',
     action:'select_tradeDetail'
 });
-
+//================================
+route.map({
+	method:'post',
+	url:/^\/ontimeSend\/?$/i,
+	controller:'ontime',
+	action:'ontime_send'
+});
+route.map({
+	method:'post',
+	url:/^\/ontimeGetStock\/?$/i,
+	controller:'ontime',
+	action:'ontime_getStock'
+});
 //================================
 
 route.map({

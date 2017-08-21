@@ -2,11 +2,9 @@
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const path = require('path');
-
+const cfg_httpserver = require(path.join(__dirname,'..','Config_HttpServer'));
 // create reusable transporter object using the default SMTP transport
-var transporter = nodemailer.createTransport({
-
-});
+var transporter = nodemailer.createTransport(cfg_httpserver.email);
 
 exports.sendMain = function(receiver,content,Hyperlink,callback){
     var mailOptions = {
@@ -61,6 +59,45 @@ exports.getPWD = function(receiver,content,callback){
 };
 
 // //test
-this.sendMain('mazhou_654452588@qq.com','http://127.0.0.1:20080',function(){
-    console.log(JSON.stringify(arguments));
-});
+// this.sendMain('mazhou_654452588@qq.com','http://127.0.0.1:20080',function(){
+//     console.log(JSON.stringify(arguments));
+// });
+
+var err_content = [];
+exports.ServerError = function(receiver,content,callback){
+	var isSend = true;
+	
+	if(err_content.indexOf(content)>=0){
+		isSend = false;
+	}
+	err_content.push(content);
+	if(err_content.length>20){
+		err_content.shift();
+	}
+	
+	if(isSend){
+		var mailOptions = {
+			from: 'stock_message@126.com'
+			,to: receiver
+			,subject: '服务器出错了'// Subject line
+			,html: '<b>您好！<br />错误信息</br>'+
+			'<p> '+content+'</p>'+
+			'<p>###</p>'
+		};
+		// console.log(JSON.stringify(mailOptions));
+		transporter.sendMail(mailOptions, function(error, info)
+		{
+			if (error) {
+				if(callback){
+					callback("faise",error);
+				}
+				console.log('mail ServerError',error);
+				return;
+			}
+			if(callback){
+				callback("success",info.messageId, info.response);
+			}
+			// console.log('Message %s sent: %s', info.messageId, info.response);
+		});
+	}
+};

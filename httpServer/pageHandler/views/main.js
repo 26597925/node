@@ -376,7 +376,10 @@ var oojs$ = {
         if(arguments.length>1){
             type = arguments[1];
         }
-
+        var enable = null;
+        if(arguments.length>2){
+            enable = arguments[2];
+        }
 		htmltag.empty();
 
         if(type!='' && type == 'datepicker')
@@ -386,6 +389,9 @@ var oojs$ = {
             }).datepicker({ dateFormat: 'yy年mm月dd日' });
             input.datepicker('setDate',new Date());
             htmltag.append(input);
+            if( enable != null && enable == 0 ){
+                input.prop('disabled',true);
+            }
         }
 
 		var tmpval = '';
@@ -395,6 +401,9 @@ var oojs$ = {
         select= $('<select ></select>',{
             style:"height:25px;width:50px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
+        if( enable != null && enable == 0 ){
+                select.prop('disabled',true);
+            }
 		for(var i = 0; i < 24; i++){
             tmpval = i<=9?("0"+i):i;
             select.append("<option value='"
@@ -408,6 +417,9 @@ var oojs$ = {
         select= $('<select ></select>',{
             style:"height:25px;width:50px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
+        if( enable != null && enable == 0 ){
+                select.prop('disabled',true);
+            }
         for(var i = 0; i < 60; i++){
 
             tmpval = i<=9?("0"+i):i;
@@ -422,6 +434,9 @@ var oojs$ = {
         select= $('<select></select>',{
             style:"height:25px;width:50px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
+        if( enable != null && enable == 0 ){
+                select.prop('disabled',true);
+            }
         for(var i = 0; i < 60; i++){
             tmpval = i<=9?("0"+i):i;
             select.append("<option value='"
@@ -496,6 +511,14 @@ var oojs$ = {
             modal:true
         });
     }
+    ,closeHint:function () {
+        /**
+         *<div id="dialog" title="提示" style="display:none;">
+         *<p id="dialogtext" style=""></p>
+         *</div>
+         * */
+        $("#dialog").dialog("close");
+    }
 
 	,apply : function(dest, source) {
 		for ( var name in source) {
@@ -548,6 +571,7 @@ var oojs$ = {
                 //console.log('main',evt.data);
                 var jsonObj = JSON.parse(evt.data);
                 if(jsonObj.hasOwnProperty('type')){
+                    jsonObj['from'] = 'ws';
                     oojs$.dispatch(jsonObj['type'],jsonObj);
                 }
             };
@@ -711,12 +735,23 @@ var oojs$ = {
                     tr = $('<tr></tr>',{'class':"odd"}).appendTo(tbody);
                 }
                 var td = null;
+
+                if(list_body[elm].hasOwnProperty("colspan")){
+                    td = $('<td></td>',{ style:'background-color:#eeeeee;','colspan':list_head.length,'align':"right",'valign':"bottom"}).appendTo(tr);
+                    td.append(list_body[elm]['div']['ELEMENT']);
+                }else{
                 for(var in_elm = 0; in_elm < list_head.length; in_elm++){
                     if(!list_body[elm].hasOwnProperty( list_head[in_elm]["ID"] )){
+                        // td = $('<td></td>').appendTo(tr);
                         continue;
+                    }else{
+                        td = $('<td></td>').appendTo(tr);
+                        // if('STATUS'!=list_head[in_elm]["ID"]){
+                        td.append(list_body[elm][ list_head[in_elm]["ID"] ]['ELEMENT']);
+                        // }
                     }
-                    td = $('<td></td>').appendTo(tr);
-                    td.append(list_body[elm][ list_head[in_elm]["ID"] ]['ELEMENT']);
+                   
+                }
                 }
             }
         }
@@ -1010,7 +1045,7 @@ var oojs$ = {
 //jsonData {"view":[{"type":"label","value":"请输入最大值","suf":{  ...}}],"result":[{"id":"check_id","value":[0,1,0]}]}
 //jsonData {"view":[{"type":"input","id":"input_id","value":"","suf":{  ...}},"result":[{"id":"check_id","value":[0,1,0]}]}
 //jsonData {"view":[{"type":"check","id":"check_id","key":["ck_1","ck_2","ck_3"],"value":["近期涨停","昨日一封","昨日烂板"]}],"title":"","result":[{"id":"check_id","value":[0,1,0]}]}
-//jsonData {"view":[{"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"suf":[{...},{...}}],"result":[{"id":"check_id","value":[0,1,0]}]}
+//jsonData {"view":[{"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"suf":[{...},{...}}],"title":"","result":[{"id":"check_id","value":[0,1,0]}]}
 //
 oojs$.ns("com.stock.JsonView");
 oojs$.com.stock.JsonView = oojs$.createClass(
@@ -1485,14 +1520,15 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,PERCENT_tmp:''
     ,ACCOUNT:null
     ,CAPITAL:null
-    ,ENABLE:null
+    ,ENABLE:null            //是否当日添加券商
+    ,enable:null            //是否禁用按钮
     ,select_tradetype:[
         {id:"BUYCOUNT",name:"交易股数"}
         ,{id:"BUYAMOUNT",name:"交易金额"}
         ,{id:"PERCENT",name:"交易比例"}
     ]//帐户用
     
-    ,init:function(div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT){
+    ,init:function(div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT, enable){
         //column1
         var self = this;
         div1.empty();
@@ -1505,6 +1541,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.PERCENT_tmp = self.PERCENT = PERCENT;
         self.CHECKED = CHECKED;
         self.ACCOUNT = ACCOUNT;
+        self.enable = enable ;
 
         if(ACCOUNT
             &&ACCOUNT.hasOwnProperty("ADDTIME")
@@ -1521,6 +1558,9 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
 
         self.INPUT = $('<input></input>',{'type':'text'});
         self.LABEL_UNIT = $('<label></label>');
+        if( null != enable && 0==enable ){
+            self.INPUT.prop('disabled',true);
+        }
 
         var checkbox = self.CHECK = $('<input></input>',{
             'type':'checkbox'
@@ -1529,9 +1569,15 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             {'scope':self},
             self.ck_change
         );
-
+        if( null != enable && 0==enable ){
+            checkbox.prop('disabled',true);
+        }
         if(CHECKED){
             checkbox.prop('checked', true);
+        } else{
+            if(self.LABEL_UNIT){
+                self.LABEL_UNIT.css({ 'color':  '#a7a7a7' });
+            }
         }
 
         
@@ -1558,7 +1604,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
                 self.SELECT_DIRTYPE.append(
                     "<option value='2'>融资买入</option>"
                 );
-                if(!CHECKED){
+                if( !CHECKED ){
                     self.SELECT_DIRTYPE.prop("disabled", true );
                 }
                 self.SELECT_DIRTYPE.change(
@@ -1615,21 +1661,30 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             div2.append(self.LABEL_UNIT);
         }
 
-        if(self.ENABLE!=null&&self.ENABLE==false){
+        
+        if(self.ENABLE!=null && self.ENABLE==false ){
             checkbox.prop('checked', false);
             checkbox.prop('disabled', true);
         }
 
-        if(self.ENABLE!=null
+        if( null != enable && 0 == enable && null != checkbox ){
+            checkbox.prop('disabled', true);
+        }
+
+        if( (self.ENABLE!=null
             &&self.ENABLE==false
-            &&self.SELECT
+            &&self.SELECT)
+            ||
+            (null != enable && 0==enable && self.SELECT)
         ){
             self.SELECT.prop("disabled", true );
         }
 
-        if(self.ENABLE!=null
+        if( (self.ENABLE!=null
             &&self.ENABLE==false
-            &&self.SELECT_DIRTYPE
+            &&self.SELECT_DIRTYPE)
+            ||
+            (null != enable && 0==enable && self.SELECT_DIRTYPE )
         ){
             self.SELECT_DIRTYPE.prop("disabled", true );
         }
@@ -1672,13 +1727,12 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             if(self.SELECT){
                 self.SELECT.prop('disabled',false);
             }
+            if(self.LABEL_UNIT){
+                self.LABEL_UNIT.css({ 'color': '#242424' });
+            }
         }else{
-            self.BUYCOUNT='';
-            self.BUYAMOUNT='';
-            self.PERCENT='';
-
             if(self.INPUT){
-                self.INPUT.val('');
+                
                 self.INPUT.prop('disabled',true);
             }
 
@@ -1687,11 +1741,11 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             }
 
             if(self.SELECT){
-                self.SELECT.val('-1');
+                
                 self.SELECT.prop('disabled',true);
             }
             if(self.LABEL_UNIT){
-                self.LABEL_UNIT.text("");
+                self.LABEL_UNIT.css({ 'color':  '#a7a7a7' });
             }
         }
     }
@@ -1835,7 +1889,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             );
         }
 
-        console.log("main select append_select_tradetype ",self.BUYCOUNT,self.BUYAMOUNT,self.PERCENT,self.select_tradetype);
+        //console.log("main select append_select_tradetype ",self.BUYCOUNT,self.BUYAMOUNT,self.PERCENT,self.select_tradetype);
         if(Number(self.PERCENT_tmp)>0){
             select.val('PERCENT');
             self.INPUT.val(Number(self.PERCENT_tmp))
@@ -1890,29 +1944,33 @@ oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
     ,kids:null
     ,inputs:null
     ,type:''
+    ,enable:null
     ,val:function(){
-        if(this.type == 'tomorrow'){
-            var date = new Date($(this.inputs[0]).val());
-            date.setHours($(this.kids[0]).val());
-            date.setMinutes($(this.kids[1]).val());
-            date.setSeconds($(this.kids[2]).val());
+        var self = this;
+        if(self.type == 'tomorrow'){
+            var date = new Date($(self.inputs[0]).val());
+            date.setHours($(self.kids[0]).val());
+            date.setMinutes($(self.kids[1]).val());
+            date.setSeconds($(self.kids[2]).val());
             return date.toJSON();
         }
-        if(this.type == 'datepicker'){
-            var date = new Date($(this.inputs[0]).datepicker('getDate'));
-            date.setHours($(this.kids[0]).val());
-            date.setMinutes($(this.kids[1]).val());
-            date.setSeconds($(this.kids[2]).val());
+        if(self.type == 'datepicker'){
+            var date = new Date($(self.inputs[0]).datepicker('getDate'));
+            date.setHours($(self.kids[0]).val());
+            date.setMinutes($(self.kids[1]).val());
+            date.setSeconds($(self.kids[2]).val());
             return date.toJSON();
             //return {'yMd':date.toJSON(),'hh':$(this.kids[0]).val(),'mm':$(this.kids[1]).val(),'ss':$(this.kids[2]).val()};;
         }
-        return {hh:$(this.kids[0]).val(),"mm":$(this.kids[1]).val(),"ss":$(this.kids[2]).val()};;
+        return {hh:$(self.kids[0]).val(),"mm":$(self.kids[1]).val(),"ss":$(self.kids[2]).val()};;
     }
-    ,init:function(div, hh_mm_ss, datepicker, date){
+    ,init:function(div, hh_mm_ss, datepicker, date, enable){
+        var self = this;
+        self.enable = enable;
         if(datepicker && datepicker == 'tomorrow'){
-            this.type = datepicker;
-            oojs$.generateHMDOption(div,'datepicker');
-            this.inputs = div.find( "input" );
+            self.type = datepicker;
+            oojs$.generateHMDOption(div,'datepicker', enable);
+            self.inputs = div.find( "input" );
             
             var _date = new Date();
             if(date == null){
@@ -1920,28 +1978,28 @@ oojs$.com.stock.component.hh_mm_ss=oojs$.createClass({
             }else{
                 _date = new Date(date);
             }
-            $(this.inputs[0]).val(oojs$.Format(_date,'yyyy-MM-dd'));
-            $(this.inputs[0]).prop('disabled',true);
-
+            $(self.inputs[0]).val(oojs$.Format(_date,'yyyy-MM-dd'));
+            $(self.inputs[0]).prop('disabled',true);
+            
         }else if(datepicker && datepicker == 'datepicker'){
-            this.type = datepicker;
-            oojs$.generateHMDOption(div,datepicker);
-            this.inputs = div.find( "input" );
+            self.type = datepicker;
+            oojs$.generateHMDOption(div,datepicker, enable);
+            self.inputs = div.find( "input" );
             if( date!=null ){
-                $(this.inputs[0]).datepicker('setDate',date);
+                $(self.inputs[0]).datepicker('setDate',date);
             }
         }else{
-            this.type = '';
-            oojs$.generateHMDOption(div);
+            self.type = '';
+            oojs$.generateHMDOption(div, null, enable);
         }
 
-        this.kids = div.find( "select" );
+        self.kids = div.find( "select" );
         var hh = parseInt(hh_mm_ss["hh"]);
         var mm = parseInt(hh_mm_ss["mm"]);
         var ss = parseInt(hh_mm_ss["ss"]);
-        $(this.kids[0]).val(hh<=9?"0"+hh:hh);
-        $(this.kids[1]).val(mm<=9?"0"+mm:mm);
-        $(this.kids[2]).val(ss<=9?"0"+ss:ss);
+        $(self.kids[0]).val(hh<=9?"0"+hh:hh);
+        $(self.kids[1]).val(mm<=9?"0"+mm:mm);
+        $(self.kids[2]).val(ss<=9?"0"+ss:ss);
     }
     
 })
@@ -1960,6 +2018,12 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
     NAME:"stockset"
     ,data:''
     ,input:null
+    ,amount:0                   //0:股票个数不加限制，1:限时为1个，2:限时为2个，n:限制为n个（n<=1000 and n!=0）
+    ,enable:null                //0:禁用，1:启用
+    ,limitAmount: function(amount){
+        var self = this;
+        self.amount = amount;
+    }
     ,val:function(){
         console.log("检查当前的值是否合法")
         return this.data;
@@ -2038,7 +2102,6 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         var checkbox = null;
         var data = String(self.data);
         
-
         if(data.indexOf(",") == 0){
             data = data.substr(1);
         }
@@ -2047,14 +2110,19 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
             data = data.substr(0,data.length-1);
         }
 
-
-        if( data.length > 0 ){
+        if( data.length > 0  ){
             var datas = data.split(",");
+            var datas_len = datas.length;
+            if(self.amount!=0 && datas_len>self.amount){
+                datas_len = self.amount;
+                self.data = datas[0];
+                oojs$.showError('该策略只允许'+self.amount+"股被操作，多余的股将被自动删除");
+            }
 
             if(datas.length == 1 &&  datas[0] == ""){
                 //null
             }else{
-                for(var i = 0; i < datas.length; i++){
+                for(var i = 0; i < datas_len; i++){
                     checkbox = $('<input></input>',{
                         'style':'width:10px',
                         'type':'checkbox',
@@ -2068,31 +2136,46 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
         }
     }
 
-    ,init:function(div1,div2,data){
+    ,init:function(div1, div2, data, amount, enable){
         var self = this;
-        if(data == "null"){
+        if(data == "null" || data == null){
             data = "";
         }
         data = $.trim(String(data));
-        console.log('data',typeof(data));
+        self.amount = parseInt(amount);
+        //console.log('stockset init data',typeof(data));
         div1.empty();
         div2.empty();
         
         self.data = data;
-        
+        self.enable = enable;
+
         var div_ck = $('<div></div>',{
             'width': '590px',
             'word-wrap': 'break-word'});
         div1.append(div_ck);
 
+        if( enable != null && enable == 0 ){
+            div_ck.prop( 'disabled', true );
+        }
+
         self.rangeChk(div_ck);
 
-        $('<input></input>',{type:"button",value:"删除"}).appendTo(div1).click(
+        var delBtn = $('<input></input>',{type:"button",value:"删除"}).appendTo(div1).click(
             {"div1":div1,"div2":div2,"div_ck":div_ck,'data':data,'scope':self},
             self.delCKBtnFun
         );
 
+        if( enable != null && enable == 0 ){
+            delBtn.prop( 'disabled', true );
+        }
+
+
+        //股票输入框
         var input = self.input = $('<input></input>',{}).text("");
+        if( enable != null && enable == 0 ){
+            input.prop( 'disabled', true );
+        }
         var stocks = preload.getStock();
         if(stocks!=null){
 
@@ -2115,13 +2198,21 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
 
         $('<label style="color: #000000; font-size: 80%;">请输入股票编码</label>').appendTo(div2);
         div2.append(input);
-        $('<input></input>',{'type':"button",'value':"新增"}).appendTo(div2).click(
+        var newBtn = $('<input></input>',{'type':"button",'value':"新增"}).appendTo(div2).click(
             {"div1":div1,"div2":div2,"div_ck":div_ck,"input":input,'data':data,'scope':self},
             self.addCKBtnFun
         );
-
+        if( enable != null && enable == 0 ){
+            newBtn.prop( 'disabled', true );
+        }
         var input_up = $('<input  type="file" name="uploads" multiple="multiple" style="display: none;" />');//
+        if( enable != null && enable == 0 ){
+            input_up.prop( 'disabled', true );
+        }
         var button = $('<input type="button" value="上传文件"></input>');
+        if( enable != null && enable == 0 ){
+            button.prop( 'disabled', true );
+        }
         button.click(function (){
             input_up.click();
          });

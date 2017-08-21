@@ -54,6 +54,60 @@ var tx_structor =[
     // {'id':48,'name':'跌停价'},
     {'id':49,'name':'量比'}
 ];
+//实时卖出需要的字段
+var tx_structor_ontime =[
+    //{'id':0,'name':'未知'},
+    // {'id':1,'name':'名字'},
+    {'id':2,'name':'代码'},
+    {'id':3,'name':'当前价格'},
+    {'id':4,'name':'昨收'}
+    // ,
+    //{'id':5,'name':'今开'},
+    // {'id':6,'name':'成交量(手)'},
+    // {'id':7,'name':'外盘'},
+    // {'id':8,'name':'内盘'},
+    // {'id':9,'name':'买一'},
+    // {'id':10,'name':'买一量(手)'},
+    // {'id':11,'name':'买二'},
+    // {'id':12,'name':'买二量(手)'},
+    // {'id':13,'name':'买三'},
+    // {'id':14,'name':'买三量(手)'},
+    // {'id':15,'name':'买四'},
+    // {'id':16,'name':'买四量(手)'},
+    // {'id':17,'name':'买五'},
+    // {'id':18,'name':'买五量(手)'},
+    // {'id':19,'name':'卖一'},
+    // {'id':20,'name':'卖一量(手)'},
+    // {'id':21,'name':'卖二'},
+    // {'id':22,'name':'卖二量(手)'},
+    // {'id':23,'name':'卖三'},
+    // {'id':24,'name':'卖三量(手)'},
+    // {'id':25,'name':'卖四'},
+    // {'id':26,'name':'卖四量(手)'},
+    // {'id':27,'name':'卖五'},
+    // {'id':28,'name':'卖五(手)'},
+    // {'id':29,'name':'最近逐笔成交'},
+    // {'id':30,'name':'时间'},
+    // {'id':31,'name':'涨跌'},
+    // {'id':32,'name':'涨跌%'},
+    // {'id':33,'name':'最高'},
+    // {'id':34,'name':'最低'},
+    // {'id':35,'name':'价格/成交量(手)/成交额'},
+    // {'id':36,'name':'成交量(手)'},
+    // {'id':37,'name':'成交额(万)'},
+    // {'id':38,'name':'换手率'},
+    // {'id':39,'name':'市盈率'},
+    // {'id':40,'name':''},
+    // {'id':41,'name':'最高'},
+    // {'id':42,'name':'最低'},
+    // {'id':43,'name':'振幅'},
+    // {'id':44,'name':'流通市值'},
+    // {'id':45,'name':'总市值'},
+    // {'id':46,'name':'市净率'},
+    // {'id':47,'name':'涨停价'},
+    // {'id':48,'name':'跌停价'},
+    // {'id':49,'name':'量比'}
+];
 
 var tx_title = function(){
     var temarr = [];
@@ -63,9 +117,18 @@ var tx_title = function(){
     return temarr;
 };
 
+var tx_title_ontime = function(){
+	var temarr = [];
+	for(var i = 0; i < tx_structor_ontime.length; i++){
+		temarr.push(tx_structor_ontime[i].name)
+	}
+	return temarr;
+};
+
 exports.tx_structor = tx_structor;
 exports.tx_title = tx_title;
-
+exports.tx_structor_ontime = tx_structor_ontime;
+exports.tx_title_ontime = tx_title_ontime;
 
 // 获取盘口分析：
 // http://qt.gtimg.cn/q=s_pksz000858

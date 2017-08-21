@@ -6,7 +6,10 @@ const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 //const localIP = require(path.join(__dirname,"..","..","..",'localIP'));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 const cfg_httpserver = require(path.join(__dirname, "..", "..", "..", "Config_HttpServer.js"));
+const mail = require(path.join(__dirname,  "..", "..", "mailer.js"));
+const localIP = require(path.join(__dirname,"..", "..", "..", 'localIP'));
 
+var ip = localIP.localIP;
 var stock_load = false;
 
 exports.stocks = function(){
@@ -64,9 +67,11 @@ exports.capital = function(){
         result.data = arguments[0];
         self.responseDirect(200,"text/json",JSON.stringify(result));
       }else{
+	      
         result.message = "请求失败 code：001 proxy";
         result.success = false;
         self.responseDirect(200,"text/json",JSON.stringify(result));
+        
       }
 
     });
@@ -97,6 +102,9 @@ var proxy_stock = function(callback){
       }
     });
   }).on("error",function(err){
+	  if( String(ip) == cfg_httpserver.ip ){
+		  mail.ServerError('mazhou_654452588@qq.com', cfg_httpserver.stockServer.url+'</ br>');
+	  }
     if(callback){
       callback(null);
     }
@@ -116,14 +124,14 @@ var proxy_capitals = function(sendData,callback){
 	for(var elm in cfg_httpserver.capitals){
 		options[elm] = cfg_httpserver.capitals[elm];
 	}
-	
+	var my_path = options.path;
 	options.path = options.path+"?rdm="+Math.ceil(Math.random()*10000);
 	
-	console.log(unit_date.getTime(), path.basename(__filename), "http_post", options);
+	console.log(unit_date.getTime(), path.basename(__filename), "proxy_capitals http_post", options);
 	
 	var req = http.request(options, function(res) {
   // var req = http.request(cfg_httpserver.capitals, function(res) {
-    console.log(unit_date.getTime(),'Status: ' + res.statusCode);
+    console.log(unit_date.getTime(),'proxy_capitals Status: ' + res.statusCode);
     //console.log(unit_date.getTime(),'Headers: ' + JSON.stringify(res.headers));
     if(res.statusCode == 200){
 	    res.setEncoding('utf8');
@@ -134,6 +142,11 @@ var proxy_capitals = function(sendData,callback){
 		    }
 	    });
     }else{
+	    if( String(ip) == cfg_httpserver.ip ){
+		    options.path = my_path;
+		    console.log("mail",String(res.statusCode)+' </ br>'+JSON.stringify(options)+'</ br>'+result);
+	      mail.ServerError('mazhou_654452588@qq.com', String(res.statusCode)+' </ br>'+JSON.stringify(options)+'</ br>'+result);
+	    }
 	    if(callback){
 		    callback();
 	    }
