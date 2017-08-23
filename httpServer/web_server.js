@@ -17,7 +17,7 @@ const wsconfig = require(path.join(__dirname,'pageHandler','models','WSSConfig')
 const wssRoute = require(path.join(__dirname,'pageHandler','models','WSSRoute'));
 const descrip = require(path.join(__dirname,'..','bean','des_stock'));
 
-console.log("localIP",localIP.localIP);
+//console.log("localIP",localIP.localIP);
 var self = this;
 self.wss = null;//web socket server
 this.stocks = {'date':new Date(),'data':null};//stock {date,data[{name,code},....]}
