@@ -29,7 +29,7 @@
 <ul>
 <li>npm install bufferhelper</li>
 <li>npm install iconv-lite</li>
-
+<li>npm install ipware</li>
 </ul>
 <span>
 yum install -y gcc-c++ make
