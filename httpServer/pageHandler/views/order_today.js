@@ -104,6 +104,7 @@ oojs$.com.stock.order = oojs$.createClass(
     ,tabs2:null				//2cdbiaoqian
     ,panel1:null			//1st面板
     ,panel2:null			//2cd面板
+    ,panel_detail:null      //鼠标滑过出现的面板
     ,order_ctl_div:null		//订单下拉框div
     ,select_title:null		//订单顶部下拉框数据结构
     ,tb:null				//下拉框选择后，显示的数据
@@ -346,7 +347,10 @@ oojs$.com.stock.order = oojs$.createClass(
                 	
 	            }else{
                     if( inner == 'DEALSTOCK' ){
-                        list_body[elm][inner]['ELEMENT']='信息'
+
+                        list_body[elm][inner]['ELEMENT']=$('<a href="#">信息</a>')//$('<input></input>',{type:"button",value:"信息"})//
+                        .mouseenter({'scope':self},self.detail_enter)
+                        .mouseout({'scope':self},self.detail_out);
                     }
 	            }
             }
@@ -1056,6 +1060,29 @@ oojs$.com.stock.order = oojs$.createClass(
         self.appendTB_order_list();
     }
 
+    ,detail_enter:function( event ){
+        var self = event.data.scope;
+        if( self.panel_detail != null ){//. //
+            // $('#'+self.panel_detail).css({'top':$(this).top+$(this).height(),'left':$(this).offset().left});
+            var childPos = $(this).position();//$(this).offset();//event.target.offset();//
+            var parentPos = $(this).parent().offset();//event.target.parent().offset();//
+            $('#debug').text( "left: " + childPos.left + ", top: " + childPos.top );
+            $('#'+self.panel_detail).css({
+                'top':120,//childPos.top-parentPos.top,
+                'left':380//childPos.left - parentPos.left
+                });
+                //{'top':$(this).parent().offset().top+$(this).height(),'left':$(this).offset().left});
+            $('#'+self.panel_detail).show();
+        }
+    }
+
+    ,detail_out:function( event ){
+        var self = event.data.scope;
+        if( self.panel_detail != null ){
+            $('#'+self.panel_detail).hide();
+        }
+    }
+
     ,order_submit:function(event){
         var self = event.data.scope;
 
@@ -1098,7 +1125,7 @@ oojs$.com.stock.order = oojs$.createClass(
         console.log("account_list\n",JSON.stringify(trade_list));
 
         var account_result = [];
-        // var index = 0;
+        var index = 0;
         var COMPONENT_ACCOUNTSET = null;
         for(var idx = 0; idx < trade_list.length; idx++){
 
@@ -1119,17 +1146,17 @@ oojs$.com.stock.order = oojs$.createClass(
             
             
 
-            account_result[idx] = {};
+            account_result[index] = {};
                 
             for(var elm in trade_list[idx]["ELEMENT"]){
-                account_result[idx][elm] = trade_list[idx]["ELEMENT"][elm];
+                account_result[index][elm] = trade_list[idx]["ELEMENT"][elm];
             }
             
             for( var elm in  COMPONENT_ACCOUNTSET ){
                 if(typeof(COMPONENT_ACCOUNTSET[elm]) == 'object'){
                     continue
                 }
-                account_result[idx][elm] = COMPONENT_ACCOUNTSET[elm];
+                account_result[index][elm] = COMPONENT_ACCOUNTSET[elm];
             }
 
             if( trade_list[idx]["COMPONENT"] 
@@ -1137,11 +1164,13 @@ oojs$.com.stock.order = oojs$.createClass(
                 && trade_list[idx]["COMPONENT"].val()['CHECKED']
                 ){
                 
-                account_result[idx]['CHECKED'] = 1;
+                account_result[index]['CHECKED'] = 1;
                 
             }else{
-                account_result[idx]['CHECKED'] = 0;
+                account_result[index]['CHECKED'] = 0;
             }
+
+            index++;
         }
         
         if(account_result.length == 0){
@@ -1334,6 +1363,9 @@ oojs$.com.stock.order = oojs$.createClass(
         if(arguments[0].hasOwnProperty('panel2')){
             self.panel2 = arguments[0]['panel2'];
         }
+        if(arguments[0].hasOwnProperty('panel_detail')){
+            //self.panel_detail = arguments[0]['panel_detail'];
+        }
     }
 });
 
@@ -1345,6 +1377,7 @@ var order_today = new oojs$.com.stock.order({
     ,'tabs2':'order_today_tabs_a2'
     ,'panel1':'order_today_tabs_1'
     ,'panel2':'order_today_tabs_2'
+    ,'panel_detail':'todayDetail'
 });
 
 oojs$.addEventListener("ready",function(){
