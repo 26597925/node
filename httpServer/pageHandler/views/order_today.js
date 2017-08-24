@@ -1364,7 +1364,7 @@ oojs$.com.stock.order = oojs$.createClass(
             self.panel2 = arguments[0]['panel2'];
         }
         if(arguments[0].hasOwnProperty('panel_detail')){
-            //self.panel_detail = arguments[0]['panel_detail'];
+            self.panel_detail = arguments[0]['panel_detail'];
         }
     }
 });
