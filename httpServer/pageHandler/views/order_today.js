@@ -349,12 +349,19 @@ oojs$.com.stock.order = oojs$.createClass(
                     if( inner == 'DEALSTOCK' ){
 
                         list_body[elm][inner]['ELEMENT']=$('<a href="#">信息</a>')//$('<input></input>',{type:"button",value:"信息"})//
-                        .mouseenter({'scope':self},self.detail_enter)
-                        .mouseout({'scope':self},self.detail_out);
+                        ;
                     }
 	            }
             }
-
+            // console.log("list item:",JSON.stringify(list_body[elm]))
+            if(null != list_body[elm]['DEALSTOCK']['ELEMENT'] ){
+            list_body[elm]['DEALSTOCK']['ELEMENT']
+            .mouseenter({
+                'scope':self, 
+                'data':list_body[elm]
+            },self.detail_enter)
+            .mouseout({'scope':self},self.detail_out);
+            }
             var div = $('<div></div>');
 
             $('<input></input>',{type:"button",value:"详情"}).appendTo(div).click(
@@ -1060,16 +1067,38 @@ oojs$.com.stock.order = oojs$.createClass(
         self.appendTB_order_list();
     }
 
+    ,data_detail:null
+    ,first_enter:false
     ,detail_enter:function( event ){
         var self = event.data.scope;
-        if( self.panel_detail != null ){//. //
+        
+        if( self.panel_detail != null ){
+            self.data_detail = $.extend(true,{},event.data.data);
+            
             // $('#'+self.panel_detail).css({'top':$(this).top+$(this).height(),'left':$(this).offset().left});
-            var childPos = $(this).position();//$(this).offset();//event.target.offset();//
+            var childPos = $(this).offset();//event.target.offset();//$(this).position();//
             var parentPos = $(this).parent().offset();//event.target.parent().offset();//
-            $('#debug').text( "left: " + childPos.left + ", top: " + childPos.top );
+            
+            // $('#debug').text( "left: " + childPos.left+",p_left:"+parentPos.left + ", top: " + childPos.top );
+            var html_tmp = '未知';
+            if( null != self.data_detail && self.data_detail['DEALSTOCK']['ORIGIN'].length >0 ){
+                html_tmp='';
+                // for(var idx = 0; idx < self.data_detail['DEALSTOCK']['ORIGIN'].length; idx++ ){
+                    html_tmp += self.data_detail['DEALSTOCK']['ORIGIN']+'<br />';
+                // }
+            }
+            if(!self.first_enter){
+                self.first_enter = true;
+                console.log("enter",html_tmp)//JSON.stringify(self.data_detail));
+            }
+            $('#'+self.panel_detail).empty();
+            $('#'+self.panel_detail).append(html_tmp);
+            // var detail_item = $.extend(true,{},self.detail_item)
+            
             $('#'+self.panel_detail).css({
-                'top':120,//childPos.top-parentPos.top,
-                'left':380//childPos.left - parentPos.left
+                'position': 'fixed',
+                'top':childPos.top+$(this).height(),//120,//parentPos.top-childPos.top,//
+                'left':childPos.left//380//parentPos.left-childPos.left
                 });
                 //{'top':$(this).parent().offset().top+$(this).height(),'left':$(this).offset().left});
             $('#'+self.panel_detail).show();
@@ -1078,6 +1107,8 @@ oojs$.com.stock.order = oojs$.createClass(
 
     ,detail_out:function( event ){
         var self = event.data.scope;
+        self.data_detail = null;
+        self.first_enter = false;
         if( self.panel_detail != null ){
             $('#'+self.panel_detail).hide();
         }
