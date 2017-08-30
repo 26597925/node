@@ -89,11 +89,19 @@ oojs$.com.stock.order = oojs$.createClass(
 	    //'PRICES'
         //FROMID
     ]
-    //及时卖出,测单条件，dirtype:1卖出 groupid:5实时 policyid:1002即时卖出，请求爬虫数据
+    //一键卖出,撤单条件，请求爬虫数据
     ,ontime_cdtion: {
-        'DIRTYPE':['0','1','9'],
-        'PGROUPID':['5'],
-        'POLICYID':['1003','1004','1005']
+            'DIRTYPE':[
+            '0',//买入
+            '1',//卖出
+            '9'//撤单
+        ],
+        'PGROUPID':['5'],//实时
+        'POLICYID':[
+            '1003',//一键卖出
+            '1004',//一键撤单
+            '1005'//一键买入
+        ]
     }
     
     ,instance:null
@@ -118,7 +126,12 @@ oojs$.com.stock.order = oojs$.createClass(
     ,TYPE_NEW: 'new'
     ,TYPE_MDF: 'modify'
     ,TYPE_DTL: 'detail'
-    ,capitals: ''           //缓存资金数据变量
+    ,capitals: []           //缓存资金数据变量
+    ,stockset_slct:null     //撤单，股票下拉框
+    ,accoutset_callback:null//撤单，账号是否选择回调函数
+    
+
+
 	,init:function(){
 		var self = this;
         $('#'+self.tabs).tabs();
@@ -642,6 +655,7 @@ oojs$.com.stock.order = oojs$.createClass(
             ,'ELEMENT1':$('<div></div>')
             ,'ELEMENT2':$('<div></div>')
             ,'ROWSPAN':2
+            ,'ORIGIN':policy_data["STOCKSET"]['ORIGIN']
             ,'COMPONENT':stockset};
         stockset.init(
             STOCKSET['ELEMENT1'],
@@ -699,23 +713,24 @@ oojs$.com.stock.order = oojs$.createClass(
             }
             
         }else if(type == self.TYPE_MDF || type == self.TYPE_DTL){
-            //依据merge_if，把合并的数据从policy_data裁开到dictTrade_list_body
-            var dictTrade_list_bod = [];
+            //依据merge_if，把合并的数据从policy_data裁开到 dictTrade_list_body
+            var dictTrade_list_body = [];
             for(var elm in policy_data){
                 if(self.merge_if.indexOf(elm)>=0 || elm == "CTRL"){
                     continue;
                 }else{
                     for(var idx = 0; idx < policy_data[elm]['ORIGIN'].length; idx++ ){
-                        if( null == dictTrade_list_bod[idx] ){
-                            dictTrade_list_bod[idx] = {};
+                        if( null == dictTrade_list_body[idx] ){
+                            dictTrade_list_body[idx] = {};
                         }
-                        dictTrade_list_bod[idx][elm] = policy_data[elm]['ORIGIN'][idx];
+                        dictTrade_list_body[idx][elm] = policy_data[elm]['ORIGIN'][idx];
                     }
                 }
             }
-            self.parseTrade_list(policy_data, dictTrade_list_bod, type, from, attach);
+            self.parseTrade_list(policy_data, dictTrade_list_body, type, from, attach);
         }
     }
+    
     ,parseTrade_list: function( policy_data, dictTrade_list_body,  type, from, attach ){
         var self = this;
         var trade_list = [];
@@ -726,6 +741,26 @@ oojs$.com.stock.order = oojs$.createClass(
         var PERCENT = '';
         var CHECKED = 1;
         var tmp_trade = null;
+        var isCancelOrder_ontime = false;
+
+        if( self.accoutset_callback != null ){
+            for(var elm in self.accoutset_callback){
+                self.accoutset_callback[elm] = null;
+                delete self.accoutset_callback[elm]
+            }
+            self.accoutset_callback = null;
+        }
+        //判断是否是实时，撤单，是：添加回调事件
+        if(type == self.TYPE_NEW 
+            && policy_data['DIRTYPE']['ORIGIN'] == '9' 
+            && policy_data['PGROUPID']['ORIGIN'] ==  '5'
+            && policy_data['POLICYID']['ORIGIN'] ==  '1004'){
+            if( self.accoutset_callback == null ){
+                self.accoutset_callback = {};
+                isCancelOrder_ontime = true;
+            }
+        }
+
         for( var elm in dictTrade_list_body ){
             item_account = dictTrade_list_body[elm];
             sendAccounts.push({"accountid":item_account['ACCOUNTID']})
@@ -735,7 +770,20 @@ oojs$.com.stock.order = oojs$.createClass(
             trade_list[index]["COLUMN1"] = $('<div></div>');
             trade_list[index]["COLUMN2"] = $('<div></div>');
             trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
+
+            if(isCancelOrder_ontime){
+                self.accoutset_callback[item_account['ACCOUNTID']] = function(param){
+                    //console.log("check arguments:", JSON.stringify(param) );
+                    self.handler_cancel_select({'data':{
+                        'scope':self,
+                        'ACCOUNTID':param.ACCOUNTID,
+                        'CHECKED':param.CHECKED
+                    }});
+                }
+            }
+
             ////div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED)
+            
             if(type == self.TYPE_NEW){
                 PERCENT = policy_data["PERCENT"]['ORIGIN']
             }else if(type == self.TYPE_MDF){
@@ -745,7 +793,7 @@ oojs$.com.stock.order = oojs$.createClass(
                 ){
                  CHECKED = item_account['CHECKED'] == null?'1':item_account['CHECKED']
             }
-           
+            //div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT, enable, evt_chk_f
             trade_list[index]["COMPONENT"].init(
                 trade_list[index]["COLUMN1"]
                 ,trade_list[index]["COLUMN2"]
@@ -757,7 +805,10 @@ oojs$.com.stock.order = oojs$.createClass(
                 ,PERCENT//item_account['PERCENT']
                 ,CHECKED
                 ,item_account
+                ,null
+                ,isCancelOrder_ontime?self.accoutset_callback[item_account['ACCOUNTID']]:null
             );
+            //详情处理
             if( type == self.TYPE_DTL ){
                 index++;
                 trade_list[index]={"COLUMN1":"状态","COLUMN2": preload.getExecute( tmp_trade['ELEMENT']['STATUS'] )};
@@ -770,8 +821,10 @@ oojs$.com.stock.order = oojs$.createClass(
             }
             index++;
         }
+
         var policyHead = self.get_policy_head(); 
         if('forbid' == from || 'del' == from){
+            //禁用和删除的处理
             //{'scope':self,"policy_data":policy_data,"trade_list":trade_list, "type":type}
             self.order_submit( {'data':{
                 'scope':self,
@@ -784,37 +837,47 @@ oojs$.com.stock.order = oojs$.createClass(
         }else{
             if(sendAccounts.length>0){
                 console.log("trade_list",JSON.stringify(trade_list));
-                self.capitalVerify( policyHead, policy_data, sendAccounts, trade_list, type, from ); 
+                self.capitalVerify( policyHead, policy_data, sendAccounts, trade_list, type, from, isCancelOrder_ontime ); 
             }else{
                 oojs$.showError("您还没有添加账号");
             }
         }
     }
     //资金验证 drawitem_data , sendAccounts, trade_list, type
-    ,capitalVerify:function( policyHead, policy_data, sendAccounts, trade_list, type, from ){
+    ,capitalVerify:function( policyHead, policy_data, sendAccounts, trade_list, type, from, isCancelOrder_ontime ){
         var self = this;
-        if( !('dirtype' == from || 'group' == from || 'policy' == from) || self.capitals == '' ){
-                //不是下拉框触发,或者资金为空，需要加载数据
-                oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
-                    console.log(JSON.stringify(arguments));
-                     try{
-                        var capitals = JSON.parse(result.data);
-                    }catch(err){
-                        capitals = '';
-                        console.log('order',err);
-                    }
-                    self.capitals = capitals;
-                    self.parseCapital(trade_list,capitals);
-                });
-            }else{
-                //下拉框触发，不用再加载数据
-                self.parseCapital(trade_list, self.capitals);
-            }
-        
- 		self.draw_order( policyHead, policy_data, trade_list, type );
+
+        if( !('dirtype' == from || 'group' == from || 'policy' == from) || self.capitals.length == 0 || isCancelOrder_ontime){
+            //不是下拉框触发,或者资金为空，需要加载数据
+            oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
+                console.log(JSON.stringify(arguments));
+                try{
+                    var capitals = JSON.parse(result.data);
+                }catch(err){
+                    capitals = [];
+                    // capitals = [
+                    // { "status": "200",  "accountid": "0880003093040", "account_muse": "99988.88",   "stock_position": "", "cancel_orders": "002898,732277"}, 
+                    // { "status": "200",  "accountid": "09824056843",   "account_muse": "69018.21",   "stock_position": "", "cancel_orders": "" }
+                    // ]
+                    console.log('order',err);
+                }
+                self.capitals = capitals;
+                self.parseCapital(trade_list,capitals);
+                if(isCancelOrder_ontime){
+                    self.resetStockset(policy_data)
+                }
+                self.draw_order( policyHead, policy_data, trade_list, type );
+               
+            });
+        }else{
+            //下拉框触发，不用再加载数据
+            self.parseCapital(trade_list, self.capitals);
+            self.draw_order( policyHead, policy_data, trade_list, type );
+        }
+ 		
     }
     ,parseCapital: function(trade_list, capitals){
-        if(capitals!=''){
+        if(capitals.length>0){
             for(var i = 0; i < trade_list.length; i++){
                 for(var elm in capitals){
                     var item_capital = capitals[elm];
@@ -828,6 +891,22 @@ oojs$.com.stock.order = oojs$.createClass(
                 }
             }
         }
+    }
+    ,resetStockset:function(policy_data){
+        //判断是否一键撤销，是自选股改为请求该账号下具有撤单的股票的下拉框形式展示
+        var self = this;
+        
+        delete policy_data["STOCKSET"]['ELEMENT1'];
+        delete policy_data["STOCKSET"]['ELEMENT2'];
+        delete policy_data["STOCKSET"]['ROWSPAN'];
+        self.stockset_slct = 
+        policy_data["STOCKSET"]['ELEMENT'] = 
+        policy_data["STOCKSET"]['COMPONENT'] = $('<select ></select>',{
+            style:"height:25px;width:100px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
+        });
+
+        self.parse_cancelStock();
+        
     }
     //绘制订单 account_list
     ,draw_order: function(policy_head, policy_data, trade_list, type){
@@ -930,6 +1009,55 @@ oojs$.com.stock.order = oojs$.createClass(
         	'type':event.data.type, 
         	'data':event.data.data}
         }); 
+    }
+
+    ,handler_cancel_select: function( event ){
+        var self = event.data.scope;
+        var ACCOUNTID = event.data.ACCOUNTID;
+        var CHECKED = event.data.CHECKED;
+
+        //{ "status": "200", "tradeid": "29", "accountid": "880003092753", "userid": "20036", "account_muse": "99988.88", "account_value": "0.00", "account_msum": "99988.88", "stock_position": "", "cancel_orders": "002898,732277", "shanghai_code": "A112160495", "shenzhen_code": "0232992772", "account_name": "???", "details": "queryAccount,request=\\/account\\/detail?rdm=2088,accountid=880003092753,userid=20036,canuse=1,clientid=43,jypasswd.len=6" }, 
+        for(var elm in self.capitals){
+            if(self.capitals[elm]['accountid'] == ACCOUNTID ){
+                self.capitals[elm]['CHECKED'] = CHECKED;
+            }
+        }
+        //console.log('self_capitals',self.capitals);
+        self.parse_cancelStock();
+
+    }
+
+    ,parse_cancelStock: function(){
+        var self = this;
+        var stock = {};
+        var tmp_arr;
+        for(var elm in self.capitals){
+            if( self.capitals[elm].hasOwnProperty("CHECKED") &&  self.capitals[elm]['CHECKED'] == false ){
+
+            }else{
+                if( self.capitals[elm]['cancel_orders'].length >= 6 ){
+                    tmp_arr = self.capitals[elm]['cancel_orders'].split(",");
+                    if( tmp_arr.length > 0 ){
+                        for(var idx = 0; idx < tmp_arr.length; idx++ ){
+                            stock[tmp_arr[idx]] = null;
+                        }
+                    }
+                }
+            }
+        }
+        //console.log('stock:::::',JSON.stringify(stock));
+        if(self.stockset_slct!=null){
+           self.stockset_slct.empty();
+            for( var elm in stock ){
+                self.stockset_slct.append(
+                    "<option value='"
+                    +elm
+                    +"'>"
+                    +elm+"</option>"
+                );
+            } 
+        }
+        
     }
 
     ,parse2obj_DIRTYPE: function(obj, appendObj){

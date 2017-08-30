@@ -1522,13 +1522,14 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,CAPITAL:null
     ,ENABLE:null            //是否当日添加券商
     ,enable:null            //是否禁用按钮
+    ,evt_chk_f:null         //事件勾选事件
     ,select_tradetype:[
         {id:"BUYCOUNT",name:"交易股数"}
         ,{id:"BUYAMOUNT",name:"交易金额"}
         ,{id:"PERCENT",name:"交易比例"}
     ]//帐户用
     
-    ,init:function(div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT, enable){
+    ,init:function(div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT, enable, evt_chk_f ){
         //column1
         var self = this;
         div1.empty();
@@ -1542,6 +1543,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.CHECKED = CHECKED;
         self.ACCOUNT = ACCOUNT;
         self.enable = enable ;
+        self.evt_chk_f = evt_chk_f;
 
         if(ACCOUNT
             &&ACCOUNT.hasOwnProperty("ADDTIME")
@@ -1715,6 +1717,13 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     }
     ,ck_change:function(event){
         var self = event.data['scope'];
+        //是否勾选回调函数
+        if(self.evt_chk_f){
+            self.evt_chk_f({
+                'ACCOUNTID':self.ACCOUNTID,
+                'CHECKED':$(this).is(':checked')
+            });
+        }
         if ($(this).is(':checked')) {
             if(self.INPUT){
                 self.INPUT.prop('disabled',false);
@@ -1732,7 +1741,6 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             }
         }else{
             if(self.INPUT){
-                
                 self.INPUT.prop('disabled',true);
             }
 

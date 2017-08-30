@@ -167,5 +167,5 @@ var proxy_capitals = function(sendData,callback){
   req.write(result);
   req.end();
 };
-
+//web server used
 exports.stock_load = proxy_stock;
