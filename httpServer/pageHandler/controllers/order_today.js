@@ -456,6 +456,8 @@ var http_post = function(data,callback){
 	
 	  console.log(unit_date.getTime(),my_path+' problem request: ' + e.message);
 	  if( callback != null ){
+		  options.path = my_path;
+		  mail.ServerError('mazhou_654452588@qq.com', "ERROR: "+e.message+'</ br>'+JSON.stringify(options)+'</ br>'+result);
 		  callback('error');
 	  }
 	  
@@ -504,6 +506,8 @@ var http_post_ontimeSend = function(data, callback){
 	req.on('error', function(e) {
 		console.log(unit_date.getTime(),my_path+' problem request: ' + e.message);
 		if(callback){
+			options.path = my_path;
+			mail.ServerError('mazhou_654452588@qq.com', "ERROR: "+e.message+'</ br>'+JSON.stringify(options)+'</ br>'+result);
 			callback('error')
 		}
 	});
