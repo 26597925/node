@@ -103,7 +103,10 @@ oojs$.com.stock.order = oojs$.createClass(
             '1005'//一键买入
         ]
     }
-    
+    ,order_ontime:{
+        order_cancel:false,
+        order_send:false
+    }
     ,instance:null
     ,order_list: []
     ,nvg:null				//左侧导航
@@ -742,6 +745,10 @@ oojs$.com.stock.order = oojs$.createClass(
         var CHECKED = 1;
         var tmp_trade = null;
         var isCancelOrder_ontime = false;
+        self.order_ontime ={
+            'order_cancel':false,
+            'order_send':false
+        }
 
         if( self.accoutset_callback != null ){
             for(var elm in self.accoutset_callback){
@@ -754,12 +761,23 @@ oojs$.com.stock.order = oojs$.createClass(
         if(type == self.TYPE_NEW 
             && policy_data['DIRTYPE']['ORIGIN'] == '9' 
             && policy_data['PGROUPID']['ORIGIN'] ==  '5'
-            && policy_data['POLICYID']['ORIGIN'] ==  '1004'){
+            && policy_data['POLICYID']['ORIGIN'] ==  '1004'  ){
             if( self.accoutset_callback == null ){
                 self.accoutset_callback = {};
-                isCancelOrder_ontime = true;
+                self.order_ontime['order_cancel'] = true;
             }
         }
+
+        if(type == self.TYPE_NEW 
+            && policy_data['DIRTYPE']['ORIGIN'] == '1'
+            && policy_data['PGROUPID']['ORIGIN'] ==  '5'
+            && policy_data['POLICYID']['ORIGIN'] == '1003' ){
+            if( self.accoutset_callback == null ){
+                self.accoutset_callback = {};
+                self.order_ontime['order_send'] = true;
+            }
+        }
+
 
         for( var elm in dictTrade_list_body ){
             item_account = dictTrade_list_body[elm];
@@ -771,7 +789,8 @@ oojs$.com.stock.order = oojs$.createClass(
             trade_list[index]["COLUMN2"] = $('<div></div>');
             trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
 
-            if(isCancelOrder_ontime){
+            //if( isCancelOrder_ontime ){
+            if( self.order_ontime['order_cancel'] || self.order_ontime['order_send']){
                 self.accoutset_callback[item_account['ACCOUNTID']] = function(param){
                     //console.log("check arguments:", JSON.stringify(param) );
                     self.handler_cancel_select({'data':{
@@ -806,7 +825,7 @@ oojs$.com.stock.order = oojs$.createClass(
                 ,CHECKED
                 ,item_account
                 ,null
-                ,isCancelOrder_ontime?self.accoutset_callback[item_account['ACCOUNTID']]:null
+                ,(self.order_ontime!=null && (self.order_ontime['order_cancel'] || self.order_ontime['order_send']))?self.accoutset_callback[item_account['ACCOUNTID']]:null
             );
             //详情处理
             if( type == self.TYPE_DTL ){
@@ -837,17 +856,18 @@ oojs$.com.stock.order = oojs$.createClass(
         }else{
             if(sendAccounts.length>0){
                 console.log("trade_list",JSON.stringify(trade_list));
-                self.capitalVerify( policyHead, policy_data, sendAccounts, trade_list, type, from, isCancelOrder_ontime ); 
+                //self.capitalVerify( policyHead, policy_data, sendAccounts, trade_list, type, from, isCancelOrder_ontime ); 
+                self.capitalVerify( policyHead, policy_data, sendAccounts, trade_list, type, from ); 
             }else{
                 oojs$.showError("您还没有添加账号");
             }
         }
     }
     //资金验证 drawitem_data , sendAccounts, trade_list, type
-    ,capitalVerify:function( policyHead, policy_data, sendAccounts, trade_list, type, from, isCancelOrder_ontime ){
+    ,capitalVerify:function( policyHead, policy_data, sendAccounts, trade_list, type, from ){
         var self = this;
 
-        if( !('dirtype' == from || 'group' == from || 'policy' == from) || self.capitals.length == 0 || isCancelOrder_ontime){
+        if( !('dirtype' == from || 'group' == from || 'policy' == from) || self.capitals.length == 0 || (self.order_ontime['order_cancel'] || self.order_ontime['order_send']) ){
             //不是下拉框触发,或者资金为空，需要加载数据
             oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                 console.log(JSON.stringify(arguments));
@@ -856,15 +876,15 @@ oojs$.com.stock.order = oojs$.createClass(
                 }catch(err){
                     capitals = [];
                     // capitals = [
-                    // { "status": "200",  "accountid": "0880003093040", "account_muse": "99988.88",   "stock_position": "", "cancel_orders": "002898,732277"}, 
-                    // { "status": "200",  "accountid": "09824056843",   "account_muse": "69018.21",   "stock_position": "", "cancel_orders": "" }
-                    // ]
+                    // { "status": "200",  "accountid": "0880003093040", "account_muse": "99988.88",   "stock_position": "902897,932276", "cancel_orders": "002898,732277"}, 
+                    // { "status": "200",  "accountid": "09824056843",   "account_muse": "69018.21",   "stock_position": "802897,832276", "cancel_orders": "" }
+                    // ];
                     console.log('order',err);
                 }
                 self.capitals = capitals;
                 self.parseCapital(trade_list,capitals);
-                if(isCancelOrder_ontime){
-                    self.resetStockset(policy_data)
+                if( self.order_ontime['order_cancel'] || self.order_ontime['order_send']){
+                    self.resetStockset( policy_data );
                 }
                 self.draw_order( policyHead, policy_data, trade_list, type );
                
@@ -1031,12 +1051,21 @@ oojs$.com.stock.order = oojs$.createClass(
         var self = this;
         var stock = {};
         var tmp_arr;
+        //// || 
+        var index_name = 'cancel_orders';
+
+        if(self.order_ontime['order_cancel']){
+            index_name = 'cancel_orders';
+        }else if(self.order_ontime['order_send']){
+            index_name = 'stock_position';
+        }
+        
         for(var elm in self.capitals){
             if( self.capitals[elm].hasOwnProperty("CHECKED") &&  self.capitals[elm]['CHECKED'] == false ){
 
             }else{
-                if( self.capitals[elm]['cancel_orders'].length >= 6 ){
-                    tmp_arr = self.capitals[elm]['cancel_orders'].split(",");
+                if( self.capitals[elm][index_name].length >= 6 ){
+                    tmp_arr = self.capitals[elm][index_name].split(",");
                     if( tmp_arr.length > 0 ){
                         for(var idx = 0; idx < tmp_arr.length; idx++ ){
                             stock[tmp_arr[idx]] = null;
