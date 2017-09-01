@@ -64,7 +64,7 @@ exports.capital = function(){
   if(self.req.post){
     proxy_capitals(self.req.post, function(){
       if(arguments.length ==1){
-        result.data = arguments[0];
+        result.data = JSON.parse(arguments[0]);
         self.responseDirect(200,"text/json",JSON.stringify(result));
       }else{
 	      
@@ -136,7 +136,7 @@ var proxy_capitals = function(sendData,callback){
     if(res.statusCode == 200){
 	    res.setEncoding('utf8');
 	    res.on('data', function (body) {
-		    console.log(unit_date.getTime(),'Body: ', body,typeof body);
+		    console.log(unit_date.getTime(),options.path+' Body: ', body,typeof body);
 		    if(callback){
 			    callback( body);
 		    }
