@@ -141,7 +141,7 @@ var proxy_capitals = function(sendData,callback){
 	    res.setEncoding('utf8');
 	
 	    var body = '';
-	    req.on('data', function (chunkData) {
+	    res.on('data', function (chunkData) {
 		    body += chunkData;
 		    console.log("chunkData ",chunkData);
 	    }).on('end', function () {
