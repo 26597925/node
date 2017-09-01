@@ -106,40 +106,40 @@ exports.runPageServer = function( port )
 
 	}else{
 			// console.log(unit_date.getTime(),path.basename(__filename),"url:", req.url);
-			var _bufData = '';
-			req.on('data', function (chunkData) {
+		var _bufData = '';
+		req.on('data', function (chunkData) {
 				_bufData += chunkData;
 			})
 		.on('end', function () {
-		var reqData = "";
-		//console.log(unit_date.getTime(),JSON.stringify(req.headers));
-		if ("POST" == req.method.toUpperCase()) {
-			if ( (req.headers.hasOwnProperty('content-type')
-				&& req.headers['content-type']
-				&& req.headers['content-type'].indexOf('application/json') != -1)
-			|| ( req.headers.hasOwnProperty('accept')
-				&& req.headers.accept
-				&& req.headers.accept.indexOf('application/json') != -1 )
-			) {
+			var reqData = "";
+			//console.log(unit_date.getTime(),JSON.stringify(req.headers));
+			if ("POST" == req.method.toUpperCase()) {
+				if ( (req.headers.hasOwnProperty('content-type')
+					&& req.headers['content-type']
+					&& req.headers['content-type'].indexOf('application/json') != -1)
+				|| ( req.headers.hasOwnProperty('accept')
+					&& req.headers.accept
+					&& req.headers.accept.indexOf('application/json') != -1 )
+				) {
 
-			if (_bufData.length > 0) {
-				try {
-          _bufData = _bufData.replace(/\\n/g,"");
-          _bufData = _bufData.replace(/\\/g, "");
-				  reqData = JSON.parse(_bufData);
-
-				} catch (err) {
-				  console.log(unit_date.getTime(),"not json format",err);
+					if (_bufData.length > 0) {
+						try {
+		          _bufData = _bufData.replace(/\\n/g,"");
+		          _bufData = _bufData.replace(/\\/g, "");
+						  reqData = JSON.parse(_bufData);
+		
+						} catch (err) {
+						  console.log(unit_date.getTime(),"not json format",err);
+						}
+					} else {
+						reqData = {};
+					}
+				} else {
+					reqData = querystring.parse(_bufData.toString());
 				}
-			} else {
-				reqData = {};
 			}
-			} else {
-			reqData = querystring.parse(_bufData.toString());
-			}
-		}
-		req.post = reqData;
-		handlerRequest(req, res);
+			req.post = reqData;
+			handlerRequest(req, res);
 		});
 		}
 	}).listen(port);
