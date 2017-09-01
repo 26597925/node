@@ -138,7 +138,7 @@ var proxy_capitals = function(sendData,callback){
 	    res.on('data', function (body) {
 		    console.log(unit_date.getTime(),'Body: ' + body);
 		    if(callback){
-			    callback(body);
+			    callback( JSON.parse(body));
 		    }
 	    });
     }else{
