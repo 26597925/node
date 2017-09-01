@@ -871,8 +871,9 @@ oojs$.com.stock.order = oojs$.createClass(
             //不是下拉框触发,或者资金为空，需要加载数据
             oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                 console.log(JSON.stringify(arguments));
+                var capitals = [];
                 try{
-                    var capitals = JSON.parse(result.data);
+                    capitals = result.data;
                 }catch(err){
                     capitals = [];
                     // capitals = [
