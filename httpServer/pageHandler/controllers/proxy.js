@@ -64,10 +64,6 @@ exports.capital = function(){
   if(self.req.post){
     proxy_capitals(self.req.post, function(){
       if(arguments.length ==1){
-      	console.log( 'length',
-		      arguments[0].length,
-		      String(arguments[0]).substring(arguments[0].length-10,arguments[0].length-1)
-	      );
         result.data = JSON.parse(String(arguments[0]));
         self.responseDirect(200,"text/json",JSON.stringify(result));
       }else{
