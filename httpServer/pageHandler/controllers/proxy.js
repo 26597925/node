@@ -143,6 +143,7 @@ var proxy_capitals = function(sendData,callback){
 	    var body = '';
 	    req.on('data', function (chunkData) {
 		    body += chunkData;
+		    console.log("chunkData ",chunkData);
 	    }).on('end', function () {
 		    if(callback){
 			    callback( body);
