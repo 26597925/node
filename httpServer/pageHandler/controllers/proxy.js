@@ -136,9 +136,9 @@ var proxy_capitals = function(sendData,callback){
     if(res.statusCode == 200){
 	    res.setEncoding('utf8');
 	    res.on('data', function (body) {
-		    console.log(unit_date.getTime(),'Body: ' + body);
+		    console.log(unit_date.getTime(),'Body: ', body,typeof body);
 		    if(callback){
-			    callback( JSON.parse(body));
+			    callback( body);
 		    }
 	    });
     }else{
