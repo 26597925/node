@@ -876,11 +876,14 @@ oojs$.com.stock.order = oojs$.createClass(
                     capitals = result.data;
                 }catch(err){
                     capitals = [];
+                    console.log('order',err);
+                }
+                if(capitals == ""){
+                    capitals = [];
                     // capitals = [
                     // { "status": "200",  "accountid": "0880003093040", "account_muse": "99988.88",   "stock_position": "902897,932276", "cancel_orders": "002898,732277"}, 
                     // { "status": "200",  "accountid": "09824056843",   "account_muse": "69018.21",   "stock_position": "802897,832276", "cancel_orders": "" }
                     // ];
-                    console.log('order',err);
                 }
                 self.capitals = capitals;
                 self.parseCapital(trade_list,capitals);
@@ -920,13 +923,17 @@ oojs$.com.stock.order = oojs$.createClass(
         delete policy_data["STOCKSET"]['ELEMENT1'];
         delete policy_data["STOCKSET"]['ELEMENT2'];
         delete policy_data["STOCKSET"]['ROWSPAN'];
-        self.stockset_slct = 
-        policy_data["STOCKSET"]['ELEMENT'] = 
-        policy_data["STOCKSET"]['COMPONENT'] = $('<select ></select>',{
+        self.stockset_slct = $('<select ></select>',{
             style:"height:25px;width:100px;"//-webkit-appearance: none;-moz-appearance: none;-o-appearance: none;"
         });
+        policy_data["STOCKSET"]['ELEMENT'] = $('<div></div>');
+        policy_data["STOCKSET"]['COMPONENT'] = new oojs$.com.stock.component.stockset_ontime();
+        policy_data["STOCKSET"]['COMPONENT'].init(
+            policy_data["STOCKSET"]['ELEMENT'], 
+            self.stockset_slct);
 
         self.parse_cancelStock();
+        policy_data["STOCKSET"]['COMPONENT'].assign(self.stockset_slct.val());
         
     }
     //绘制订单 account_list
@@ -1077,7 +1084,7 @@ oojs$.com.stock.order = oojs$.createClass(
         }
         //console.log('stock:::::',JSON.stringify(stock));
         if(self.stockset_slct!=null){
-           self.stockset_slct.empty();
+            self.stockset_slct.empty();
             for( var elm in stock ){
                 self.stockset_slct.append(
                     "<option value='"
@@ -1085,7 +1092,8 @@ oojs$.com.stock.order = oojs$.createClass(
                     +"'>"
                     +elm+"</option>"
                 );
-            } 
+            }
+            console.log("select:::::",self.stockset_slct.val());
         }
         
     }
@@ -1333,8 +1341,6 @@ oojs$.com.stock.order = oojs$.createClass(
                 }//accountset返回的null的情况
             }
             
-            
-
             account_result[index] = {};
                 
             for(var elm in trade_list[idx]["ELEMENT"]){

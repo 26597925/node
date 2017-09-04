@@ -2268,6 +2268,65 @@ oojs$.com.stock.component.stockset=oojs$.createClass({
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -->
 <script type="text/javascript">
+
+/****stage
+* var stockset_ontime = new oojs$.com.stock.component.stockset_ontime();
+* 
+* stockset_ontime.appendCK_stockset(div, select);
+* console.log(stockset_ontime.val())=>value
+*/
+oojs$.ns("com.stock.component.stockset_ontime");
+oojs$.com.stock.component.stockset_ontime=oojs$.createClass({
+    NAME:"stockset"
+    ,input:null
+    ,val:function(){
+        var self = this;
+        return self.input.val();
+    }
+    ,init:function(div, slct, enable){
+        var self = this;
+        //股票输入框
+        var input = self.input = $('<input></input>',{}).text("");
+        if( enable != null && enable == 0 ){
+            input.prop( 'disabled', true );
+        }
+        var stocks = preload.getStock();
+        if(stocks!=null){
+            $(input).autocomplete({
+                source: stocks
+                ,select: function( event, ui ) {
+                    input.val(ui.item.value);
+                }
+            });
+        }
+        div.append(input);
+        if( slct != null ){
+            slct.change(
+                {'scope':self},
+                self.select_change
+            );
+        }
+        if( enable != null && enable == 0 ){
+            slct.prop( 'disabled', true );
+        }
+        div.append(slct);
+    }
+    ,assign:function( value ){
+        var self = this;
+        self.input.val(value);
+    }
+    ,select_change:function(event){
+        var self = event.data.scope;
+        self.input.val( this.value );
+    }
+})
+
+</script>
+
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 /****
 * var rmb = new oojs$.com.stock.component.RMB();
 * rmb.int(input,select,'元');
