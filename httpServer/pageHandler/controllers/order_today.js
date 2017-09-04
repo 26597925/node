@@ -443,13 +443,19 @@ var http_post = function(data,callback){
 	    options.path = my_path;
 	    mail.ServerError('mazhou_654452588@qq.com', String(res.statusCode)+'</ br>'+JSON.stringify(options)+'</ br>'+result);
     }
-    res.setEncoding('utf8');
-    res.on('data', function (body) {
-      console.log(unit_date.getTime(),'Body: ' , body);
-      if( callback != null ){
-      	callback('success');
-      }
-    });
+	
+	  var result_back="";
+	  res.setEncoding("utf8");
+	  res.on("data",function(chunk){
+		  result_back += chunk;
+	  });
+	  res.on("end",function(){
+		  console.log(unit_date.getTime(),'Body: ' , result_back);
+		  if(callback){
+			  callback('success');
+		  }
+	  });
+	  
   });
 
   req.on('error', function(e) {
@@ -494,13 +500,19 @@ var http_post_ontimeSend = function(data, callback){
 			options.path = my_path;
 			mail.ServerError('mazhou_654452588@qq.com', String(res.statusCode)+'</ br>'+JSON.stringify(options)+'</ br>'+result);
 		}
-		res.setEncoding('utf8');
-		res.on('data', function (body) {
-			console.log(unit_date.getTime(),'http_post_ontimeSend Body: ', body);
+		
+		var result_back="";
+		res.setEncoding("utf8");
+		res.on("data",function(chunk){
+			result_back += chunk;
+		});
+		res.on("end",function(){
+			console.log(unit_date.getTime(),'http_post_ontimeSend Body: ' , result_back);
 			if(callback){
-				callback('success', body);
+				callback('success', result_back );
 			}
 		});
+		
 	});
 	
 	req.on('error', function(e) {
