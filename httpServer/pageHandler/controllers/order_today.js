@@ -425,7 +425,12 @@ var http_post = function(data,callback){
   var result = JSON.stringify(data) ;
   result = result.replace("\\","");
   //result = result.replace("\"","'");
-	var options = {};
+	var options = {
+		headers: {
+			'Content-Type': 'application/json',
+			'Content-Length': result.length
+		}
+	};
 	
 	for(var elm in cfg_httpserver.order){
 		options[elm] = cfg_httpserver.order[elm];
