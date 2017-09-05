@@ -1421,7 +1421,7 @@ oojs$.com.stock.order = oojs$.createClass(
                     sendData[i][elm] = account_result[i][elm];
                 }
 
-                if( elm == 'STOCKSET' && policy_stockset_doc != '' ){
+                if( elm == 'STOCKSET' && policy_stockset_doc != '' && type == self.TYPE_NEW ){
                     if( policy_stockset_doc == '0' ){
                         //允许空
                     }else if( policy_stockset_doc == '1' ){
