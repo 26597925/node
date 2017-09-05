@@ -459,14 +459,14 @@ var http_post = function(data,callback){
   });
 
   req.on('error', function(e) {
-	
-	  console.log(unit_date.getTime(),my_path+' problem request: ' + e.message);
-	  options.path = my_path;
-	  mail.ServerError('mazhou_654452588@qq.com', "ERROR: "+e.message+'</ br>'+JSON.stringify(options)+'</ br>'+result);
-	  if( callback != null ){
-		  callback('error');
+	  if(e.message != "Parse Error") {
+		  console.log(unit_date.getTime(), my_path + ' problem request: ' + e.message);
+		  options.path = my_path;
+		  mail.ServerError('mazhou_654452588@qq.com', "ERROR: " + e.message + '</ br>' + JSON.stringify(options) + '</ br>' + result);
+		  if (callback != null) {
+			  callback('error');
+		  }
 	  }
-	  
   });
 
   req.write(result);
@@ -517,10 +517,12 @@ var http_post_ontimeSend = function(data, callback){
 	
 	req.on('error', function(e) {
 		console.log(unit_date.getTime(),my_path+' problem request: ' + e.message);
-		options.path = my_path;
-		mail.ServerError('mazhou_654452588@qq.com', "ERROR: "+e.message+'</ br>'+JSON.stringify(options)+'</ br>'+result);
-		if(callback){
-			callback('error')
+		if(e.message != "Parse Error"){
+			options.path = my_path;
+			mail.ServerError('mazhou_654452588@qq.com', "ERROR: "+e.message+'</ br>  '+JSON.stringify(options)+'</ br>  '+result);
+			if(callback){
+				callback('error')
+			}
 		}
 	});
 	
