@@ -1,0 +1,28 @@
+.rightbox .rightcontent .scroller {
+    background-color: #B40404;
+    color: #ffffff;
+    font-family: Verdana;
+    font-size: 14px;
+    height:25px;
+    line-height:28px;
+    overflow:hidden;
+    position:relative;
+}
+.rightbox .rightcontent .scroller .scrollingtext {
+    color: #ffffff;
+    white-space:nowrap;
+    position:absolute;
+    font-family: Verdana;
+    font-size: 14px;
+    font-style: oblique;
+}
+
+/*div.rightbox > div.rightcontent > div.scroller > div.scrollingtext > a:link, a:visited {
+    font-family: Verdana;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+div.rightbox > div.rightcontent > div.scroller > div.scrollingtext > a:visited {
+    text-decoration:none;
+}*/

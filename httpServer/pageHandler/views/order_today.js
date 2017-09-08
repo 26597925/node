@@ -179,16 +179,41 @@ oojs$.com.stock.order = oojs$.createClass(
                 }
                 break;
             case "list":
-                console.log('order_today list:',dt.data)
+                // console.log('order_today list:',dt.data)
+                
                 self.order_list = [];
                 self.order_list = dt.data.data;
+                self.handler_scrollHint();
                 if(self.order_list.length != 0 ){
                     self.appendTB_order_list();
                 }
                 break;
         }
     }
-
+    ,handler_scrollHint:function(){
+        var self = this;
+        var stock = {};
+        var tmp_arr;
+        if(self.order_list && self.order_list.length>0){
+            for( var idx = 0; idx < self.order_list.length; idx++ ){
+                if( self.order_list[idx].hasOwnProperty('DEALSTOCK') && self.order_list[idx]['DEALSTOCK'] ){
+                    tmp_arr = self.order_list[idx]['DEALSTOCK'].split(",");
+                    if( tmp_arr.length > 0 ){
+                        for(var idx = 0; idx < tmp_arr.length; idx++ ){
+                            stock[tmp_arr[idx]] = null;
+                        }
+                    }
+                }
+            }
+        }
+        var msg = "股票 "
+        for(var elm in stock){
+            msg += elm+" "
+        }
+        msg += "已处理，细节请看详情"
+        $('#scrollingtext').empty();
+        $('#scrollingtext').append( msg );
+    }
     //event handler
 	,order_tab1_clk:function(event){
         var self = event.data.scope;
@@ -867,7 +892,7 @@ oojs$.com.stock.order = oojs$.createClass(
     ,capitalVerify:function( policyHead, policy_data, sendAccounts, trade_list, type, from ){
         var self = this;
 
-        if( !('dirtype' == from || 'group' == from || 'policy' == from) || self.capitals.length == 0 || (self.order_ontime['order_cancel'] || self.order_ontime['order_send']) ){
+        if(  !(type == self.TYPE_DTL) ||!('dirtype' == from || 'group' == from || 'policy' == from ) || self.capitals.length == 0 || (self.order_ontime['order_cancel'] || self.order_ontime['order_send']) ){
             //不是下拉框触发,或者资金为空，需要加载数据
             oojs$.httpPost_json('/capital',sendAccounts,function(result,textStatus,token){
                 console.log(JSON.stringify(arguments));
