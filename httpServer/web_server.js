@@ -33,7 +33,7 @@ var handler_client = function(client,broadcastData){
 			
 			switch (broadcastData.type) {
 				case bean.WSS_ORDERTODAY:
-					client.send(JSON.stringify(broadcast_data));
+					client.send(JSON.stringify(broadcastData));
 					break;
 				
 				case bean.WSS_MARKET:
