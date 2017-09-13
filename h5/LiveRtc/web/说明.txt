@@ -1,0 +1,3 @@
+逻辑都在webplayer里，一共两条主线：
+1、接收流，用onaddstream接收到推的流信息，然后拆分成videotracks和audiotracks，在根据label中的“：”分成三个字段，按其中的第三个字段把多个源的tracks重新组合成每一路源，存储起来。
+2、接收通知进行播放，从peerbuild端接收到一个ssrc数组，然后根据数组找到bp（label里的第三个字段，用于区分源）和bp所对应的存储的stream，并去重，建立map对象，然后组装完善map，分成需要增加的、需要减掉的和依然需要存在并播放的，然后进行播放交互。

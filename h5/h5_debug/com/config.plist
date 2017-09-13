@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>out</key>
+	<string>/Users/letv/Documents/Tomcat/webapps/H5_N/debug/js</string>
+	<key>cat</key>
+	<array>
+		<dict>
+			<key>out</key>
+			<string>H5</string>
+			<key>file</key>
+			<array>
+				<string>utils</string>
+				<string>common</string>
+				<string>enter</string>
+				<string>loaders</string>
+			</array>
+		</dict>
+		<dict>
+			<key>out</key>
+			<string>Selector</string>
+			<key>file</key>
+			<array>
+				<string>selector</string>
+			</array>
+		</dict>
+		<dict>
+			<key>out</key>
+			<string>lib.ts.min</string>
+			<key>file</key>
+			<array>
+				<string>player</string>
+				<string>webp2p.core</string>
+				<string>webp2p.logic</string>
+				<string>webp2p.protocol</string>
+				<string>webp2p.tools</string>
+			</array>
+		</dict>
+		<dict>
+			<key>out</key>
+			<string>lib.mp4.min</string>
+			<key>file</key>
+			<array>
+				<string>player</string>
+				<string>webp2p.core</string>
+				<string>webp2p.logic</string>
+				<string>webp2p.protocol</string>
+				<string>webp2p.tools</string>
+				<string>webp2p.segmentmp4</string>
+			</array>
+		</dict>
+		<dict>
+			<key>out</key>
+			<string>lib</string>
+			<key>file</key>
+			<array>
+				<string>player</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

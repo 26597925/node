@@ -1,0 +1,16 @@
+p2p$.ns("com.selector");
+p2p$.com.selector.Config={//设置外部参数
+	callback:"callback",
+	useType:-1,
+	encode:0,
+	p2p:1,
+	video:null,
+	playUrl:null,
+	showConsole:0,
+	bufferLength:10,
+	startTime:-1,
+	jsonp:0,
+	autoplay:1,
+	maxMetaNum:2,
+	domains:""
+};

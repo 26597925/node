@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script type="text/javascript" src="http://js.letvcdn.com/lc04_iscms/201706/06/16/23/H5.js"></script>
+<div style="width:100%;margin:0;text-align: center"><video id="video" width="500" height="400" controls="controls" style="background-color: #000000"></div>
+<div style="width:100%;margin:0;text-align: center">
+    <input type="text" id="m3u8-url" class="form-control" value="" size="75"/>
+    <span class="input-group-addon"><a href="#" onclick="doPlay();return false;">播放</a></span>
+</div>
+    <script>
+        var video = document.getElementById("video");
+        var url = "";
+        var player = new  p2p$.com.enter.H5P2P({video:video,playUrl:url,jsonp:1});
+        function doPlay(){
+            if (!player) {
+                return;
+            }
+            try {
+                player.openUrl_(document.getElementById('m3u8-url').value);
+            } catch (e) {
+                alert("Create media player failed, error: " + e);
+            }
+        }
+    </script>
+</body>
+</html>

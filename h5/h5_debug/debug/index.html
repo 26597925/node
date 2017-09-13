@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>HTML5 Demo Player - DEBUG</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <style type="text/css">
+        .progressBar
+        {
+            position: relative;
+            width: 100%;
+            height:20px;
+            background-color: #eee;
+        }
+        .timeBar
+        {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: #88CC88;
+        }
+        .bufferedBar
+        {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: #BBCCBB;
+        }
+    </style>
+    <script type="text/javascript" src="js/H5.js"></script>
+</head>
+<body>
+<div class="text-center">
+    <div style="width:800px;margin:0 auto;"><h1>HTML5 Demo Player - DEBUG</h1></div>
+    <div id="subtitle" style="width:800px;margin:0 auto;"></div>
+    <div style="width:800px;margin:0 auto;">
+        <div style="position:relative;width:800px;height:480px;">
+            <div style="position:absolute;left:0;top:0;">
+                <video id="player" style="background:#000;width:800px;height:480px;" width="770" height="380" autoplay controls="controls" controls webkit-playsinline>
+            </div>
+            <div id="loading" style="background:#000;width:800px;height:480px;position:absolute;left:0;top:0;opacity:0.8;display:none;">
+                <div style="height:200px;"></div>
+                <img src="img/loading.gif" width="32" height="32" align="absmiddle" />
+            </div>
+        </div>
+        <div id="progressBar" class="progressBar" style="margin-top:3px; cursor:pointer;" title="点击 Seek 到指定位置">
+            <div id="timeBar" class="timeBar"></div>
+            <div class="range"></div>
+        </div>
+        <div class="input-group input-group-lg" style="padding-top:5px;">
+            <input type="text" id="m3u8-url" class="form-control" value=""/>
+                <span class="input-group-addon">
+                <a href="#" onclick="doPlay();return false;">播放</a>
+                </span>
+        </div>
+        <div style="padding:2px;">
+                <span class="progressTime">
+                	起播: <span class="usetime" id="usetime"></span>ms,
+                    时间: <span class="current" id="current"></span>s,
+                    缓冲: <span class="buffered" id="buffered"></span>s,
+                    时长: <span class="duration" id="duration"></span>s,
+                </span>
+            &nbsp;Time:
+            <input class="text" id="seekValue" value="0" type="input" style="width:40px;"/>&nbsp;<button class="btn btn-mini" onclick="seekVideoPlayer('seek')">Seek To</button>
+            &nbsp;Contact:
+            <input class="text" id="contactValue" value="13901230246" type="input" style="width:90px;"/>&nbsp;<button class="btn btn-mini" onclick="doSubmitLog()">Submit Log</button>
+            <span id="serviceNumberValue">Ready</span>
+        </div>
+    </div>
+</div>
+<div style="width:1400px;margin:0 auto;padding:10px; display:none;" id="cde-console-layer">
+    <div id="cde-top-layer">
+        <div style="float:right;margin-right:20px;">
+            <div>设备时间: <span id="cde-current-time"></span></div>
+            <div>模块版本: <span id="cde-module-version"></span></div>
+        </div>
+        <span class="logo">CDE 传输控制台</span>
+        <div>
+            控制台状态：<span id="cde-online-status" style="color:red;cursor:pointer;" title="点击切换状态">正在连接 ...</span>
+        </div>
+    </div>
+    <div id="cde-system-title" class="title">
+        <div id="cde-system-status" class="status" style="float:right;margin-right:20px;">
+				<span id="cde-show-speed-test-wrapper">
+					<a href="#" id="show-speed-test">网速测试</a>
+					&nbsp;&nbsp;
+				</span>
+            <a href="#" id="cde-show-log-pipe">模块日志</a>
+            &nbsp;&nbsp;
+                <span id="cde-report-support-log-wrapper">
+					<a href="#" target="_blank" id="cde-report-support-log">上报日志</a>
+					&nbsp;&nbsp;
+				</span>
+        </div>
+        系统状态
+    </div>
+    <div class="cde-system-status-more">
+        <table id="cde-system-status-more-1" border="0">
+            <tr class="row">
+                <td><b>操作系统</b></td>
+                <td class="prefix">CPU: </td>
+                <td></td><td class="value">-</td>
+                <td class="value"></td><td>核</td>
+                <td class="prefix"> 内存:</td>
+                <td></td><td class="value">-</td>
+                <td align="right">总大小</td><td class="value">-</td>
+
+                <td width="20"></td>
+
+                <td><b>当前进程</b></td>
+                <td class="prefix">CPU: </td>
+                <td></td><td class="value">-</td>
+                <td></td>
+                <td class="prefix"> 内存:</td>
+                <td></td><td class="value">-</td>
+                <td align="right">大小</td><td class="value">-</td>
+
+                <td width="20"></td>
+
+                <td><b>数据缓存</b></td>
+                <td></td><td class="value" style="font-weight:bold;">-</td><td class="value">-</td><td class="value">-</td><td> 容量</td><td class="value">-</td>
+            </tr>
+        </table>
+        <table id="cde-system-status-more-2" border="0">
+            <tr class="row">
+                <td><b>频道数</b></td><td class="value">-</td><td>&nbsp;</td>
+                <td><b>端口</b></td><td class="value">-</td><td>&nbsp;</td>
+
+                <td><i>GEO:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>设备:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>系统:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>网络:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>P2P:</i></td><td class="value">-</td><td>&nbsp;</td>
+
+                <td><i><b>App</b> ID:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>版本:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>渠道:</i></td><td class="value">-</td><td>&nbsp;</td>
+                <td><i>包名:</i></td><td class="value">-</td><td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+    <div id="cde-channels-layer" ></div>
+</div>
+<script type="text/javascript" src="js/index.js"></script>
+<script>
+initDemoPlayer();
+</script>
+</body>
+</html>
