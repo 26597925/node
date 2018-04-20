@@ -198,9 +198,9 @@ oojs$.com.stock.order = oojs$.createClass(
             for( var idx = 0; idx < self.order_list.length; idx++ ){
                 if( self.order_list[idx].hasOwnProperty('DEALSTOCK') && self.order_list[idx]['DEALSTOCK'] ){
                     tmp_arr = self.order_list[idx]['DEALSTOCK'].split(",");
-                    if( tmp_arr.length > 0 ){
-                        for(var idx = 0; idx < tmp_arr.length; idx++ ){
-                            stock[tmp_arr[idx]] = null;
+                    if(tmp_arr && tmp_arr.length > 0 ){
+                        for(var idx_sun = 0; idx_sun < tmp_arr.length; idx_sun++ ){
+                            stock[tmp_arr[idx_sun]] = null;
                         }
                     }
                 }
