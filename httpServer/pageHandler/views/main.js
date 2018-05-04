@@ -1589,7 +1589,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         var label_name = $('<label></label>').text('帐户:');
         div1.append(label_name);
         //column2
-        var label_value = $('<label></label>').text(ACCOUNTID);
+        var label_value = $('<label></label>').text(ACCOUNT["CANAME"]+" "+ACCOUNTID);
         div2.append(label_value);
 
         self.NEWDIRTYPE = 0;

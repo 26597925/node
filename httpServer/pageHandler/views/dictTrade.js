@@ -10,6 +10,10 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             NAME:"券商帐号"
         }
         ,{
+            ID:"CANAME",
+            NAME:"用户"
+        }
+        ,{
             ID:"PASSWORD",
             NAME:"券商密码"
         }
@@ -546,6 +550,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             list_body[elm] = {};
             list_body[elm]['TRADEID'] = {ELEMENT:this.getRecord_dt_selectList(this.dictTrade_list_body[elm]['TRADEID'])};
             list_body[elm]['ACCOUNTID'] = {ELEMENT:this.dictTrade_list_body[elm]['ACCOUNTID']};
+            list_body[elm]['CANAME'] = {ELEMENT:this.dictTrade_list_body[elm]['CANAME']};
             list_body[elm]['PASSWORD'] = {ELEMENT:oojs$.changeToStar(this.dictTrade_list_body[elm]['PASSWORD'])};
             list_body[elm]['MAXBUY'] = {ELEMENT:this.dictTrade_list_body[elm]['MAXBUY']};
             list_body[elm]['BUYCOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYCOUNT']};
