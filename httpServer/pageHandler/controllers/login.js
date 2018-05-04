@@ -7,6 +7,7 @@ const verifyCode = require(path.join(__dirname,"verifyCode.js"));
 const db = require(path.join(__dirname, "..", "..", "web_DB.js"));
 const unit_date = require(path.join(__dirname,"..","..","..","js_unit","unit_date.js"));
 const getIP = require('ipware')().get_ip;
+const md5 = require('md5');
 
 var add_newUser = function(context){
     var self = context;
@@ -19,20 +20,20 @@ var add_newUser = function(context){
             &&self.req.post["ADDRESS"]
             ){
 
-            
+            var PASSWORD = md5(self.req.post["PASSWORD"])
             
             var sql = "INSERT INTO `tb_user_basic` "
             +"( `UENAME`, `UCNAME`, `PHONENUMBER`, `PASSWORD`, `ADDRESS`, `MODTIME`)"
             +" VALUES ( '"+self.req.post["UENAME"]+"', '"
                 +self.req.post["UCNAME"]+"', '"
                 +self.req.post["PHONENUMBER"]+"', '"
-                +self.req.post["PASSWORD"]+"', '"
+                +PASSWORD+"', '"
                 +self.req.post["ADDRESS"]+"', '"
                 +unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+"')";
             db.query(sql,function(){
 
                 if(arguments.length==1){
-                    var sql2 = "select USERID from tb_user_basic where `PHONENUMBER` = '"+self.req.post["PHONENUMBER"]+"' and `PASSWORD` = '"+self.req.post["PASSWORD"]+"'";
+                    var sql2 = "select USERID from tb_user_basic where `PHONENUMBER` = '"+self.req.post["PHONENUMBER"]+"' and `PASSWORD` = '"+PASSWORD+"'";
                     db.query(sql2,function(){
                         if(arguments.length==1){
                             updateUserLoginTime(arguments[0][0]["USERID"],self);
@@ -67,8 +68,9 @@ exports.logup_submit = function(){
         && self.req.post.hasOwnProperty('EMAIL')
 	      && self.req.post.hasOwnProperty('VERIFY')
     ){
-      var verify =  self.req.post['VERIFY'];
-      console.log(unit_date.getTime(),String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))), String(verify));
+        var verify =  self.req.post['VERIFY'];
+        var PASSWORD = md5(self.req.post["PASSWORD"])
+        console.log(unit_date.getTime(),String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))), String(verify));
 	    if(String(verifyCode.decode(sessions.getCookieCode(self.req,self.res))) != String(verify) ){
 		    result = {'success':false,'message':'校验码验证失败'};
 		    self.responseDirect(200,"text/json",JSON.stringify(result));
@@ -155,7 +157,7 @@ exports.login = function(args){
 	}
   
   var usr = args["usr"] || null;
-  var psw = args["psw"] || null;
+  var psw = md5(args["psw"]) || null;
   var verify = args["verify"] || null;
   
 
@@ -166,6 +168,7 @@ exports.login = function(args){
   }
 
   if(usr && psw){
+
         var sql = "SELECT `USERID`, `GROUPID`, `UENAME`, `PASSWORD`  FROM `tb_user_basic` where `UENAME`='"+usr+"' and `PASSWORD`='"+psw+"'";
         var result = {'success':true,'message':'登录成功'};
         db.query(sql,function(){
@@ -312,7 +315,7 @@ exports.updateUserInfo = function(){
             updates.push('`PHONENUMBER`="'+self.req.post['PHONENUMBER']+'"');
         }
         if( self.req.post.hasOwnProperty('PASSWORD')){
-            updates.push('`PASSWORD`="'+self.req.post['PASSWORD']+'"');
+            updates.push('`PASSWORD`="'+md5(self.req.post['PASSWORD'])+'"');
         }
         if( self.req.post.hasOwnProperty('ADDRESS')){
             updates.push('`ADDRESS`="'+self.req.post['ADDRESS']+'"');
