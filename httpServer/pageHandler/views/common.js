@@ -1653,7 +1653,7 @@ oojs$.com.stock.preload=oojs$.createClass({
 
         oojs$.httpGet("/select_policyGID",function(result,textStatus,token){
 
-            if(result.success){
+            if(result && result.success){
                 self.PGROUP = [];
                 self.PGROUP = result.data;
                 self.STATUS.PGROUP = 1;

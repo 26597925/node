@@ -107,7 +107,7 @@ exports.insert_preorder = function(){
 	  if( self.req.post[0].hasOwnProperty('ONTIMESEND') && self.req.post[0]['ONTIMESEND'] ){
 		  //及时卖出，调用爬虫数据，其次优先下单后插入数据库,并且该请求只有一个股票
 		  var gotoCrawler = true;
-		  
+		  //9表示一键撤单
 		  if( String(self.req.post[0]['DIRTYPE']) == '9'){
 			  gotoCrawler = false;
 		  }
@@ -135,6 +135,7 @@ exports.insert_preorder = function(){
 				  }
 			  });
 		  }else{
+				//一键操作
 				initsql(self, result, null, '1');
 			}
 	  }else{
@@ -149,7 +150,7 @@ exports.insert_preorder = function(){
 };
 
 var initsql = function(self, result, stocks, type){
-	//type:0 一般的操作，1为及时卖出
+	//type:0 一般的操作，1为一键操作
 	//stocks 数组
 	
 	console.log(unit_date.getTime(), path.basename(__filename), "initsql", JSON.stringify(self.req.post), type, stocks);
@@ -189,9 +190,9 @@ var initsql = function(self, result, stocks, type){
 	  ", `LABLE`"+//24
     ") VALUES";
 
-  var value = "(" +
-    "%s" +//1 ORDERID
-    ",%s" +//2 USERID
+	var value = "(" +
+	"%s" +//1 ORDERID
+	",%s" +//2 USERID
     ",%s" +//3 PGROUPID
     ",'%s'" + //4 ACCOUNTID
     ",%s" + //5 TRADEID
@@ -220,84 +221,85 @@ var initsql = function(self, result, stocks, type){
 //
 	
 	var sqldata = "";
-  var hms = unit_date.Format(new Date(),"HH:mm:ss").split(":");
+	var hms = unit_date.Format(new Date(),"HH:mm:ss").split(":");
 
-  var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
-  var reportServer = [];
-  var report_ontimesend = [];
-  var _POLICYPARAM_no64 = '', _POLICYPARAM = '',_POLICYPARAM_RESULT = '';
+	var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT;
+	var reportServer = [];
+	var report_ontimesend = [];
+	var _POLICYPARAM_no64 = '', _POLICYPARAM = '',_POLICYPARAM_RESULT = '';
 	
 	ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
 	
 	for( var i = 0; i < self.req.post.length; i++ ){
-    if(i!=0){
-      sqldata += ",";
-    }
+		if(i!=0){
+			sqldata += ",";
+		}
 
-    STARTTIME = unit_date.objToNumber(self.req.post[i]['STARTTIME']);
-    ENDTIME = unit_date.objToNumber(self.req.post[i]['ENDTIME']);
+		STARTTIME = unit_date.objToNumber(self.req.post[i]['STARTTIME']);
+		ENDTIME = unit_date.objToNumber(self.req.post[i]['ENDTIME']);
 
-    BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
-    BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
-    PERCENT =  unit_date.string2num(self.req.post[i]['PERCENT']);
+		BUYCOUNT = unit_date.string2int(self.req.post[i]['BUYCOUNT']);
+		BUYAMOUNT = unit_date.string2num(self.req.post[i]['BUYAMOUNT']);
+		PERCENT =  unit_date.string2num(self.req.post[i]['PERCENT']);
 		_POLICYPARAM_no64 = self.req.post[i]['POLICYPARAM'];
-    _POLICYPARAM = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM'])).toString('base64');
-    _POLICYPARAM_RESULT = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM']['result'])).toString('base64');
-    sqldata += util.format(value,
-      ORDERID//1 ORDERID
-      ,uID//self.req.post[i]['USERID']//2 USERID
-      ,self.req.post[i]['PGROUPID']//3 PGROUPID
-      ,self.req.post[i]['ACCOUNTID']//4 ACCOUNTID
-      ,self.req.post[i]['TRADEID']//5 TRADEID
-      ,self.req.post[i]['POLICYID']//6 POLICYID
-      ,self.req.post[i]['PNAME']//6_1 PNAME
-      ,_POLICYPARAM//7 POLICYPARAM
-      ,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
-      ,self.req.post[i]['STOCKSET']//9 STOCKSET
-      ,STARTTIME// 11 STARTTIME
-      ,ENDTIME// 12 ENDTIME
-      ,self.req.post[i]['ISTEST']//13 ISTEST
-      ,BUYCOUNT //14 BUYCOUNT
-      , BUYAMOUNT  // 15 BUYAMOUNT
-      , PERCENT // 16 PERCENT
-      // ,self.req.post[i]['FLAG']// 18 FLAG
-      ,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
-	    ,self.req.post[i]['CHECKED']//23 CHECKED
-	    ,self.req.post[i]['LABLE']//24 LABLE
-    );
+		_POLICYPARAM = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM'])).toString('base64');
+		_POLICYPARAM_RESULT = new Buffer(JSON.stringify(self.req.post[i]['POLICYPARAM']['result'])).toString('base64');
+		sqldata += util.format(value,
+			ORDERID//1 ORDERID
+			,uID//self.req.post[i]['USERID']//2 USERID
+			,self.req.post[i]['PGROUPID']//3 PGROUPID
+			,self.req.post[i]['ACCOUNTID']//4 ACCOUNTID
+			,self.req.post[i]['TRADEID']//5 TRADEID
+			,self.req.post[i]['POLICYID']//6 POLICYID
+			,self.req.post[i]['PNAME']//6_1 PNAME
+			,_POLICYPARAM//7 POLICYPARAM
+			,self.req.post[i]['DIRTYPE']// 8 DIRTYPE
+			,self.req.post[i]['STOCKSET']//9 STOCKSET
+			,STARTTIME// 11 STARTTIME
+			,ENDTIME// 12 ENDTIME
+			,self.req.post[i]['ISTEST']//13 ISTEST
+			,BUYCOUNT //14 BUYCOUNT
+			, BUYAMOUNT  // 15 BUYAMOUNT
+			, PERCENT // 16 PERCENT
+			// ,self.req.post[i]['FLAG']// 18 FLAG
+			,unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")// 20  MODTIME
+			,self.req.post[i]['CHECKED']//23 CHECKED
+			,self.req.post[i]['LABLE']//24 LABLE
+		);
 
-	  var operation = '1';
+		var operation = '1';
 
-	  if(self.req.post[i]['FLAG_USER'] == '0' || self.req.post[i]['CHECKED']== '0'){
-		  operation = '3';
-	  }else{
-		  operation = '1';
-	  }
+		if(self.req.post[i]['FLAG_USER'] == '0' || self.req.post[i]['CHECKED']== '0'){
+			operation = '3';
+		}else{
+			operation = '1';
+		}
 
-    reportServer.push(
-      {
-        "orderid":String(ORDERID)
-        ,"operation":String(operation)//operation=删除0记录,插入新数据1,修改记录2
-        ,"accountid":String(self.req.post[i]['ACCOUNTID'])
-        ,"tradeid":String(self.req.post[i]['TRADEID'])
-        ,"userid":String(uID)
-        ,"policyid":String(self.req.post[i]['POLICYID'])
-        ,"policyparam":_POLICYPARAM_RESULT
-        ,"dirtype":String(self.req.post[i]['DIRTYPE'])
-        ,"istest":String(self.req.post[i]['ISTEST'])
-        ,"starttime":String(STARTTIME)
-        ,"endtime":String(ENDTIME)
-        ,"buycount":String(BUYCOUNT)
-        ,"buyamount":String(BUYAMOUNT)
-        ,"percent":String(PERCENT)
-        ,"stockset":String(self.req.post[i]['STOCKSET'])
-        ,"fromid":String(2)
-        ,"flaguser":String(1)
-        ,"flagsystem":String(1)
-      }
-    );
-	  // 1502180435
-	  // 1502070890
+		reportServer.push(
+		{
+	        "orderid":String(ORDERID)
+	        ,"operation":String(operation)//operation=删除0记录,插入新数据1,修改记录2
+	        ,"accountid":String(self.req.post[i]['ACCOUNTID'])
+	        ,"tradeid":String(self.req.post[i]['TRADEID'])
+	        ,"userid":String(uID)
+	        ,"policyid":String(self.req.post[i]['POLICYID'])
+	        ,"policyparam":_POLICYPARAM_RESULT
+	        ,"dirtype":String(self.req.post[i]['DIRTYPE'])
+	        ,"istest":String(self.req.post[i]['ISTEST'])
+	        ,"starttime":String(STARTTIME)
+	        ,"endtime":String(ENDTIME)
+	        ,"buycount":String(BUYCOUNT)
+	        ,"buyamount":String(BUYAMOUNT)
+	        ,"percent":String(PERCENT)
+	        ,"stockset":String(self.req.post[i]['STOCKSET'])
+	        ,"fromid":String(2)
+	        ,"flaguser":String(1)
+	        ,"flagsystem":String(1)
+	    }
+	    );
+
+		// 1502180435
+		// 1502070890
 		//{
 		// 	"view":[{"type":"select","id":"select_id1","key":["1","2","3"],"value":["相对涨幅", "绝对涨幅", "绝对价格"],"suf":[{"type":"input","id":"input1"},{"type":"input","id":"input2"},{"type":"input","id":"input3"}]}]
 		// 		,"title":"懒人模式"
@@ -306,15 +308,13 @@ var initsql = function(self, result, stocks, type){
 		// }
 		//["300104","0.00","30.68"] ["代码","当前价格","昨收"]}
 		var price = 0;
+		
 		if(1 == type && _POLICYPARAM_no64.hasOwnProperty('result')){
-			
 			var result_obj = {};
 			for(var idx = 0; idx < _POLICYPARAM_no64['result'].length; idx++){
 				result_obj[_POLICYPARAM_no64['result'][idx].id] = _POLICYPARAM_no64['result'][idx].value;
 			}
-			
 			console.log('_POLICYPARAM_no640',JSON.stringify(result_obj) ,JSON.stringify(stocks) );
-			
 			if(
 				result_obj.hasOwnProperty('input1')
 				&&result_obj.hasOwnProperty('select_id1')
@@ -336,33 +336,56 @@ var initsql = function(self, result, stocks, type){
 				//绝对价格
 				price = Number(result_obj['input3']);
 			}
+
 			console.log('2_0price', price );
+
 			if(String(self.req.post[i]['DIRTYPE']) != '9'){
 				if(price > Number(stocks[2])*1.1){price = Number(stocks[2])*1.1}
 				if(price < Number(stocks[2])*0.9){price = Number(stocks[2])*0.9}
 			}
+
 			console.log('2_1price', price );
 			price = Math.round(price*100)/100;
 			price = parseInt(price*100)/100;
 			console.log('3price', price );
+
 		}
-		if(self.req.post[i]['CHECKED']== '1'){
-		  report_ontimesend.push(
-			  {
-				  "orderid": String(ORDERID)        //
-				  , "systime": String( parseInt( (new Date()).getTime()/1000 ) )     //本地时间
-				  , "policyid": String(self.req.post[i]['POLICYID'])          //
-				  , "pricetype": "0"            //
-				  , "dir": String(self.req.post[i]['DIRTYPE'])                 //
-				  , "stock": String(self.req.post[i]['STOCKSET'])           //
-				  , "price": String(price)             //
-				  , "istest": "0"               //
-				  , "sequence": "0"             //
-			  }
-		  )
+
+		//只发送打勾的数据
+		if(self.req.post[i]['CHECKED']== '1'){console.log("\n\n\n:::",String(self.req.post[i]['DIRTYPE']),String(self.req.post[i]['DIRTYPE']))
+			if( String(self.req.post[i]['DIRTYPE']) == '9'){
+				if(report_ontimesend.length <= 0 ){
+					report_ontimesend.push(
+					{
+						"orderid": String(ORDERID)        //
+						, "systime": String( parseInt( (new Date()).getTime()/1000 ) )     //本地时间
+						, "policyid": String(self.req.post[i]['POLICYID'])          //
+						, "pricetype": "0"            //
+						, "dir": String(self.req.post[i]['DIRTYPE'])                 //
+						, "stock": String(self.req.post[i]['STOCKSET'])           //
+						, "price": String(price)             //
+						, "istest": "0"               //
+						, "sequence": "0"             //
+					})
+				}
+				
+			}else{
+				report_ontimesend.push(
+				{
+					"orderid": String(ORDERID)        //
+					, "systime": String( parseInt( (new Date()).getTime()/1000 ) )     //本地时间
+					, "policyid": String(self.req.post[i]['POLICYID'])          //
+					, "pricetype": "0"            //
+					, "dir": String(self.req.post[i]['DIRTYPE'])                 //
+					, "stock": String(self.req.post[i]['STOCKSET'])           //
+					, "price": String(price)             //
+					, "istest": "0"               //
+					, "sequence": "0"             //
+				})
+			}
 		}
-  }
-	
+	}
+
 	if( 0 == type ){//先插入数据库再通知
 		handlerMysql( self, sql+sqldata ,result, type, reportServer );
 	}else if( 1 == type ){//先通知再插入数据库
