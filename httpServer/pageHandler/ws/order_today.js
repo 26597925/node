@@ -26,7 +26,7 @@ exports.message = function(){
     this.parentAlias = this.alias;
     this.alias = path.basename(__filename);
     _ws = this.ws;
-
+    
     self.uID = this.data.uID;
     if(self.data && self.data.hasOwnProperty('action')){
         switch(this.data.action){

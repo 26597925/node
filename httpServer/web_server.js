@@ -84,10 +84,87 @@ var handler_client = function(client,broadcastData){
 	}
 };
 
+this.regestOrder = function(uID,msg) {
+	//注册订单信息，老夏访问时，查找websocket对应的orderid列表，回馈用户执行情况，每个websocket分为today，period，tomorrow列表
+	//msg :{type:today|period|tomorrow,orderid:id} 
+	self.wss.clients.forEach(function each(client){debugger
+		if (client.customObj["uID"] == uID){
+			if(msg["type"] == "today"){
+				if(client.customObj.hasOwnProperty("today") ){//client.customObj["today"]
+					client.customObj["today"].push(String(msg.orderid))
+					if(client.customObj["today"].length>50){
+						client.customObj["today"].shift();
+					}
+				}else{
+					client.customObj["today"] = [];
+					client.customObj["today"].push(String(msg.orderid))
+				}
+			}else if(msg["type"] == "period"){
+				if(client.customObj.hasOwnProperty("period") ){//client.customObj["today"]
+					client.customObj["period"].push(String(msg.orderid))
+					if(client.customObj["period"].length>50){
+						client.customObj["period"].shift();
+					}
+				}else{
+					client.customObj["period"] = [];
+					client.customObj["period"].push(String(msg.orderid))
+				}
+			}else if(msg["type"] == "tomorrow"){
+				if(client.customObj.hasOwnProperty("tomorrow") ){//client.customObj["today"]
+					client.customObj["tomorrow"].push(String(msg.orderid))
+					if(client.customObj["tomorrow"].length>50){
+						client.customObj["tomorrow"].shift();
+					}
+				}else{
+					client.customObj["tomorrow"] = [];
+					client.customObj["tomorrow"].push(String(msg.orderid))
+				}
+			}
+			
+			// client.customObj["orderid"] = msg["orderid"];
+			// client.customObj["accountid"] = msg"accountid"];
+			// client.customObj["tradeid"] = msg["tradeid"];
+			// client.customObj["userid"] = msg["userid"];
+			// client.customObj["policyid"] = msg["policyid"];
+
+		}
+	});
+}
+
 this.broadcast = function (broadcastData) {
 	if(self.wss){
-		self.wss.clients.forEach(function each(client){
-			handler_client(client,broadcastData)
+		var orderid=0;
+		self.wss.clients.forEach(function each(client){debugger
+			if(client.customObj.hasOwnProperty("today")){
+				if(broadcastData.data.hasOwnProperty("orderid")){
+					orderid = broadcastData.data.orderid;
+					var idx = client.customObj.today.indexOf(String(orderid));
+					if( idx > -1 ){
+						client.customObj.today.splice(idx, 1);
+						handler_client(client,broadcastData);
+					}
+				}
+				
+			}else if(client.customObj.hasOwnProperty("period")){
+				if(broadcastData.data.hasOwnProperty("orderid")){
+					orderid = broadcastData.data.orderid;
+					var idx = client.customObj.period.indexOf(String(orderid));
+					if( idx > -1 ){
+						client.customObj.period.splice(idx, 1);
+						handler_client(client,broadcastData);
+					}
+				}
+			}else if(client.customObj.hasOwnProperty("tomorrow")){
+				if(broadcastData.data.hasOwnProperty("orderid")){
+					orderid = broadcastData.data.orderid;
+					var idx = client.customObj.tomorrow.indexOf(String(orderid));
+					if( idx > -1 ){
+						client.customObj.tomorrow.splice(idx, 1);
+						handler_client(client,broadcastData);
+					}
+				}
+			}
+			
 		});
 	}
 };
@@ -162,7 +239,8 @@ var handlerWss = function(ws){
 		var clientData = JSON.parse(data);
 
 		if(clientData.type == 'ready'){
-			if(WebSocket.OPEN ==	ws.readyState){
+			if(WebSocket.OPEN == ws.readyState){
+					ws.customObj["uID"] = clientData.uID;
 					ws.send(JSON.stringify({'type':'ready','action':'init'}));
 				}
 			return;

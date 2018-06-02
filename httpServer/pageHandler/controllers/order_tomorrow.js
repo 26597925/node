@@ -180,6 +180,7 @@ exports.insert_orderPeriod = function(){
   var reportServer = [];
 	var _POLICYPARAM = '',_POLICYPARAM_RESULT = '';
 	ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
+  self.root.regestOrder( uID, {"type":"tomorrow","orderid":ORDERID} );
   for( var i = 0; i < self.req.post.length; i++ ){
     if(i!=0){
       sqldata += ",";
@@ -313,6 +314,9 @@ exports.update_orderPeriod = function(){
 	
 	  var reportServer = [];
     var ORDERID ,STARTTIME,ENDTIME,BUYCOUNT,BUYAMOUNT,PERCENT,PRDSTART,PRDEND;
+    if(self.req.post.length>0){
+      self.root.regestOrder( uID, {"type":"tomorrow","orderid":self.req.post[0]['ORDERID']} );
+    }
 	  
 	  var sql_pre = 'INSERT INTO `view_orderid_tomorow`  (' +
 		  '`ROWID`' +//0

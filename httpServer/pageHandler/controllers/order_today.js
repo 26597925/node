@@ -100,52 +100,52 @@ exports.select_preorder = function(){
 };
 
 exports.insert_preorder = function(){
-  var  self = this;
-  var result = {'success':true,'data':''};
-  if(self.req.post.length > 0 ){
+	var  self = this;
+	var result = {'success':true,'data':''};
+	if(self.req.post.length > 0 ){
 		
-	  if( self.req.post[0].hasOwnProperty('ONTIMESEND') && self.req.post[0]['ONTIMESEND'] ){
-		  //及时卖出，调用爬虫数据，其次优先下单后插入数据库,并且该请求只有一个股票
-		  var gotoCrawler = true;
-		  //9表示一键撤单
-		  if( String(self.req.post[0]['DIRTYPE']) == '9'){
-			  gotoCrawler = false;
-		  }
-		  // else if( self.req.post[0]['POLICYPARAM'].hasOwnProperty('result') ){
-			 //  //如果绝对 卖出 或者 撤单 不走爬虫数据,但需要保证昨收
-			 //  var result_obj = {};
-			 //  for(var idx = 0; idx < self.req.post[0]['POLICYPARAM']['result'].length; idx++){
-				//   result_obj[self.req.post[0]['POLICYPARAM']['result'][idx].id] = self.req.post[0]['POLICYPARAM']['result'][idx].value;
-			 //  }
-		  //
-			 //  if( String(result_obj['select_id1']) == '3' ){
-				//   gotoCrawler = false;
-			 //  }
-		  // }
-		  console.log('order_today','insert_preorder','gotoCrawler',gotoCrawler);
-			if(gotoCrawler){
-			  ontime_getStock( [String(self.req.post[0]['STOCKSET'])], function( result_stk ){
-				  //{"stocks":{"300104":["300104","0.00","30.68"]},"title":["代码","当前价格","昨收"]
-				  console.log('',"result_stk",result_stk);
-				  if(result_stk.stocks.hasOwnProperty(String(self.req.post[0]['STOCKSET']))){
-					  initsql(self, result, result_stk.stocks[String(self.req.post[0]['STOCKSET'])], '1');
-				  }else{
-					  result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员 code: 001'};
-					  self.responseDirect(200,"text/json",JSON.stringify(result));
-				  }
-			  });
-		  }else{
-				//一键操作
-				initsql(self, result, null, '1');
+		if( self.req.post[0].hasOwnProperty('ONTIMESEND') && self.req.post[0]['ONTIMESEND'] ){
+			//及时卖出，调用爬虫数据，其次优先下单后插入数据库,并且该请求只有一个股票
+			var gotoCrawler = true;
+			//9表示一键撤单
+			if( String(self.req.post[0]['DIRTYPE']) == '9'){
+				gotoCrawler = false;
 			}
-	  }else{
-		  //常规操作
-		  initsql(self, result, null, '0')
-	  }
-  }else{
-	  result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员 code: 000'};
-	  self.responseDirect(200,"text/json",JSON.stringify(result));
-  }
+			// else if( self.req.post[0]['POLICYPARAM'].hasOwnProperty('result') ){
+				//  //如果绝对 卖出 或者 撤单 不走爬虫数据,但需要保证昨收
+				//  var result_obj = {};
+				//  for(var idx = 0; idx < self.req.post[0]['POLICYPARAM']['result'].length; idx++){
+					//   result_obj[self.req.post[0]['POLICYPARAM']['result'][idx].id] = self.req.post[0]['POLICYPARAM']['result'][idx].value;
+				 //  }
+			//
+				 //  if( String(result_obj['select_id1']) == '3' ){
+					//   gotoCrawler = false;
+				 //  }
+			// }
+			console.log('order_today','insert_preorder','gotoCrawler',gotoCrawler);
+				if(gotoCrawler){
+				ontime_getStock( [String(self.req.post[0]['STOCKSET'])], function( result_stk ){
+					//{"stocks":{"300104":["300104","0.00","30.68"]},"title":["代码","当前价格","昨收"]
+					console.log('',"result_stk",result_stk);
+					if(result_stk.stocks.hasOwnProperty(String(self.req.post[0]['STOCKSET']))){
+						initsql(self, result, result_stk.stocks[String(self.req.post[0]['STOCKSET'])], '1');
+					}else{
+						result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员 code: 001'};
+						self.responseDirect(200,"text/json",JSON.stringify(result));
+					}
+				});
+			}else{
+					//一键操作
+					initsql(self, result, null, '1');
+				}
+		}else{
+			//常规操作
+			initsql(self, result, null, '0')
+		}
+	}else{
+		result = {'success':false,'message':path.basename(__filename).replace('.js','')+'操作数据失败，请联系管理员 code: 000'};
+		self.responseDirect(200,"text/json",JSON.stringify(result));
+	}
   
 };
 
@@ -229,7 +229,7 @@ var initsql = function(self, result, stocks, type){
 	var _POLICYPARAM_no64 = '', _POLICYPARAM = '',_POLICYPARAM_RESULT = '';
 	
 	ORDERID = unit_date.objToNumber({hh:hms[0],mm:hms[1],ss:hms[2]})*10000+self.cumulation();
-	
+	self.root.regestOrder( uID, {"type":"today","orderid":ORDERID} );
 	for( var i = 0; i < self.req.post.length; i++ ){
 		if(i!=0){
 			sqldata += ",";
@@ -464,7 +464,7 @@ var http_post = function(data,callback){
 	console.log(unit_date.getTime(), path.basename(__filename), "http_post", result);
 	console.log(unit_date.getTime(), path.basename(__filename), "http_post", options );
 	
-  var req = http.request(options, function(res) {
+	var req = http.request(options, function(res) {
     console.log(unit_date.getTime(),'Status: ' + res.statusCode);
     console.log(unit_date.getTime(),'Headers: ' + JSON.stringify(res.headers));
     if(String(res.statusCode) != '200' && String(ip) == cfg_httpserver.ip ){
@@ -614,7 +614,7 @@ exports.update_ordertoday = function(){
 	
 	  var reportServer = [];
 	  var ORDERID, STARTTIME, ENDTIME, BUYCOUNT, BUYAMOUNT, PERCENT, _POLICYPARAM, _POLICYPARAM_RESULT;
-	  
+	  self.root.regestOrder( uID, {"type":"today","orderid":self.req.post[0]['ORDERID']} );
 	  // " `POLICYPARAM`='%s' ," +
 	  // " `STOCKSET`='%s' ," +
 	  // " `STARTTIME`=%s ," +
@@ -861,7 +861,7 @@ exports.dynamic = function(){
     var sendDate = new bean.entity_wss();
     sendDate.type = bean.WSS_ORDERTODAY;
     sendDate.action = 'new_data';
-    sendDate.data = {};
+    sendDate.data = self.req.post;
     self.root.broadcast(sendDate);
     // }else{
     //     result = {'success':false,'data':'','message':path.basename(__filename).replace('.js','')+'操作数据失败'};
