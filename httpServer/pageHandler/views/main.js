@@ -1012,6 +1012,28 @@ var oojs$ = {
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -->
 <script type="text/javascript">
+oojs$.ns("com.account.idName");
+oojs$.com.account.idName = oojs$.createClass(
+{
+    root:{}
+    ,setValue:function( id, name){
+        this.root[id] = name;
+    }
+    ,getValue:function( id ){
+        if (this.root.hasOwnProperty(id)){
+            return this.root[id]
+        }
+        return "";
+    }
+})
+
+var idName = new oojs$.com.account.idName();
+
+</script>
+<!--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-->
+<script type="text/javascript">
 //step 1:
 // fun_policy:function(div,obj_json,fun_plcy){
 //         var tag = null;
@@ -1583,7 +1605,12 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             }
         }
 
-        
+        if(ACCOUNT.hasOwnProperty("CANAME") && ACCOUNT.hasOwnProperty("ACCOUNTID")){
+            //如果有CANAME 和ACCOUNTID 保存在idName
+            idName.setValue(ACCOUNT["ACCOUNTID"],ACCOUNT["CANAME"]);
+        }else if(!ACCOUNT.hasOwnProperty("CANAME") && ACCOUNT.hasOwnProperty("ACCOUNTID")){
+            ACCOUNT["CANAME"] = idName.getValue(ACCOUNT["ACCOUNTID"])
+        }
         
         div1.append(checkbox);
         var label_name = $('<label></label>').text('帐户:');
