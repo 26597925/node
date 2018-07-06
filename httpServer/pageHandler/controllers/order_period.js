@@ -19,6 +19,7 @@ exports.select_orderPeriod = function(){
     ' `ROWID`,'+
     ' `ORDERID`,'+
     ' `USERID`,'+
+    ' `CANAME`,'+
     ' `PGROUPID`,'+
     ' `ACCOUNTID`,'+
     ' `TRADEID`,'+
@@ -121,6 +122,7 @@ exports.insert_orderPeriod = function(){
   var sql = "INSERT INTO `view_orderid_period` (" +
     "`ORDERID`" +//1
     ", `USERID`" +//2
+    ", `CANAME`" +//2_1
     ", `PGROUPID`" +//3
     ", `ACCOUNTID`" +//4
     ", `TRADEID`" +//5
@@ -152,6 +154,7 @@ exports.insert_orderPeriod = function(){
   var value = "(" +
     "%s" +//1 ORDERID
     ",%s" +//2 USERID
+    ",%s" +//2_1 CANAME
     ",%s" +//3 PGROUPID
     ",'%s'" + //4 ACCOUNTID
     ",%s" + //5 TRADEID
@@ -214,6 +217,7 @@ exports.insert_orderPeriod = function(){
     sqldata += util.format(value,
       ORDERID//1 ORDERID
       ,uID//self.req.post[i]['USERID']//2 USERID
+      ,self.req.post[i]['CANAME']//2_1 CANAME
       ,self.req.post[i]['PGROUPID']//3 PGROUPID
       ,self.req.post[i]['ACCOUNTID']//4 ACCOUNTID
       ,self.req.post[i]['TRADEID']//5 TRADEID

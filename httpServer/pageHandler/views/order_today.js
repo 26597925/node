@@ -1421,6 +1421,7 @@ oojs$.com.stock.order = oojs$.createClass(
             ,'LABLE':null
             ,'CHECKED':null
             ,'ONTIMESEND':null
+            ,'CANAME':null
         }
 
         //TRADEID
