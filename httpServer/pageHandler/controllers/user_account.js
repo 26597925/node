@@ -19,7 +19,7 @@ exports.select_userAccount = function(){
     " `tb_capital_conf`.`ACCOUNTID`," +
 		" `tb_user_account`.`ADDTIME`," +
     " `CANAME`," +
-    // " `PASSWORD`," +
+    " `PASSWORD`," +
 		" `TXPASSWD`," +
     " `MAXBUY`," +
     " `BUYCOUNT`," +
