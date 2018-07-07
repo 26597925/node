@@ -195,7 +195,7 @@ var initsql = function(self, result, stocks, type){
 	var value = "(" +
 	"%s" +//1 ORDERID
 	",%s" +//2 USERID
-	",%s" +//2_1 CANAME
+	",'%s'" +//2_1 CANAME
     ",%s" +//3 PGROUPID
     ",'%s'" + //4 ACCOUNTID
     ",%s" + //5 TRADEID
