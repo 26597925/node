@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
-const http = require('http');
+// const http = require('http');
+const https = require('https');
 const url = require("url");
 const path = require("path");
 const fs = require("fs");
@@ -169,12 +170,19 @@ this.broadcast = function (broadcastData) {
 	}
 };
 
+const options = {
+  key: fs.readFileSync(path.join(__dirname,"..","..","..","www_3atrader_cn.key")),
+  cert: fs.readFileSync(path.join(__dirname,"..","..","..","www_3atrader_cn.cer"))
+};
+
 exports.runPageServer = function( port )
 {
 	// port = port || 20070;
-	port = port || 80;
+	//port = port || 80;
+	port = port || 443;
 	console.log(unit_date.getTime(),'Collector Server 127.0.0.1:'+ port );
-	var server = http.createServer(function(req, res){
+
+	var server = https.createServer(options,function(req, res){
 	if(req.url == '/upload' && req.method.toLowerCase() == 'post'){
 
 			var controller = require(path.join(__dirname,'pageHandler','controllers','upload.js'));
