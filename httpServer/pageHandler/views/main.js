@@ -558,8 +558,8 @@ var oojs$ = {
         var self = this;
         if(self._ws == null){
             var host = window.document.location.host.replace(/:.*/, '');
-            
-            this._ws = new WebSocket('ws://' + location.hostname+(location.port ? ':'+location.port: ''));
+            //websocket初始化
+            this._ws = new WebSocket('wss://' + location.hostname+(location.port ? ':'+location.port: ''));
             self._ws.onopen = function(){
                 self._ws_status = "open";
                 if(self._ws_catch.length>0){
@@ -1011,6 +1011,7 @@ var oojs$ = {
 <!--
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -->
+//临时存储用户账号姓名信息
 <script type="text/javascript">
 oojs$.ns("com.account.idName");
 oojs$.com.account.idName = oojs$.createClass(
@@ -1070,6 +1071,7 @@ var idName = new oojs$.com.account.idName();
 //jsonData {"view":[{"type":"check","id":"check_id","key":["ck_1","ck_2","ck_3"],"value":["近期涨停","昨日一封","昨日烂板"]}],"title":"","result":[{"id":"check_id","value":[0,1,0]}]}
 //jsonData {"view":[{"type":"select","id":"select_id","key":["k1","k2"],"value":["值1","值2"],"suf":[{...},{...}}],"title":"","result":[{"id":"check_id","value":[0,1,0]}]}
 //
+//策略相关通过json配置
 oojs$.ns("com.stock.JsonView");
 oojs$.com.stock.JsonView = oojs$.createClass(
 {
@@ -1154,7 +1156,7 @@ oojs$.com.stock.JsonView = oojs$.createClass(
     }
 })
 
-
+//策略相关通过json配置 Space
 oojs$.ns("com.stock.Space");
 oojs$.com.stock.Space = oojs$.createClass(
 {
@@ -1186,7 +1188,7 @@ oojs$.com.stock.Space = oojs$.createClass(
     }
 });
 
-
+//策略相关通过json配置 Label
 oojs$.ns("com.stock.Label");
 oojs$.com.stock.Label = oojs$.createClass(
 {
@@ -1225,7 +1227,7 @@ oojs$.com.stock.Label = oojs$.createClass(
     }
 });
 
-
+//策略相关通过json配置 Input
 oojs$.ns("com.stock.Input");
 oojs$.com.stock.Input = oojs$.createClass(
 {
@@ -1292,6 +1294,7 @@ oojs$.com.stock.Input = oojs$.createClass(
     }
 });
 
+//策略相关通过json配置 Select
 oojs$.ns("com.stock.Select");
 oojs$.com.stock.Select = oojs$.createClass(
 {
@@ -1410,6 +1413,7 @@ oojs$.com.stock.Select = oojs$.createClass(
     }
 });
 
+//策略相关通过json配置 Check
 oojs$.ns("com.stock.Check");
 oojs$.com.stock.Check = oojs$.createClass(
 {
@@ -1521,6 +1525,7 @@ oojs$.com.stock.Check = oojs$.createClass(
 * accountset.init( div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT);
 * console.log(accountset.val());=>{ACCOUNTID:"123456",BORROW:0,BUYAMOUNT:"",BUYCOUNT:"",CHECKED:true,DIRTYPE:9,PERCENT:""}
 */
+//账号设置
 oojs$.ns("com.stock.component.accountset");
 oojs$.com.stock.component.accountset =oojs$.createClass({
     NAME:"account"

@@ -812,6 +812,7 @@ oojs$.com.stock.order = oojs$.createClass(
             trade_list[index]["ELEMENT"] = item_account;
             trade_list[index]["COLUMN1"] = $('<div></div>');
             trade_list[index]["COLUMN2"] = $('<div></div>');
+            //账号设置
             trade_list[index]["COMPONENT"] = new oojs$.com.stock.component.accountset();
 
             //if( isCancelOrder_ontime ){
@@ -827,17 +828,22 @@ oojs$.com.stock.order = oojs$.createClass(
             }
 
             ////div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED)
-            
+            //
             if(type == self.TYPE_NEW){
                 PERCENT = policy_data["PERCENT"]['ORIGIN']
             }else if(type == self.TYPE_MDF){
                 PERCENT = item_account['PERCENT']
+            }else{
+                PERCENT = item_account['PERCENT']
             }
+
+
             if(item_account.hasOwnProperty('CHECKED')
                 ){
                  CHECKED = item_account['CHECKED'] == null?'1':item_account['CHECKED']
             }
             //div1, div2, ACCOUNTID, DIRTYPE, BORROW, BUYCOUNT, BUYAMOUNT, PERCENT, CHECKED, ACCOUNT, enable, evt_chk_f
+            //账号赋值
             trade_list[index]["COMPONENT"].init(
                 trade_list[index]["COLUMN1"]
                 ,trade_list[index]["COLUMN2"]
@@ -850,7 +856,7 @@ oojs$.com.stock.order = oojs$.createClass(
                 ,CHECKED
                 ,item_account
                 ,null
-                ,(self.order_ontime!=null && (self.order_ontime['order_cancel'] || self.order_ontime['order_send']))?self.accoutset_callback[item_account['ACCOUNTID']]:null
+                ,(self.order_ontime!=null && (self.order_ontime['order_cancel'] || self.order_ontime['order_send']))?self.accoutset_callback[item_account['ACCOUNTID']]:null//是否勾选回调函数
             );
             //详情处理
             if( type == self.TYPE_DTL ){
