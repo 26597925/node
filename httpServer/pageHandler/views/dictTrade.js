@@ -47,7 +47,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
     ,tb_data_add:null
     ,tb_select_mdy:null
     ,tb_data_mdy:null
-	,init:function(){
+	,init:function(){//初始化
         var self = this;
 		$( "#dictTrade_tabs" ).tabs();
 
@@ -69,13 +69,13 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
         }
 	}
-	,dictTrade_tab1_click:function(){
+	,dictTrade_tab1_click:function(){//点击上边标签
 	    var self = dictTrade;
         dictTrade.load_userAccount(function(){
             self.appendTB_list();
         });
 	}
-    ,handler_trd_del:function(){
+    ,handler_trd_del:function(){//删除帐号
 		var USERID = arguments[0];
     	var ACCOUNTID = arguments[1];
     	var TRADEID =  arguments[2];
@@ -89,14 +89,14 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             }
         })
 	}
-    ,handler_trd_chg:function(){
+    ,handler_trd_chg:function(){//修改帐号
         var USERID = arguments[0];
         var ACCOUNTID = arguments[1];
         var TRADEID =  arguments[2];
         // console.log(JSON.stringify(arguments));
         dictTrade.appendTB_modify( TRADEID,ACCOUNTID );
 	}
-    ,handler_trd_reset:function(event){
+    ,handler_trd_reset:function(event){//交易重置
         event.data = null;
         console.log("handler_trd_reset appendTB_add");
         dictTrade.appendTB_add({"data":{"scope":dictTrade,"type":"reset"}});
@@ -190,6 +190,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         tr = $('<tr></tr>').appendTo(tb);
     }
 	,sub_userAccount : function(head,body,type){
+
+
         var self = this;
 		var sendData = {};
         for(var i = 0; i < head.length; i++){
@@ -215,6 +217,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
                     break;
                 case "PASSWORD":
                     sendData[head[i]["ID"]] = body[head[i]["ID"]].val();
+
                     if(String(sendData[head[i]["ID"]]).trim().length<3){
                         oojs$.showError("请输入正确的密码");
                         return;
@@ -360,7 +363,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         var TXPASSWD=null;
         
         if(item_TRADE && item_TRADE['STATUS'] == "2"){
-            TXPASSWD = $('<input type="text" value="'+record["TXPASSWD"]+'" ></input>');
+            //TXPASSWD = $('<input type="text" value="'+record["TXPASSWD"]+'" ></input>');
+            TXPASSWD = $('<input type="text" value="" ></input>');
         }
         $("#dictTrade_tabs_1").empty();
 
@@ -395,7 +399,8 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         body = {
             "TRADEID":self.select_trade_noEvent
             ,"ACCOUNTID":$('<input type="text" value="'+record["ACCOUNTID"]+'" ></input>').prop("disabled",true)
-            ,"PASSWORD":$('<input type="text" value="'+record["PASSWORD"]+'"></input>')
+            //,"PASSWORD":$('<input type="text" value="'+record["PASSWORD"]+'"></input>')
+            ,"PASSWORD":$('<input type="text" value=""></input>')
             ,"MAXBUY":null
             ,"BUYCOUNT":$('<input type="text" value="'+record["BUYCOUNT"]+'" ></input><label style="color: red; font-size: 80%;">(*注：最大值99)</label>')
             ,"BUYAMOUNT":null
