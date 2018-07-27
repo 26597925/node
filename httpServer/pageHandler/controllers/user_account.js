@@ -69,9 +69,7 @@ exports.modify_userAccount = function(){
       console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'modify_userAccount',JSON.stringify(self.req.post));
 
         reqRSA('["'+self.req.post["PASSWORD"]+'","'+self.req.post["TXPASSWD"]+'"]',function(result_p){
-            // console.log(">>>>>>>>>>>>", result_p );
-            // result_p0 = JSON.parse(result_p[0]);
-            // var PASSWORD_O = String( result_p0[ String(self.req.post["PASSWORD"]) ] );
+
             var PASSWORD="", TXPASSWD="";
 
             if(result_p instanceof Array ){
