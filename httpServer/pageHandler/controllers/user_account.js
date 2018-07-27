@@ -238,9 +238,9 @@ exports.add_userAccount = function(){
      
       var url = cfg_httpserver.account.url+param;
       console.log(unit_date.getTime(),path.basename(__filename).replace('.js',''),'param',url);
-      // http_get(url,function(hresult,url){
+      http_get(url,function(hresult,url){
         try{
-          hresult = '{ "status": 200, "tradeid": 1, "accountid": "'+Math.floor(Math.random()*1000000000)+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
+          // hresult = '{ "status": 200, "tradeid": 1, "accountid": "'+Math.floor(Math.random()*1000000000)+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
           // hresult = '{ "status": 200, "tradeid": '+self.req.post["TRADEID"]+', "accountid": "'+self.req.post["ACCOUNTID"]+'", "shanghai_code": "A382208153", "shenzhen_code": "0150916266", "account_name": "李洪福", "detail": "successful" }'
           hresult = JSON.parse(hresult);
           if(hresult['status'] == 200){
@@ -258,7 +258,7 @@ exports.add_userAccount = function(){
         }
         //{ "status": 200, "tradeid": 2, "accountid": "5890000049", "shanghai_code": "A738685727", "shenzhen_code": "0125561330", "account_name": "夏彦刚", "detail": "successful" }
         //{ "status": 403, "tradeid": 4, "accountid": "10500998", "shanghai_code": "", "shenzhen_code": "", "account_name": "", "detail": "连接交易服务器失败, 请尝试其它交易服务器。" }
-      // });
+      });
     }else{
       result = {'success':false,'message':'请求数据参数错误 001'};
       self.responseDirect(200,"text/json",JSON.stringify(result));
