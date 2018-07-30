@@ -119,11 +119,11 @@ var oojs$ = {
 			}
 		}
 	}
-    ,changeToStar: function(letter){
+    ,changeToStar: function(letter){//隐藏密码用
         var size = letter.length;
         var newLetter = '';
         if(size>2){
-            newLetter += letter.substr(0,2)+"******"
+            newLetter += "********";//letter.substr(0,2)+"******"
         }else{
             newLetter += '********'
         }
@@ -1533,7 +1533,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
     ,div2:null
     ,INPUT:null
     ,NEWDIRTYPE:0
-    ,CHECK:null
+    ,CHECK:null             //checkbox控件
     ,LABEL_UNIT:null
     ,SELECT_DIRTYPE:null
     ,SELECT:null
@@ -1790,6 +1790,8 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
             }
         }
     }
+
+    //选择股票类型股、¥、百分比
     ,select_change:function(event){
         var self = event.data['scope'];
         console.log("select_change",self.SELECT.val(),"select_change");
@@ -1951,6 +1953,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         }
         return select;
     }
+
     ,destroy:function(){
         if(div1){
             div1.empty();
@@ -1968,6 +1971,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.append_select_tradetype = null;
         delete self.append_select_tradetype;
     }
+
 })
 </script>
 <!--

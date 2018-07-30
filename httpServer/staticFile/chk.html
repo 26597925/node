@@ -147,9 +147,27 @@
         console.log(arguments[0]);
         appendCK_stockset($('#div1'),$('#div2'),arguments[0],rangeChk,delBtnFun,addBtnFun,receiveData);
     };
-    $(document).ready(function(){
+    var allcheck_change = function(event){
+        if ($(this).is(':checked')) {
+            console.log("yes")
+        }else{
+            console.log("no")
+        }
+    };
 
-        appendCK_stockset($('#div1'),$('#div2'),"12312,312312",rangeChk,delBtnFun,addBtnFun,receiveData);
+    var appendAllCheckbox = function(){
+        var check = $('<input></input>',{
+            'type':'checkbox'
+            ,'name':"test"
+        }).change(
+            {'scope':self},
+            allcheck_change
+        ).prop("checked",true);
+
+        $('#div1').append(check);
+    };
+    $(document).ready(function(){
+        appendAllCheckbox()
 
     });
 

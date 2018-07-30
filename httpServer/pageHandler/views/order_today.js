@@ -473,6 +473,7 @@ oojs$.com.stock.order = oojs$.createClass(
         oojs$.appendTB_list(panel,list_head,list_body);
     }
     ,isRegistSelect:false
+    //初始化订单
     ,init_order: function(event){
         var self = event.data.scope;
         var DIRTYPE = event.data.DIRTYPE;
@@ -546,6 +547,7 @@ oojs$.com.stock.order = oojs$.createClass(
                 'data':data }});
         // }
     }
+    //处理策略
     ,handler_policy: function(event){
         var self = event.data.scope;
         var type = event.data.type;
@@ -758,7 +760,7 @@ oojs$.com.stock.order = oojs$.createClass(
             self.parseTrade_list(policy_data, dictTrade_list_body, type, from, attach);
         }
     }
-    
+    //解析券商列表
     ,parseTrade_list: function( policy_data, dictTrade_list_body,  type, from, attach ){
         var self = this;
         var trade_list = [];
@@ -806,7 +808,7 @@ oojs$.com.stock.order = oojs$.createClass(
 
         for( var elm in dictTrade_list_body ){
             item_account = dictTrade_list_body[elm];
-            sendAccounts.push({"accountid":item_account['ACCOUNTID']})
+            sendAccounts.push({"accountid":item_account['ACCOUNTID']});
             tmp_trade = trade_list[index] = {};
             
             trade_list[index]["ELEMENT"] = item_account;
@@ -931,6 +933,7 @@ oojs$.com.stock.order = oojs$.createClass(
         }
  		
     }
+    //解析资金
     ,parseCapital: function(trade_list, capitals){
         if(capitals.length>0){
             for(var i = 0; i < trade_list.length; i++){
@@ -1014,14 +1017,14 @@ oojs$.com.stock.order = oojs$.createClass(
         }).appendTo(order_body_div);
 
         oojs$.appendTB_item_D2(tb,policy_head,policy_data);
-        self.appendTB_accountHint(tb);
+        self.appendTB_accountHint(tb, trade_list);
         // self.appendTB_account_body(tb, account_itemD2, dirtype);
 
         oojs$.appendTB_item_D2x(tb,trade_list);
 
         var tr = $('<tr></tr>',{}).appendTo(tb);
-        var td = $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr)
-        
+        var td = $('<td></td>',{ 'colspan':"2",'align':"center",'valign':"bottom"}).appendTo(tr);
+        //按钮处理
         if(self.TYPE_MDF == type && policy_data['ONTIMESEND']['ORIGIN'] || self.TYPE_DTL == type){
             //实时处理 与 详情
             // $('<input></input>',{'type':"button",value:"提交"}).appendTo(td).click(
@@ -1042,7 +1045,7 @@ oojs$.com.stock.order = oojs$.createClass(
             );
         }
     }
-
+    //策略类型，下来框触发
     ,handler_dirtype: function(event){
         var self = event.data.scope;
         var DIRTYPE = this.value;
@@ -1056,7 +1059,7 @@ oojs$.com.stock.order = oojs$.createClass(
         	'data':event.data.data}
         });
     }
-
+    //分组交易类型，下拉框触发
     ,handler_group: function(event){
         var self = event.data.scope;
         self.init_order(
@@ -1128,7 +1131,7 @@ oojs$.com.stock.order = oojs$.createClass(
         }
         
     }
-
+    //策略解析为对象
     ,parse2obj_DIRTYPE: function(obj, appendObj){
         var self = this;
         if( !obj.hasOwnProperty( appendObj['DIRTYPE'] ) ){
@@ -1136,7 +1139,7 @@ oojs$.com.stock.order = oojs$.createClass(
         }
         self.parse2obj_PGROUPID( obj[appendObj['DIRTYPE']], appendObj );
     }
-
+    //交易解析为对象
     ,parse2obj_PGROUPID: function(obj, appendObj){
         var self = this;
         if( !obj.hasOwnProperty( appendObj['PGROUPID'] ) ){
@@ -1149,19 +1152,19 @@ oojs$.com.stock.order = oojs$.createClass(
             ,"USERID":appendObj["USERID"]
         });
     }
-
+    //策略部分交易类型
     ,appendOption_select1: function () {
         var self = this;
         return self.option_append(self.order_select1, self.select_title, preload.getDirtype);
     }
-
+    ///策略部分
     ,appendOption_select2: function (DIRTYPE) {
         var self = this;
         return self.option_append(self.order_select2,self.select_title[DIRTYPE],function(pp){
             return preload.getPGroupItem(pp)["NAME"];
         });
     }
-
+    ///策略部分下拉框控件
     ,appendOption_select3: function (DIRTYPE, PGROUPID) {
         var self = this;
         var options = self.select_title[DIRTYPE][PGROUPID];
@@ -1208,6 +1211,7 @@ oojs$.com.stock.order = oojs$.createClass(
         }
         return policyHead_arr;
     }
+    //过滤器合并统一策略，多个账号的操作
     ,orderId_filter:function(list, label, merge_if){
         var self = this;
 
@@ -1248,7 +1252,9 @@ oojs$.com.stock.order = oojs$.createClass(
         // console.log('orderId_filter',list_cp);
         return list_cp;
     }
-    ,appendTB_accountHint:function(tb){
+    //排版中提示信息
+    ,appendTB_accountHint:function(tb, trade_list){
+	    var self = this;
         var tr = $('<tr></tr>',{'class':"even"}).appendTo(tb);
         var td = $('<td></td>',{ colspan:"2",align:"left",valign:"bottom"}).appendTo(tr);
         td.append($('<label></label>').text("请选择您帐户:"));
@@ -1257,7 +1263,39 @@ oojs$.com.stock.order = oojs$.createClass(
         }).text('(*注：只有选择了账户才能选择交易策略)');
         label.css({ 'color': 'red', 'font-size': '80%' });
         td.append(label);
+        //全选复选框按钮
+        td.append($('<label></label>').text("  是否全选:"));
+        //全选复选框☑默认全选️
+        var checkall = $('<input></input>',{
+            'type':'checkbox'
+            ,'name':"checkall"
+        }).change(
+            {'trade_list':trade_list},
+            self.allcheck_change
+        ).prop("checked",true);
+
+        td.append(checkall);
+
     }
+    //全选或全不选操作触发的事件
+    ,allcheck_change:function(event){
+	    var trade_list = event.data.trade_list;
+        if ($(this).is(':checked')) {
+
+            for(var i = 0; i < trade_list.length; i++){
+                trade_list[i]["COMPONENT"].CHECK.prop("checked",true);
+                trade_list[i]["COMPONENT"].ck_change({"data":{"scope":trade_list[i]["COMPONENT"]}});
+            }
+        }else{
+
+            for(var i = 0; i < trade_list.length; i++){
+                trade_list[i]["COMPONENT"].CHECK.prop("checked",false);
+                trade_list[i]["COMPONENT"].ck_change({"data":{"scope":trade_list[i]["COMPONENT"]}});
+            }
+        }
+    }
+
+    //修改返回按钮触发
     ,order_btn_modifyreback:function(event){
         //返回
         var self = event.data.scope;
@@ -1266,6 +1304,7 @@ oojs$.com.stock.order = oojs$.createClass(
 
     ,data_detail:null
     ,first_enter:false
+    //详情入口
     ,detail_enter:function( event ){
         var self = event.data.scope;
         
