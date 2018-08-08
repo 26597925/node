@@ -1011,8 +1011,9 @@ var oojs$ = {
 <!--
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -->
-//临时存储用户账号姓名信息
+
 <script type="text/javascript">
+    //临时存储用户账号姓名信息
 oojs$.ns("com.account.idName");
 oojs$.com.account.idName = oojs$.createClass(
 {
@@ -1572,7 +1573,7 @@ oojs$.com.stock.component.accountset =oojs$.createClass({
         self.ACCOUNT = ACCOUNT;
         self.enable = enable ;
         self.evt_chk_f = evt_chk_f;
-
+//判断券商时间和系统时间，如果新增就提示用户隔日生效，因为系统每天只读（启动）一次
         if(ACCOUNT
             &&ACCOUNT.hasOwnProperty("ADDTIME")
             &&ACCOUNT.ADDTIME
