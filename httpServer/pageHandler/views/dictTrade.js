@@ -23,7 +23,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         }
         ,{
             ID:"MAXBUY",
-            NAME:"总额度"
+            NAME:"总额度(万)"
         }
         ,{
             ID:"BUYCOUNT",
@@ -31,7 +31,7 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
         }
         ,{
             ID:"BUYAMOUNT",
-            NAME:"单次最大额度"
+            NAME:"单次最大额度(万)"
         }
         ,{
             ID:"CTRL",
@@ -557,9 +557,9 @@ oojs$.com.stock.dictTrade=oojs$.createClass({
             list_body[elm]['ACCOUNTID'] = {ELEMENT:this.dictTrade_list_body[elm]['ACCOUNTID']};
             list_body[elm]['CANAME'] = {ELEMENT:this.dictTrade_list_body[elm]['CANAME']};
             list_body[elm]['PASSWORD'] = {ELEMENT:oojs$.changeToStar(this.dictTrade_list_body[elm]['PASSWORD'])};
-            list_body[elm]['MAXBUY'] = {ELEMENT:this.dictTrade_list_body[elm]['MAXBUY']};
+            list_body[elm]['MAXBUY'] = {ELEMENT:oojs$.changeToW(this.dictTrade_list_body[elm]['MAXBUY']) };
             list_body[elm]['BUYCOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYCOUNT']};
-            list_body[elm]['BUYAMOUNT'] = {ELEMENT:this.dictTrade_list_body[elm]['BUYAMOUNT']};
+            list_body[elm]['BUYAMOUNT'] = {ELEMENT:oojs$.changeToW(this.dictTrade_list_body[elm]['BUYAMOUNT'])};
             list_body[elm]['CTRL'] = {ELEMENT:$(
             	'<input type="button" name="12" value="删除" ' +
 				'onclick="dictTrade.handler_trd_del('+

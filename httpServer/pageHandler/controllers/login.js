@@ -314,9 +314,11 @@ exports.updateUserInfo = function(){
         if( self.req.post.hasOwnProperty('PHONENUMBER')){
             updates.push('`PHONENUMBER`="'+self.req.post['PHONENUMBER']+'"');
         }
+
         if( self.req.post.hasOwnProperty('PASSWORD')){
             updates.push('`PASSWORD`="'+md5(self.req.post['PASSWORD'])+'"');
         }
+
         if( self.req.post.hasOwnProperty('ADDRESS')){
             updates.push('`ADDRESS`="'+self.req.post['ADDRESS']+'"');
         }
@@ -330,7 +332,7 @@ exports.updateUserInfo = function(){
         updates.push('`MODTIME`="'+unit_date.Format(new Date(),"yyyy-MM-dd HH:mm:ss")+'"');
 
         if(updates.length>0){
-            var sql = 'UPDATE `tb_user_basic` SET';
+            var sql = 'UPDATE `tb_user_basic` SET ';
             for(var i = 0; i < updates.length; i++){
                 if(i!=0){
                     sql += ","

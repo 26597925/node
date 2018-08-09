@@ -18,14 +18,14 @@ exports.select_userAccount = function(){
     " `tb_capital_conf`.`USERID`," +
     " `tb_user_account`.`TRADEID`," +
     " `tb_capital_conf`.`ACCOUNTID`," +
-		" `tb_user_account`.`ADDTIME`," +
+	" `tb_user_account`.`ADDTIME`," +
     " `CANAME`," +
     " `PASSWORD`," +
-		" `TXPASSWD`," +
+	" `TXPASSWD`," +
     " `MAXBUY`," +
     " `BUYCOUNT`," +
     " `BUYAMOUNT`,  " +
-		" now() AS STIME" +
+	" now() AS STIME" +
     " from " +
     " `tb_capital_conf`" +
     " inner join " +
@@ -114,7 +114,7 @@ exports.modify_userAccount = function(){
                             // " `USERID` = '%s', " +
                             " `PASSWORD` = '%s', " +
                             " `TXPASSWD` = '%s', " +
-                            " `ADDTIME`=now(), " +
+                            " `MODTIME`=now(), " +
                             " `VISIBLE` = '1'" +
                             " WHERE " +
                             " `TRADEID` = %s " +
@@ -132,7 +132,7 @@ exports.modify_userAccount = function(){
                     }else{
                         sql2= "UPDATE `tb_user_account` SET " +
                             // " `USERID` = '%s', " +
-                            " `ADDTIME`=now(), " +
+                            " `MODTIME`=now(), " +
                             " `PASSWORD` = '%s', " +
                             " `TXPASSWD` = '%s' " +
                             // ", " +
@@ -306,7 +306,7 @@ var insert_userAccount = function(context,account_result){
                       "`CANAME`, " +//6
                       "`EXCHGID_SH`, " +//7
                       "`EXCHGID_SZ`, " +//8
-                      "`MODTIME`" +//9
+                      "`ADDTIME`" +//9
                       ") VALUES (" +
                       "%s" +//1
                       ",%s" +//2
@@ -342,7 +342,7 @@ var insert_userAccount = function(context,account_result){
                       " `MAXBUY`, " +
                       " `BUYCOUNT`," +
                       " `BUYAMOUNT`," +
-                      "`MODTIME`" +
+                      "`ADDTIME`" +
                       ") VALUES(" +
                       "'%s'," +
                       " %s," +
@@ -447,7 +447,7 @@ var reqRSA = function(param, cb){
                 html = JSON.parse( html );
 
             }catch(err){
-                console.log("err::::",err)
+                console.log("err::::",err);
                 html = {"success":"false","msg":err.message,"codeID":"0005"}
             }
 

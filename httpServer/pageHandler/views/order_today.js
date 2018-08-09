@@ -395,7 +395,30 @@ oojs$.com.stock.order = oojs$.createClass(
 	            }
             }
             // console.log("list item:",JSON.stringify(list_body[elm]))
+            //完成情况信息提示
             if(null != list_body[elm]['DEALSTOCK']['ELEMENT'] ){
+
+                
+                //如果都完成变成绿色，如果部分完成变成红色,仅限于判断NULL
+                var isRed = false;
+                var isAll = true;
+
+                if("object" == typeof(list_body[elm]['DEALSTOCK']['ORIGIN']) ){
+                    for( var dealObj in list_body[elm]['DEALSTOCK']['ORIGIN'] ){
+                        if(list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj] != null){
+                            isRed = true;
+                        }
+                        if(list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj] == null){
+                            isAll = false;
+                        }
+                    }
+                }
+                if(isRed && isAll){
+                    list_body[elm]['DEALSTOCK']['ELEMENT'].css("color","green");
+                }else if(isRed){
+                    list_body[elm]['DEALSTOCK']['ELEMENT'].css("color","red");
+                }
+
             list_body[elm]['DEALSTOCK']['ELEMENT']
             .mouseenter({
                 'scope':self, 

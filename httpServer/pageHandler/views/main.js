@@ -129,6 +129,10 @@ var oojs$ = {
         }
         return newLetter;
     }
+    ,changeToW: function(num){//数字转换为万
+        num = num/10000;
+        return num;
+    }
     /*****
     * <input id="upload-input" type="file" name="uploads_name" multiple="multiple"></br>
     * <button class="btn btn-lg upload-btn" type="button">Upload File</button>

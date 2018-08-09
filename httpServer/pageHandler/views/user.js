@@ -50,7 +50,7 @@ oojs$.com.stock.user=oojs$.createClass({
         $( "#user_tabs" ).tabs();
         $( "#user_tabs_a1" ).click({"self":self},self.clk_user_tabs_a1);
         $( "#user_tabs_a2" ).click({"self":self},self.clk_user_tabs_a2);
-        $( "#user_tabs_a3" ).click({"self":self},self.clk_user_tabs_a3);
+        // $( "#user_tabs_a3" ).click({"self":self},self.clk_user_tabs_a3);
         $( '#user' ).click(function(){
             self.clk_user_tabs_a1();
         });
@@ -90,6 +90,11 @@ oojs$.com.stock.user=oojs$.createClass({
         var sendData = {};
         for(var elm in item){
             console.log(typeof item[elm]["ELEMENT"]);
+            if( "PASSWORD" == elm && item[elm]["ELEMENT"].val() == "********" ){
+                // sendData[elm] = self.userInfo[0][elm];
+                continue;
+            }
+
             if(typeof item[elm]["ELEMENT"] == 'string'){
                 sendData[elm] = item[elm]["ELEMENT"];
             }else{
@@ -119,13 +124,21 @@ oojs$.com.stock.user=oojs$.createClass({
             if(elm == 'UENAME'){
                 item[elm]["ELEMENT"] = self.userInfo[0][elm];
             }else{
-                item[elm]["ELEMENT"] = $('<input type="text" value="'+self.userInfo[0][elm]+'"></input>');
+                if( "PASSWORD" ==  elm){
+                    //密码特殊处理
+                    item[elm]["ELEMENT"] = $('<input type="text" value="********"></input>');
+                }else{
+                    item[elm]["ELEMENT"] = $('<input type="text" value="'+self.userInfo[0][elm]+'"></input>');
+                }
+
             }
         }
+
         var btn = $('<input></input>',{'type':"button",value:"提交"}).click(
             {"item":item, "self":self}
             ,self.clk_submit_a2
         );
+
         item['CTRL'] =  {'ELEMENT':btn,'COLSPAN':2}
         oojs$.appendTB_item_D2(tb, self.list_benchmark_head, item);
     }
@@ -136,6 +149,9 @@ oojs$.com.stock.user=oojs$.createClass({
         for(var elm in self.userInfo[0]){
             item[elm] = {};
             item[elm]["ELEMENT"] = self.userInfo[0][elm];
+            if(elm == "PASSWORD"){
+                item[elm]["ELEMENT"] = "********";
+            }
         }
 
         $('#user_tabs_1').empty();
