@@ -10,6 +10,12 @@ oojs$.com.stock.user=oojs$.createClass({
 // TYPEID
 // EMAIL
     list_benchmark_head: [
+        //
+        {
+            ID:"USERID",
+            NAME:"用户ID:"
+        }
+        ,
         {
             ID:"UENAME",
             NAME:"用户名:"

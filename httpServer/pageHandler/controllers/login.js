@@ -252,8 +252,8 @@ exports.getUserInfo = function(USERID){
     var result = {'success':true,'data':''};
 
     var sql = "SELECT " +
-        // " `GROUPID`" +
-        // "," +
+        " `USERID`" +
+        "," +
         " `UENAME`" +
         ", `UCNAME`" +
         ", `PHONENUMBER`" +

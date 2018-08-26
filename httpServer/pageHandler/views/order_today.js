@@ -414,7 +414,7 @@ oojs$.com.stock.order = oojs$.createClass(
                     }
                 }
                 if(isRed && isAll){
-                    list_body[elm]['DEALSTOCK']['ELEMENT'].css("color","green");
+                    list_body[elm]['DEALSTOCK']['ELEMENT'].css("color","#ec39e2");
                 }else if(isRed){
                     list_body[elm]['DEALSTOCK']['ELEMENT'].css("color","red");
                 }
