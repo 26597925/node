@@ -625,7 +625,17 @@ oojs$.com.stock.order = oojs$.createClass(
                         policy_data[elm]['DATE'] = null;
                     }else if(self.instance == "order_period"){
                         policy_data[elm]['datepicker'] = 'datepicker';
-                        policy_data[elm]['DATE'] = null;
+                        if('ENDTIME' == elm){
+                            var  date = new Date();
+                            date.setFullYear(date.getFullYear()+1);
+                            date.setHours(9);
+                            date.setMinutes(0);
+                            date.setSeconds(0);
+                            policy_data[elm]['DATE'] = date;
+                        }else{
+                            policy_data[elm]['DATE'] = null;
+                        }
+
                     }else if(self.instance == "order_today"){
                         policy_data[elm]['datepicker'] = null;
                         policy_data[elm]['DATE'] = null;
