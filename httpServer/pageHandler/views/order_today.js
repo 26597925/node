@@ -405,10 +405,10 @@ oojs$.com.stock.order = oojs$.createClass(
 
                 if("object" == typeof(list_body[elm]['DEALSTOCK']['ORIGIN']) ){
                     for( var dealObj in list_body[elm]['DEALSTOCK']['ORIGIN'] ){
-                        if(list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj] != null){
+                        if(!(list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj] == null || list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj].trim()=="")){
                             isRed = true;
                         }
-                        if(list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj] == null){
+                        if(list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj] == null || list_body[elm]['DEALSTOCK']['ORIGIN'][dealObj].trim()==""){
                             isAll = false;
                         }
                     }
